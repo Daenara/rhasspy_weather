@@ -1,8 +1,5 @@
 # rhasspy Weather
 
-## Content
-* [General] (#general)
-
 ## General
 A python script that can make rhasspy voice assistant tell the weather. The output of the script is in German and so far it only works with the German rhasspy profile.
 
