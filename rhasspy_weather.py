@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 import datetime
 import locale
-from weather.weather_logic import WeatherRequest, DateType, ForecastType, WeatherForecast, WeatherReport, Location, Grain
+from rhasspy_weather.weather_logic import WeatherRequest, DateType, ForecastType, WeatherForecast, WeatherReport, Location, Grain
 import copy
 
 class Weather:
