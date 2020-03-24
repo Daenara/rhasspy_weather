@@ -7,7 +7,7 @@ import copy
 class Weather:
     def __init__(self):
         self.detail = False
-        self.weather_api_key = "eb22adf9da71420af7da325084003385"
+        self.weather_api_key = "XXXXXXXXXXXXXXXX"
         self.location = Location("Frankfurt")
         zipcode = "60389"
         country = "de"
