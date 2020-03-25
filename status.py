@@ -45,7 +45,7 @@ class Status:
     def status_response(self):
         if self.status_code == StatusCode.NORMAL:
             response = "Sieht alles normal aus."
-        if self.status_code == StatusCode.NO_NETWORK_ERROR:
+        elif self.status_code == StatusCode.NO_NETWORK_ERROR:
             response = random.choice(["Es ist leider kein Internet verfügbar.",
                                       "Ich bin nicht mit dem Internet verbunden.",
                                       "Es ist kein Internet vorhanden."])
