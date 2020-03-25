@@ -18,7 +18,6 @@ def get_weather(api_key, location, units):
         
     """
     log.debug("parsing weather from openweathermap")
-    log.debug(location)
     weather_forecast = WeatherForecast()
 
     if hasattr(location, "lat") and hasattr(location, "lon"):

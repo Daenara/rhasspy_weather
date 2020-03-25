@@ -1,7 +1,7 @@
 import datetime
 import random
 from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
-from rhasspy_weather.status import StatusCode
+from rhasspy_weather.status import Status, StatusCode
 
 import logging
 
@@ -40,29 +40,36 @@ class WeatherReport:
         
         self.forecast = forecast
         self.request = request
-        self.status = forecast.status
+        self.status = Status()
 
     def generate_report(self):
         """
         generates and returns the answer to the WeatherRequest as string
         If an error occurs it will return the error message as a string instead
         """
-
         log.debug("generating weather report - error: {0}".format(self.status.is_error))
-        if self.status.is_error:
-            return self.status
-        elif self.request.request_date < datetime.datetime.now().date() or self.request.grain == Grain.HOUR and self.request.request_date == datetime.datetime.now().date() \
+        
+        if self.request.request_date < datetime.datetime.now().date() or self.request.grain == Grain.HOUR and self.request.request_date == datetime.datetime.now().date() \
             and self.request.start_time < datetime.datetime.now().time():
-            self.status.set_status(PAST_WEATHER_ERROR) # Error: can't request forecast for the past
-            return self.status
+            log.debug("Can't get past weather, return with error message")
+            self.status.set_status(StatusCode.PAST_WEATHER_ERROR) # Error: can't request forecast for the past
+            return self.status.status_response()
         elif not self.forecast.has_weather_for_date(self.request.request_date):
+            log.debug("No weather for today")
             if self.request.request_date == datetime.datetime.now().date():
-                if not self.forecast.has_weather_for_date(self.request.request_date + datetime.timedelta(days=1)):
-                    self.status.set_status(NO_WEATHER_FOR_DAY_ERROR) # Error: day nearly over, no forecast in api response
-                    return self.status
+                if self.request.date_type == DateType.FIXED:
+                    log.debug("only weather for one day was requested, we don't have weather for that day so return with error message")
+                    self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR) # Error: day nearly over, no forecast in api response
+                    return self.status.status_response()
+                elif self.request.request_date == DateType.INTERVAL:
+                    log.debug("handle intervals that span over night here")
+                    self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
+                    return self.status.status_response()
+                    #if self.forecast.has_weather_for_date(self.request.request_date + datetime.timedelta(days=1)):
+                    #    log.debug("weather for tomorrow was requested as well so we are good to continue")
             else:
-                self.status.set_status(FUTURE_WEATHER_ERROR) # Error: to many days in advance
-                return self.status
+                self.status.set_status(StatusCode.FUTURE_WEATHER_ERROR) # Error: to many days in advance
+                return self.status.status_response()
         
         if not (self.request.grain == Grain.DAY or self.request.grain == Grain.HOUR):
             self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
@@ -379,4 +386,4 @@ class WeatherReport:
     @property
     def __output_location(self):
         log.debug("generating location for response - error: {0}".format(self.status.is_error))
-        return "in {0}".format(self.request.location) if self.request.location_specified else ""
+        return "in {0}".format(self.request.location.name) if self.request.location_specified else ""

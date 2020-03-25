@@ -78,19 +78,17 @@ class Weather:
         #define default request
         new_request = WeatherRequest(DateType.FIXED, Grain.DAY, datetime.date.today(), intent, self.detail)
 
-        log.debug(new_request)
         # if a day was specified
-        if intent_message["slots"]["when_day"] != "":
-            log.debug("day specified")
-            log.debug(intent_message["slots"]["when_day"])
+        if "when_day" in intent_message["slots"] and intent_message["slots"]["when_day"] != "":
+            log.debug("it was a day specified")
             # is it today, tomorrow or the day after tomorrow (day in date_offset)?
             if intent_message["slots"]["when_day"] in date_offset:
-                log.debug("day offset")
+                log.debug("    day offset detected")
                 new_request.request_date = datetime.date.today() + datetime.timedelta(date_offset.index(intent_message["slots"]["when_day"]))
                 new_request.date_specified += intent_message["slots"]["when_day"]
             # is a weekday named?
             elif intent_message["slots"]["when_day"] in days:
-                log.debug("weekday")
+                log.debug("    weekday detected")
                 today = datetime.date.today();
                 for x in range(7):
                     new_date = today + datetime.timedelta(x)
@@ -100,7 +98,7 @@ class Weather:
                         break
             # was a date specified (specified by rhasspy as "daynumber monthname")?
             elif ' ' in intent_message["slots"]["when_day"]:
-                log.debug("date")
+                log.debug("    date detected")
                 day, month = intent_message["slots"]["when_day"].split()
                 new_request.date_specified = "am " + day + ". " + month
                 # won't work when the year changes, fix that sometime
@@ -111,26 +109,30 @@ class Weather:
             
             # if a time was specified
             if "when_time" in intent_message["slots"] and intent_message["slots"]["when_time"] != "":
-                log.debug("time specified")
+                log.debug("it was a time specified")
                 new_request.grain = Grain.HOUR
                 # was something like midday specified (listed in time_range)?
                 if intent_message["slots"]["when_time"] in time_range:
+                    log.debug("    named time frame detected")
                     new_request.date_type = DateType.INTERVAL
                     new_request.start_time = time_range[intent_message["slots"]["when_time"]][0]
                     new_request.end_time = time_range[intent_message["slots"]["when_time"]][1]
                     new_request.time_specified += intent_message["slots"]["when_time"]
                 # was it hours and minutes (specified as "HH MM" by rhasspy intent)?
                 elif isinstance(intent_message["slots"]["when_time"], str) and ' ' in intent_message["slots"]["when_time"]:
+                    log.debug("    hours and minutes detected")
                     new_request.start_time = datetime.datetime.strptime(intent_message["slots"]["when_time"], '%H %M').time()
                 # is it only an hour (no way to only specify minutes, if it is an int, it is hours)?
                 elif isinstance(intent_message["slots"]["when_time"], int):
+                    log.debug("    hours detected")
                     new_request.start_time = datetime.time(intent_message["slots"]["when_time"], 0)
+            else:
+                log.debug("no time specified, getting weather for the full day")
+        else:
+            log.debug("no day specified, using today as default")
         
         # requested
-        log.debug("figuring out special requests")
         requested = None
-        log.debug(intent)
-        log.debug(requested)
         if intent == ForecastType.CONDITION and "condition" in intent_message["slots"]:
             requested = intent_message["slots"]["condition"]
         elif intent == ForecastType.ITEM and "item" in intent_message["slots"]:
@@ -138,13 +140,16 @@ class Weather:
         elif intent == ForecastType.TEMPERATURE and "temperature" in intent_message["slots"]:
             requested = intent_message["slots"]["temperature"]
         if not requested == None:
+            log.debug("there was a special request made")
             new_request.requested = requested.capitalize() # first letter uppercase because german nouns just are that way (and the weather_logic will break)
 
         # location
         if "location" in intent_message["slots"]:
+            log.debug("a location was specified")
             new_request.location = Location(intent_message["slots"]["location"])
             new_request.location_specified = True
         else:
+            log.debug("no location specified, using default location")
             new_request.location = self.location
                     
         return new_request
