@@ -23,6 +23,7 @@ class StatusCode(Enum):
 class Status:
     def __init__(self, status_code=StatusCode.NORMAL):
         self.status_code = status_code
+        self.__last_change = ""
 
     @property
     def status_code(self):
@@ -36,10 +37,14 @@ class Status:
         if self.status_code == StatusCode.NORMAL:
             return False
         return True
+    
+    @property
+    def last_change_message(self):
+        return self.__last_change
 
     def set_status(self, val):
         self.status_code = val
-        self.status_response()
+        self.__log_status()
 
     def status_response(self):
         if self.status_code == StatusCode.NORMAL:
@@ -77,3 +82,17 @@ class Status:
         else:
             log.info("Status: {0} - {1}".format(StatusCode(self.status_code), response))
         return response
+        
+    def __log_status(self):
+        import inspect
+
+        curframe = inspect.currentframe()
+        calframe = inspect.getouterframes(curframe, 3)
+        self.__last_change = '{0}.{1} set the status to {2}'.format(calframe[3][3],calframe[2][3], self.status_code)
+        if self.is_error:
+            log.error(self.__last_change)
+        else:
+            log.info(self.__last_change)
+        
+
+        
