@@ -1,11 +1,11 @@
 import datetime
 import random
 from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
+from rhasspy_weather.status import StatusCode
 
 import logging
 
 log = logging.getLogger(__name__)
-
 
 ##########  Weather Report ##########
 
@@ -19,7 +19,7 @@ class WeatherReport:
     request : WeatherRequest
         the request to be answered
     forecast : WeatherForecast
-        the weatherdata that should be used in the answer
+        the weather data that should be used in the answer
     error : Error
         keeps track of errors throughout the program execution
         (reuses the Error object from forecast)
@@ -34,69 +34,64 @@ class WeatherReport:
         request : WeatherRequest
             the request to be answered
         forecast : WeatherForecast
-            the weatherdata that should be used in the answer
+            the weather data that should be used in the answer
         """
-        log.info("Report initialized")
+        log.debug("weather report initialized")
+        
         self.forecast = forecast
         self.request = request
-        self.error = forecast.error
+        self.status = forecast.status
 
-    # generates the answer to a question about anything weather related (that
-    # the program supports)
-    # called from outside
     def generate_report(self):
         """
         generates and returns the answer to the WeatherRequest as string
         If an error occurs it will return the error message as a string instead
         """
 
-        log.info("status=" + str(self.error.error_code))
-        if self.error.error_code != 0:
-            return self.error.output_error()
-        if self.request.request_date == -1:
-            self.error.error_code = 8 # Error: something is wrong with the date
-            return self.error.output_error()
+        log.debug("generating weather report - error: {0}".format(self.status.is_error))
+        if self.status.is_error:
+            return self.status
         elif self.request.request_date < datetime.datetime.now().date() or self.request.grain == Grain.HOUR and self.request.request_date == datetime.datetime.now().date() \
             and self.request.start_time < datetime.datetime.now().time():
-            self.error.error_code = 6 # Error: can't request forecast for the past
-            return self.error.output_error()
+            self.status.set_status(PAST_WEATHER_ERROR) # Error: can't request forecast for the past
+            return self.status
         elif not self.forecast.has_weather_for_date(self.request.request_date):
             if self.request.request_date == datetime.datetime.now().date():
-                if self.forecast.has_weather_for_date(self.request.request_date + datetime.timedelta(days=1)):
-                    pass
-                else:
-                    self.error.error_code = 7 # Error: day nearly over, no forecast in api response
-                    return self.error.output_error()
+                if not self.forecast.has_weather_for_date(self.request.request_date + datetime.timedelta(days=1)):
+                    self.status.set_status(NO_WEATHER_FOR_DAY_ERROR) # Error: day nearly over, no forecast in api response
+                    return self.status
             else:
-                self.error.error_code = 3 # Error: to many days in advance
-                return self.error.output_error()
+                self.status.set_status(FUTURE_WEATHER_ERROR) # Error: to many days in advance
+                return self.status
+        
+        if not (self.request.grain == Grain.DAY or self.request.grain == Grain.HOUR):
+            self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
+            return self.status.status_response()
+    
         if self.request.forecast_type == ForecastType.TEMPERATURE:
-            return self.__generate_temperature_report()
+            response = self.__generate_temperature_report()
         elif self.request.forecast_type == ForecastType.CONDITION:
-            return self.__generate_condition_report()
+            response = self.__generate_condition_report()
         elif self.request.forecast_type == ForecastType.FULL:
-           return self.__generate_full_report()
+           response = self.__generate_full_report()
         elif self.request.forecast_type == ForecastType.ITEM:
-            return self.__generate_item_report()
+            response = self.__generate_item_report()
+
+        return response
     
     # returns the answer to a question about the weather
     # called by generate_report()
     def __generate_full_report(self):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating full report - error: {0}".format(self.status.is_error))
         response = ""
         if self.request.date_type == DateType.FIXED:
             if self.request.grain == Grain.DAY:
                 response = self.__generate_full_report_day()
             elif self.request.grain == Grain.HOUR:
-                log.info("     -> time - error_code=" + str(self.error.error_code))
                 weather = self.forecast.weather_at_time(self.request.request_date, self.request.start_time)
                 response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)
                 response = response + " " + self.__answer_temperature(weather.min_temperature).format(when="", where="")
-            else:
-                self.error.error_code = 4 # Error: not supported
-                response = self.error.output_error()
         elif self.request.date_type == DateType.INTERVAL: 
-            log.info("     -> interval - error_code=" + str(self.error.error_code))
             weather = self.forecast.weather_for_interval(self.request.request_date, self.request.start_time, self.request.end_time)
             response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)
             response = response + " " + self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when="", where="")
@@ -105,21 +100,16 @@ class WeatherReport:
     # returns the answer to a question about the temperature
     # called by generate_report()
     def __generate_temperature_report(self):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating temperature report - error: {0}".format(self.status.is_error))
         response = ""
         if self.request.date_type == DateType.FIXED:
             if self.request.grain == Grain.DAY:
                 response = self.__generate_temperature_report_day()
             elif self.request.grain == Grain.HOUR:
-                log.info("     -> time - error_code=" + str(self.error.error_code))
                 response = ""
                 weather = self.forecast.weather_at_time(self.request.request_date, self.request.start_time)
                 response = self.__answer_temperature(weather.min_temperature).format(when=self.__output_date_and_time, where=self.__output_location)
-            else:
-                self.error.error_code = 4 # Error: not supported
-                response = self.error.output_error()
         elif self.request.date_type == DateType.INTERVAL: 
-            log.info("     -> interval - error_code=" + str(self.error.error_code))
             weather = self.forecast.weather_for_interval(self.request.request_date, self.request.start_time, self.request.end_time)
             response = self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when=self.__output_date_and_time, where=self.__output_location)
         return response
@@ -127,20 +117,15 @@ class WeatherReport:
     # returns a string answer to a question about the weather condition
     # called by generate_report()
     def __generate_condition_report(self):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating condition report - error: {0}".format(self.status.is_error))
         response = ""
         if self.request.date_type == DateType.FIXED:
             if self.request.grain == Grain.DAY:
                 response = self.__generate_condition_report_day()
             elif self.request.grain == Grain.HOUR:
-                log.info("     -> time - error_code=" + str(self.error.error_code))
                 weather_at_time = self.forecast.weather_at_time(self.request.request_date, self.request.start_time)
                 response = self.__answer_condition(weather_at_time).format(when=self.__output_date_and_time, where=self.__output_location)
-            else:
-                self.error.error_code = 4 # Error: not supported
-                response = self.error.output_error()
         elif self.request.date_type == DateType.INTERVAL: 
-            log.info("     -> interval - error_code=" + str(self.error.error_code))
             weather = self.forecast.weather_for_interval(self.request.request_date, self.request.start_time, self.request.end_time)
             response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)
         return response
@@ -148,7 +133,7 @@ class WeatherReport:
     # returns a string with the answer to the question about an item
     # called by generate_report()
     def __generate_item_report(self):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating item report - error: {0}".format(self.status.is_error))
         rain = ["Regenmantel", "Schirm", "Gummistiefel", "Halbschuhe", "Kaputze", "Hut", "Regenschirm"]
         warm = ["Sonnenbrille", "Sonnencreme", "Sonnenschirm", "Kappe", "Sonnenhut", "Sandalen"]
         cold = ["Winterstiefel", "Mantel", "Schal", "Handschuhe", "Mütze"]
@@ -196,9 +181,8 @@ class WeatherReport:
     # if detail=True in the config this answer may be rather long
     # called by __generate_full_report()
     def __generate_full_report_day(self):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating full day report - error: {0}".format(self.status.is_error))
         if self.request.detail:
-            log.debug("Detail if True")
             response = "Der Wetter-Bericht {when} {where}: ".format(when=self.__output_date_and_time,where=self.__output_location)
             morning = self.forecast.weather_morning(self.request.request_date)
             if morning is not None:
@@ -217,19 +201,16 @@ class WeatherReport:
                 response = response + self.__answer_condition(night).format(when="Nachts", where="")
                 response = response + " " + self.__answer_temperature(night.min_temperature, night.max_temperature).format(when="", where="")
         else:
-            log.debug("Detail if False")
             weather_for_day = self.forecast.weather_for_day(self.request.request_date)
-            log.debug(self.__output_location)
             response = self.__answer_condition(weather_for_day).format(when=self.__output_date_and_time, where=self.__output_location)
             response = response + " " + self.__answer_temperature(weather_for_day.min_temperature, weather_for_day.max_temperature).format(when="", where="")
-            log.debug(response)
         return response
 
     # returns a string response with the temperatures for a full day
     # if detail=True in the config this answer may be rather long
     # called by __generate_temperature_report()
     def __generate_temperature_report_day(self):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating temperature day report - error: {0}".format(self.status.is_error))
         if self.request.detail:
             response = "Die Temperatur {when} {where}. ".format(when=self.__output_date_and_time,where=self.__output_location)
             morning = self.forecast.weather_morning(self.request.request_date)
@@ -253,7 +234,7 @@ class WeatherReport:
     # if detail=True in the config this answer may be rather long
     # called by __generate_condition_report()
     def __generate_condition_report_day(self):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating condition day report - error: {0}".format(self.status.is_error))
         if self.request.detail:
             response = "Das Wetter {when} {where}. ".format(when=self.__output_date_and_time,where=self.__output_location)
             morning = self.forecast.weather_morning(self.request.request_date)
@@ -276,7 +257,7 @@ class WeatherReport:
     # returns a string with the temperature and placeholders for location and
     # time
     def __answer_temperature(self, min_temp, max_temp=""):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating response for temperature - error: {0}".format(self.status.is_error))
         temperature_fix = ["Die Temperatur {when} {where} ist {temp} Grad.", 
                             "Es hat {where} {temp} Grad {when}.", 
                             "Es hat {where} {when} {temp} Grad.", 
@@ -298,7 +279,7 @@ class WeatherReport:
     # returns a string with the weather condition and placeholders for location
     # and time
     def __answer_condition(self, weather_obj):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating response for condition - error: {0}".format(self.status.is_error))
         weather = ["Das Wetter {when} {where}: {weather}.", 
                     "{when} {where} ist das Wetter: {weather}.", 
                     "Wetter {when} {where}: {weather}."]
@@ -360,7 +341,7 @@ class WeatherReport:
 
     @property
     def __output_date_and_time(self):
-        log.info("status=" + str(self.error.error_code))
+        log.debug("generating time and date for response - error: {0}".format(self.status.is_error))
         # set date and time to default values
         date = "am " + self.request.readable_date
         time = ""
@@ -397,5 +378,5 @@ class WeatherReport:
 
     @property
     def __output_location(self):
-        log.info("status=" + str(self.error.error_code))
-        return "in {0}".format(self.request.location) if self.request.location else ""
+        log.debug("generating location for response - error: {0}".format(self.status.is_error))
+        return "in {0}".format(self.request.location) if self.request.location_specified else ""

@@ -1,47 +1,52 @@
 import requests
 import datetime
 from rhasspy_weather.forecast import WeatherForecast
-from rhasspy_weather.helpers import WeatherCondition
+from rhasspy_weather.helpers import WeatherCondition, Location
+from rhasspy_weather.status import StatusCode
 
-# gets the weather from open weather map, parses the information
-    # and saves it in this class
-def get_weather(weather_api_key, weather_forecast):
+import logging
+
+log = logging.getLogger(__name__)
+
+def get_weather(api_key, location, units):
     """gets weather from openweathermap API and parses it
     Returns 0 is everything worked, if not returns the error code
     Parameters:
     weather_api_key : str
         API key for openweathermap
+    weather_forecast: WeatherForecast
+        
     """
-    
-    #print("WeatherForecast.get_weather_from_open_weather_map, error_code=" + str(weather_forecast.error.error_code))
-    if weather_forecast.error.error_code != 0:
-        return weather_forecast.error.error_code
-    if hasattr(weather_forecast.location, "lat") and hasattr(weather_forecast.location, "lon"):
-        url_location = "lat={lat}&lon={lon}".format(lat=weather_forecast.location.lat, lon=weather_forecast.location.lon)
-    elif hasattr(weather_forecast.location, "zipcode") and hasattr(weather_forecast.location, "country"):
-        url_location = "zip={zip},{country_code}".format(zip=weather_forecast.location.zipcode, country_code=weather_forecast.location.country)
+    log.debug("parsing weather from openweathermap")
+    log.debug(location)
+    weather_forecast = WeatherForecast()
+
+    if hasattr(location, "lat") and hasattr(location, "lon"):
+        url_location = "lat={lat}&lon={lon}".format(lat=location.lat, lon=location.lon)
+    elif hasattr(location, "zipcode") and hasattr(location, "country"):
+        url_location = "zip={zip},{country_code}".format(zip=location.zipcode, country_code=location.country)
     else:
-        url_location = "q={city_name}".format(city_name=weather_forecast.location.name)
+        url_location = "q={city_name}".format(city_name=location.name)
     forecast_url = "http://api.openweathermap.org/data/2.5/forecast?{location}&APPID={api_key}&units={units}&lang=de".format(\
-        location=url_location, api_key=weather_api_key, units=weather_forecast.units)
+        location=url_location, api_key=api_key, units=units)
     try:
         response = requests.get(forecast_url)
         response = response.json()
 
-        if response["cod"] == 401:
-            weather_forecast.error.error_code = 2 # Error: something went wrong with the api call
-            return weather_forecast.error.error_code
-        elif response["cod"] == "429":
-            weather_forecast.error.error_code = 9 # Error: request limit exceeded
-            return weather_forecast.error.error_code
-        elif response["cod"] == "404":
-            weather_forecast.error.error_code = 5 # Error: location not found
-            return weather_forecast.error.error_code
+        if str(response["cod"]) == "401":
+            weather_forecast.status.set_status(StatusCode.API_ERROR) # Error: something went wrong with the api call
+            return weather_forecast
+        elif str(response["cod"]) == "429":
+            weather_forecast.status.set_status(StatusCode.API_TIMEOUT_ERROR) # Error: request limit exceeded
+            return weather_forecast
+        elif str(response["cod"]) == "404":
+            weather_forecast.status.set_status(StatusCode.LOCATION_ERROR) # Error: location not found
+            return weather_forecast
             
         # Parse the output of Open Weather Map's forecast endpoint
-        if not (hasattr(weather_forecast.location, "lat") and hasattr(weather_forecast.location, "lon")):
-            weather_forecast.location.set_lat_and_lon(response["city"]["coord"]["lat"], response["city"]["coord"]["lon"])
-        weather_forecast.calculate_sunrise_and_sunset()
+        if not (hasattr(location, "lat") and hasattr(location, "lon")):
+            location.set_lat_and_lon(response["city"]["coord"]["lat"], response["city"]["coord"]["lon"])
+        weather_forecast.calculate_sunrise_and_sunset(location)
         forecasts = {}
         for x in response["list"]:
             if str(datetime.date.fromtimestamp(x["dt"])) not in forecasts:
@@ -61,11 +66,10 @@ def get_weather(weather_api_key, weather_forecast):
                [x["main"]["temp"] for x in forecast], condition_list, [x["main"]["pressure"] for x in forecast],[x["main"]["humidity"] for x in forecast],\
                [x["wind"]["speed"] for x in forecast],[x["wind"]["deg"] for x in forecast])
             weather_forecast.forecast.append(tmp)
-        ##print(*weather_forecast.forecast, sep='\n')
-        return 0
     except (requests.exceptions.ConnectionError, ValueError):
-        forecast.error.error_code = 1 # Error: No internet connection
-        return weather_forecast.error.error_code 
+        forecast.status.set_status(NO_NETWORK_ERROR) # Error: No internet connection
+    return weather_forecast
+        
 # parses the weather condition into my own format (WeatherConditon)
 def __get_severity_from_open_weather_map_id(id):
     if id == 210: return 0 # light thunderstorm

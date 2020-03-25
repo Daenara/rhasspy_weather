@@ -1,5 +1,6 @@
 import datetime
 from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
+from rhasspy_weather.status import Status, StatusCode
 
 import logging
 
@@ -28,6 +29,10 @@ class WeatherRequest:
         Was a specific condition, item or temperature requested
     time_specified : str
         non parsed time for the request (used for output)
+    date_specified : str
+        non parsed date for the request (used for output)
+    location_specified : bool
+        True if the location was specified, False if default location is used (used for output)
     forecast_type : ForecastType
         Type of request, full, temperature, condition or item
     detail : bool
@@ -62,8 +67,10 @@ class WeatherRequest:
         self.requested = ""
         self.time_specified = ""
         self.date_specified = ""
+        self.location_specified = False
         self.forecast_type = forecast_type
         self.detail = detail
+        self.status = Status()
     
     def __str__(self): 
         return "(" + str(self.forecast_type) + ", " + str(self.date_type) + ", " + \
@@ -91,7 +98,7 @@ class WeatherRequest:
                 datetime.datetime.now().time() > time and time < datetime.time(12,0):
                return time.replace(hour=time.hour + 12)
             return time
-        return -1 # somehing was wrong with the time
+        self.status.set_status(StatusCode.TIME_ERROR)
     
     @property
     def grain(self):
@@ -127,7 +134,7 @@ class WeatherRequest:
         elif type(val) is str:
             self.__request_date = datetime.datetime.strptime(val, "%Y-%m-%d").date()
         else:
-            self.__request_date = -1
+            self.status.set_status(StatusCode.DATE_ERROR)
     
     @property
     def start_time(self):
