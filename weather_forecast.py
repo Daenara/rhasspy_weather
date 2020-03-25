@@ -2,6 +2,10 @@ from rhasspy_weather.weather_helpers import Error, WeatherInterval
 import suntime
 import datetime
 
+import logging
+
+log = logging.getLogger(__name__)
+
 ##########  Weather Forecast ##########
 
 # Class responsible for getting an forecast from an API and saving it
@@ -48,7 +52,7 @@ class WeatherForecast:
         location : Location
             a location object containing where the saved weather occurs
         """
-
+             
         self.error = Error()
         self.forecast = []
         self.units = units
@@ -56,6 +60,7 @@ class WeatherForecast:
     
     # calculates the time for sunrise and sunset
     def calculate_sunrise_and_sunset(self):
+        log.info("status=" + str(self.error.error_code))
         sun = suntime.Sun(self.location.lat, self.location.lon)
         self.sunrise = sun.get_local_sunrise_time().time()
         self.sunset = sun.get_local_sunset_time().time()
@@ -65,6 +70,8 @@ class WeatherForecast:
         Parameters:
         request : WeatherRequest
         """
+        
+        log.info("status=" + str(self.error.error_code))
 
         weather = self.__get_forecast_for_date(request.request_date)
         if request.start_time is not None:
@@ -87,6 +94,8 @@ class WeatherForecast:
         date : datetime.date
         """
 
+        log.info("status=" + str(self.error.error_code))
+
         weather = self.__get_forecast_for_date(date)
         return weather.get_weather_for_interval(datetime.time.min, datetime.time.max)
     # returns the weather at a specific time
@@ -97,6 +106,8 @@ class WeatherForecast:
             time : datetime.time
         """
 
+        log.info("status=" + str(self.error.error_code))
+        
         weather = self.__get_forecast_for_date(date)
         return weather.get_weather_for_interval(time, time)
     # returns the weather for a time interval
@@ -107,6 +118,9 @@ class WeatherForecast:
             start : datetime.time
             end : datetime.time
         """
+        
+        log.info("status=" + str(self.error.error_code))
+        
         weather = self.__get_forecast_for_date(date)
         return weather.get_weather_for_interval(start, end)
     # returns the weather for the morning of a day
@@ -115,6 +129,8 @@ class WeatherForecast:
         Parameters:
         date : datetime.date
         """
+
+        log.info("status=" + str(self.error.error_code))
 
         start = datetime.time(6,0)
         end = datetime.time(11,59)
@@ -131,6 +147,8 @@ class WeatherForecast:
         date : datetime.date
         """
 
+        log.info("status=" + str(self.error.error_code))
+
         start = datetime.time(12,0)
         end = datetime.time(16,59)
         if date == datetime.datetime.now().date() and end < datetime.datetime.now().time():
@@ -146,6 +164,8 @@ class WeatherForecast:
         date : datetime.date
         """
 
+        log.info("status=" + str(self.error.error_code))
+
         start = datetime.time(17,0)
         end = datetime.time(20,59)
         if date == datetime.datetime.now().date() and end < datetime.datetime.now().time():
@@ -160,6 +180,8 @@ class WeatherForecast:
         Parameters:
         date : datetime.date
         """
+
+        log.info("status=" + str(self.error.error_code))
 
         start = datetime.time(21,0)
         end = datetime.time(5,59)
@@ -177,6 +199,7 @@ class WeatherForecast:
             return part_two       
     # returns the forecast at the specified date
     def __get_forecast_for_date(self, date):
+        log.info("status=" + str(self.error.error_code))
         if self.error.error_code != 0:
             return self.error.error_code
         for x in self.forecast:
@@ -190,6 +213,8 @@ class WeatherForecast:
         Parameters:
         date : datetime.date
         """
+
+        log.info("status=" + str(self.error.error_code))
 
         return self.__get_forecast_for_date(date) is not None
         

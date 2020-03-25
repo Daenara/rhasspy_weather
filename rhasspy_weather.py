@@ -9,14 +9,19 @@ import copy
 import configparser
 import shutil
 import os
+import logging
+
+log = logging.getLogger(__name__)
 
 class Weather:
     def __init__(self):
-        base_path = os.path.join(os.getcwd(), 'rhasspy_weather')
+        #base_path = os.path.join(os.getcwd(), 'rhasspy_weather')
+        base_path = os.path.dirname(__file__)
         config_path = os.path.join(base_path, 'config.ini')
         default_config_path = os.path.join(base_path, 'config.default')
         config = configparser.ConfigParser()
         if not os.path.isfile(config_path):
+            log.info("No config found, creating config")
             shutil.copy(default_config_path, config_path)
         config.read(config_path)
         self.detail = config['General'].getboolean('LevelOfDetail', False)
@@ -24,13 +29,14 @@ class Weather:
         self.location = Location(config['Location'].get('City', "Berlin"))
         self.location.set_zipcode(config['Location'].get('Zipcode'), config['Location'].get('CountryCode'))
         self.units = config['General'].get('Units', "metric")
+        log.info("config loaded")
 
     # function being called when snips detects an intent related to the weather
     def get_weather_forecast(self, intent_message):
-        #print("function: get_weather_forecast")
+        log.info("Trying to parse intent message")
         requests = self.parse_intent_message(intent_message)
         response = ""
-        #print(*requests, sep='\n')
+        log.info("Answering questions")
         for request in requests:
             if request.location == "":
                 forecast = WeatherForecast(self.units, self.location)
@@ -43,7 +49,6 @@ class Weather:
 
     # parse the query and return a list of WeatherRequests
     def parse_intent_message(self, intent_message):
-        #print("function: parse_intent_message")
         requests = []
         #intent
         intent = None
@@ -57,6 +62,8 @@ class Weather:
         elif  "GetWeatherForecast" == intent_message["intent"]["name"]:
             intent = ForecastType.FULL
         
+        log.debug(intent)
+        
         # date and time
         days = ["montag","dienstag","mittwoch","donnerstag","freitag","samstag","sonntag"]
         months = ["januar", "februar", "märz", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "dezember"]
@@ -65,15 +72,18 @@ class Weather:
         
         #define default request
         new_request = WeatherRequest(DateType.FIXED, Grain.DAY, datetime.date.today(), intent, self.detail)
-        
+        log.debug(new_request)
         # if a day was specified
         if intent_message["slots"]["when_day"] != "":
+            log.debug("day specified")
             # is it today, tomorrow or the day after tomorrow (day in date_offset)?
             if intent_message["slots"]["when_day"] in date_offset:
+                log.debug("day offset")
                 new_request.request_date = datetime.date.today() + datetime.timedelta(date_offset.index(intent_message["slots"]["when_day"]))
                 new_request.date_specified += intent_message["slots"]["when_day"]
             # is a weekday named?
             elif intent_message["slots"]["when_day"] in days:
+                log.debug("weekday")
                 today = datetime.date.today();
                 for x in range(7):
                     new_date = today + datetime.timedelta(x)
@@ -83,6 +93,7 @@ class Weather:
                         break
             # was a date specified (specified by rhasspy as "daynumber monthname")?
             elif ' ' in intent_message["slots"]["when_day"]:
+                log.debug("date")
                 day, month = intent_message["slots"]["when_day"].split()
                 new_request.date_specified += "am " + day + ". " + month
                 # won't work when the year changes, fix that sometime
@@ -93,6 +104,7 @@ class Weather:
             
             # if a time was specified
             if "when_time" in intent_message["slots"] and intent_message["slots"]["when_time"] != "":
+                log.debug("time specified")
                 new_request.grain = Grain.HOUR
                 # was something like midday specified (listed in time_range)?
                 if intent_message["slots"]["when_time"] in time_range:
@@ -107,18 +119,22 @@ class Weather:
                 elif isinstance(intent_message["slots"]["when_time"], int):
                     new_request.start_time = datetime.time(intent_message["slots"]["when_time"], 0)
         
-         # requested
+        # requested
+        log.debug("figuring out special requests")
         requested = None
-        if intent == ForecastType.CONDITION:
+        log.debug(intent)
+        log.debug(requested)
+        if intent == ForecastType.CONDITION and "condition" in intent_message["slots"]:
             requested = intent_message["slots"]["condition"]
-        elif intent == ForecastType.ITEM:
+        elif intent == ForecastType.ITEM and "item" in intent_message["slots"]:
             requested = intent_message["slots"]["item"]
-        elif intent == ForecastType.TEMPERATURE:
+        elif intent == ForecastType.TEMPERATURE and "temperature" in intent_message["slots"]:
             requested = intent_message["slots"]["temperature"]
-        new_request.requested = requested.capitalize() # first letter uppercase because german nouns just are that way (and the weather_logic will break)
-        
+        if not requested == None:
+            new_request.requested = requested.capitalize() # first letter uppercase because german nouns just are that way (and the weather_logic will break)
+        log.debug(new_request)
         requests.append(new_request)
-
+        log.debug("requests: {0}".format(requests))
         # location
         # locations = intent_message.slots.forecast_locality.all()
         # if locations is not None and len(locations) > 0:

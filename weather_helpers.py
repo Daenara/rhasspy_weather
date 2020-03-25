@@ -1,5 +1,9 @@
 from enum import Enum
 
+import logging
+
+log = logging.getLogger(__name__)
+
 ##########  Helper Classes ##########
 
 # Class used by WeatherReport and WeatherForecast

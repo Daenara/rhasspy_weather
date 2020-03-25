@@ -1,6 +1,10 @@
 import datetime
 from rhasspy_weather.weather_helpers import DateType, ForecastType, Location, Grain
 
+import logging
+
+log = logging.getLogger(__name__)
+
 ##########  Weather Request ##########
 
 # Class holding all the information that parse_intent_message found
@@ -50,6 +54,7 @@ class WeatherRequest:
         forecast_type : ForecastType
         detail : bool
         """
+        
         self.date_type = date_type
         self.grain = grain
         self.request_date = request_date
@@ -63,7 +68,7 @@ class WeatherRequest:
     def __str__(self): 
         return "(" + str(self.forecast_type) + ", " + str(self.date_type) + ", " + \
                str(self.grain) + ", " + self.string_date + ", " + str(self.start_time) + \
-               ", " + str(self.end_time) + ", " + self.location + ", " + self.requested + ")"
+               ", " + str(self.end_time) + ", " + self.location + ", " + self.requested + ", " + str(self.detail) + ")"
     
     def __get_valid_time(self, val):
         if type(val) is datetime.time:
