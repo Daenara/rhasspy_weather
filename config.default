@@ -1,0 +1,14 @@
+[General]
+api=openweathermap
+Units=metric
+LevelOfDetail=False
+
+[Location]
+City=Berlin
+Zipcode=
+CountryCode=
+lat=
+lon=
+
+[OpenWeatherMap]
+api_key=

@@ -3,16 +3,24 @@ import datetime
 import locale
 from rhasspy_weather.weather_logic import WeatherRequest, DateType, ForecastType, WeatherForecast, WeatherReport, Location, Grain
 import copy
+import configparser
+import shutil
+import os
 
 class Weather:
     def __init__(self):
-        self.detail = False
-        self.weather_api_key = "XXXXXXXXXXXXXXXX"
-        self.location = Location("Frankfurt")
-        zipcode = "60389"
-        country = "de"
-        self.location.set_zipcode(zipcode, country)
-        self.units = "metric"
+        base_path = os.path.join(os.getcwd(), 'rhasspy_weather')
+        config_path = os.path.join(base_path, 'config.ini')
+        default_config_path = os.path.join(base_path, 'config.default')
+        config = configparser.ConfigParser()
+        if not os.path.isfile(config_path):
+            shutil.copy(default_config_path, config_path)
+        config.read(config_path)
+        self.detail = config['General'].getboolean('LevelOfDetail', False)
+        self.weather_api_key = config['OpenWeatherMap'].get('api_key')
+        self.location = Location(config['Location'].get('City', "Berlin"))
+        self.location.set_zipcode(config['Location'].get('Zipcode'), config['Location'].get('CountryCode'))
+        self.units = config['General'].get('Units', "metric")
         # try:
             # locale.setlocale(locale.LC_TIME, "de_DE.UTF-8")
         # except locale.Error:
