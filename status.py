@@ -1,7 +1,6 @@
 from enum import Enum
 import random
 
-import inspect
 import logging
 
 log = logging.getLogger(__name__)
