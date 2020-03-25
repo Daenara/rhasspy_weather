@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 import datetime
-from rhasspy_weather.weather_helpers import DateType, ForecastType, Location, Grain
+from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
 from rhasspy_weather.openweathermap import get_weather
-from rhasspy_weather.weather_forecast import WeatherForecast
-from rhasspy_weather.weather_request import WeatherRequest
-from rhasspy_weather.weather_report import WeatherReport
+from rhasspy_weather.forecast import WeatherForecast
+from rhasspy_weather.request import WeatherRequest
+from rhasspy_weather.report import WeatherReport
 import copy
 import configparser
 import shutil

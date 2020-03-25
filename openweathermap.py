@@ -1,7 +1,7 @@
 import requests
 import datetime
-from rhasspy_weather.weather_forecast import WeatherForecast
-from rhasspy_weather.weather_helpers import WeatherCondition
+from rhasspy_weather.forecast import WeatherForecast
+from rhasspy_weather.helpers import WeatherCondition
 
 # gets the weather from open weather map, parses the information
     # and saves it in this class

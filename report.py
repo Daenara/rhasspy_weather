@@ -1,6 +1,6 @@
 import datetime
 import random
-from rhasspy_weather.weather_helpers import DateType, ForecastType, Location, Grain
+from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
 
 import logging
 

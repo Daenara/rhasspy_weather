@@ -1,4 +1,4 @@
-from rhasspy_weather.weather_helpers import Error, WeatherInterval
+from rhasspy_weather.helpers import Error, WeatherInterval
 import suntime
 import datetime
 
