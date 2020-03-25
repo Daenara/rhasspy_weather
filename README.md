@@ -40,9 +40,12 @@ if intent.startswith("GetWeatherForecast"):
 print(json.dumps(o))
 ```
 
-Replace the api key in rhasspy_weather.py for your own and change any other values you like. If "detail" is true and you querry the weather, temperature and so on for a full day it will read a much more detailed weather report that splits the day into morning, midday, noon and so on.
+You need a config file for the scripts to do anything. Either run the command script once after you added it or manually rename the "config.default" file to "config.ini" and edit it to your liking. 
 
-Other than the scripts you will need the intents. Here are mine (changes might break the scripts so please only change things if you know what you are doing):
+Be sure to add your api key for OpenWeatherMap in, otherwise you will only get an error as output.
+If "LevelOfDetail" is set to True and you querry the weather, temperature and so on for a full day it will read a much more detailed weather report that splits the day into morning, midday, noon and so on.
+
+Other than the scripts and the config you will need the intents. Here are mine (changes might break the scripts so please only change things if you know what you are doing):
 
 sentences.ini
 ```
@@ -138,16 +141,25 @@ If everything is set up you can querry the weather from rhasspy with sentenses l
  * Brauche ich heute einen Regenschirm?
  * Wird es am 31. März kalt?
  
- ## Functionality
- The weather logic is quite big and can answer questions about the weather condition or temperature, the complete weather report and the neccesserity of some items. Date and time can be specified and so can the location.
- 
- The rhasspy_weather parser can do a bit less right now because the location is not implemented. To balance that out rhasspy_weather knows quite a few items the logic did not learn so far.
+## Functionality
+The weather logic is quite powerfulg and can answer questions about the weather condition or temperature, the complete weather report and the neccesserity of some items. Date and time can be specified and so can the location. The logic itself can even handle multiple querries at once if they are passed in the right format, it will then read everything in a row.
+
+When using the weather logic with rhasspy it is less powerfull because the sentenses written for rhasspy and the parser just don't have that functionallity (yet).
+
+The rhasspy_weather parser can't do custom location querries right now, all querries are for the location specified in the config.ini. Multiple requests at the same time is not something I know how to implement with the rhasspy grammar and I do not see much need in it so it is not on my todo list even thought the logic could do it. 
+
+On the other side there are a few items that can be querried for with rhasspy that the logic has not learned yet, so both sides aren't perfect.
  
  ## TODO
  * add location support
- * add config file
- * make daily times in rhasspy_weather.py fit those in weather_logic.py (and use the logic already there to output the weather)
+ * ~~add config file~~
+ * make daily times in rhasspy_weather.py fit those in the weather logic (and use the logic already there to output the weather)
+ * move custom data like weekdays, time definitions for midday, etc. and all language stuff to one file for easy access and easy translation
+ * fix the localized weekday problem again, this time using my custom array instead of a system locale that might not be installed
+ * move the weather api(s) into a subfolder and only import and use the one that is specified in the config
+ * rework error handling so errors are handed through everything, not only parts of it (errors while parsing the intent for example)
+ * figure out the data type of the errors owm gives back, one was an int and one was a string, or just make sure to cast them so they don't break the code
  * move remaining slots from the sentences.ini to the slots
  * clean up and add to the sentences
- * add in new items to weather_logic.py
+ * add in new items to the logic
  * clean up code
