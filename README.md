@@ -23,18 +23,30 @@ import sys
 import json
 from rhasspy_weather.rhasspy_weather import Weather
 
+# optional logging
+import os
+import logging
+
+logging_format = '%(asctime)s - %(levelname)-5s - %(name)s.%(funcName)s[%(lineno)d]: %(message)s'
+logging.basicConfig(filename=os.path.join(os.path.dirname(__file__), 'output.log'), format=logging_format, datefmt="%Y-%m-%d %H:%M:%S", level=logging.INFO)
+
+log = logging.getLogger(__name__)
+
 def speech(text):
     global o
     o["speech"] = {"text": text}
 
+log.info("Custom Script Started")
 # get json from stdin and load into python dict
 o = json.loads(sys.stdin.read())
 
 intent = o["intent"]["name"]
 
 if intent.startswith("GetWeatherForecast"):
+	log.info("Detected Weather Intent")
     weather = Weather()
-    speech(weather.get_weather_forecast(o))
+    forecast = weather.get_weather_forecast(o)
+    speech(forecast)
 
 # convert dict to json and print to stdout
 print(json.dumps(o))
