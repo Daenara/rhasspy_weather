@@ -1,7 +1,10 @@
 # -*- encoding: utf-8 -*-
 import datetime
-import locale
-from rhasspy_weather.weather_logic import WeatherRequest, DateType, ForecastType, WeatherForecast, WeatherReport, Location, Grain
+from rhasspy_weather.weather_helpers import DateType, ForecastType, Location, Grain
+from rhasspy_weather.openweathermap import get_weather
+from rhasspy_weather.weather_forecast import WeatherForecast
+from rhasspy_weather.weather_request import WeatherRequest
+from rhasspy_weather.weather_report import WeatherReport
 import copy
 import configparser
 import shutil
@@ -21,10 +24,6 @@ class Weather:
         self.location = Location(config['Location'].get('City', "Berlin"))
         self.location.set_zipcode(config['Location'].get('Zipcode'), config['Location'].get('CountryCode'))
         self.units = config['General'].get('Units', "metric")
-        # try:
-            # locale.setlocale(locale.LC_TIME, "de_DE.UTF-8")
-        # except locale.Error:
-            # print("That locale doesn't exist on the system")
 
     # function being called when snips detects an intent related to the weather
     def get_weather_forecast(self, intent_message):
@@ -37,7 +36,7 @@ class Weather:
                 forecast = WeatherForecast(self.units, self.location)
             else:
                 forecast = WeatherForecast(self.units, Location(request.location))
-            forecast.get_weather_from_open_weather_map(self.weather_api_key)
+            get_weather(self.weather_api_key, forecast)
             response = response + WeatherReport(request, forecast).generate_report()
         
         return response
