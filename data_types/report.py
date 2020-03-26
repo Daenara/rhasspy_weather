@@ -383,7 +383,10 @@ class WeatherReport:
             # determine time
             if self.request.grain == Grain.HOUR:
                 time = "um " + self.request.readable_start_time + " Uhr"
-        return date + " " + time
+                
+        if self.request.grain == Grain.HOUR:
+            return date + " " + time
+        return date
 
     @property
     def __output_location(self):

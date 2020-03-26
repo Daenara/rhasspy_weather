@@ -137,7 +137,7 @@ def parse_intent_message(intent_message, config):
         new_request.requested = requested.capitalize() # first letter uppercase because german nouns just are that way (and the weather_logic will break)
 
     # location
-    if slot_location_name in slots:
+    if slot_location_name in slots and slots[slot_location_name] != "":
         log.debug("a location was specified")
         new_request.location = Location(slots[slot_location_name])
                 
