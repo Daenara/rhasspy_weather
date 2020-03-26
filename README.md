@@ -33,6 +33,11 @@ logging.basicConfig(filename=os.path.join(os.path.dirname(__file__), 'output.log
 
 log = logging.getLogger(__name__)
 
+def exception_to_log(type, value, traceback):
+    log.exception("Uncaught exception: ", exc_info=(type, value, traceback))
+
+sys.excepthook = exception_to_log
+
 def speech(text):
     global o
     o["speech"] = {"text": text}
