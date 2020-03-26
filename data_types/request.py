@@ -1,5 +1,5 @@
 import datetime
-from .enums import DateType, ForecastType, Grain
+from enum import Enum
 from .location import Location
 from .status import Status, StatusCode
 import logging
@@ -195,3 +195,24 @@ class WeatherRequest:
         if self.grain == Grain.HOUR and self.start_time == datetime.time(0,0,0):
             return (time_difference - 1)
         return time_difference
+
+# WeatherRequest for a fixed time or an interval?
+class DateType(Enum):
+    FIXED = "fixed"
+    INTERVAL = "interval"
+
+# What kind of WeatherRequest was made?
+class ForecastType(Enum):
+    FULL = "full"
+    TEMPERATURE = "temperature"
+    ITEM = "item"
+    CONDITION = "condition"
+    
+# my implementation of hermes-pythons Grain since that is the only thing I need from that package
+class Grain(Enum):
+    YEAR = 0
+    QUARTER = 1
+    MONTH = 2
+    WEEK = 3
+    DAY = 4
+    HOUR = 5

@@ -1,6 +1,6 @@
 import datetime
 import random
-from .enums import DateType, ForecastType, Grain
+from .request import DateType, ForecastType, Grain
 from .location import Location
 from .status import Status, StatusCode
 
