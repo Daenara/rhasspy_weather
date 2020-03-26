@@ -13,7 +13,6 @@ class WeatherConfig:
     def __init__(self):
         self.status = Status()
         base_path = os.path.join(os.path.dirname(sys.modules['__main__'].__file__), "rhasspy_weather")
-        #base_path = os.path.dirname(__file__)
         config_path = os.path.join(base_path, 'config.ini')
         default_config_path = os.path.join(base_path, 'config.default')
         config = configparser.ConfigParser(allow_no_value=True)
@@ -34,6 +33,7 @@ class WeatherConfig:
             self.__units = self.__get_required_option(section_general, "units", "metric")
             self.__api = self.__get_required_option(section_general, "api", "openweathermap")
             self.__timezone = pytz.timezone(self.__get_required_option(section_general, "timezone", "Europe/Berlin"))
+            self.__locale = self.__get_required_option(section_general, "locale", "German")
         else:
             log.error("Section [{0}] is missing from config. Please refer to 'config.default' for an example config.".format(section_name_general))
             self.status.set_status(StatusCode.CONFIG_ERROR)
@@ -97,6 +97,10 @@ class WeatherConfig:
     @property
     def units(self):
         return self.__units
+        
+    @property
+    def locale(self):
+        return self.__locale
         
     @property
     def location(self):
