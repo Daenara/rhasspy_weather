@@ -196,7 +196,6 @@ class WeatherForecast:
     # returns the forecast at the specified date
     def __get_forecast_for_date(self, date):
         log.debug("getting the complete forecast for a date - error: {0}".format(self.status.is_error))
-        log.debug(date)
         if self.status.is_error:
             return self.status
         for x in self.forecast:
