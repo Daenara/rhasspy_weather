@@ -2,7 +2,7 @@ import datetime
 from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
 from rhasspy_weather.data_types.status import Status, StatusCode
 from rhasspy_weather.data_types.location import Location
-from rhasspy_weather.locale.german import named_days, weekday_names, month_names, named_times
+from rhasspy_weather.locale.german import named_days, weekday_names, month_names, named_times, named_times_synonyms
 
 import logging
 
@@ -84,12 +84,19 @@ def parse_intent_message(intent_message, config):
             new_request.grain = Grain.HOUR
             
             named_times_lowercase = [x.lower() for x in named_times]
-            # was something like midday specified (listed in time_range)?
-            if isinstance(slots[slot_time_name], str) and slots[slot_time_name].lower() in named_times_lowercase:
+            named_times_synonyms_lowercase = [x.lower() for x in named_times_synonyms]
+            named_times_combined = named_times_lowercase + named_times_synonyms_lowercase
+            # was something like midday specified (listed in named_times or in named_times_synonyms)?
+            if isinstance(slots[slot_time_name], str) and slots[slot_time_name].lower() in named_times_combined:
                 log.debug("  named time frame detected")
-                index = named_times_lowercase.index(slots[slot_time_name].lower())
-                key = list(named_times.keys())[index]
-                value = list(named_times.values())[index]
+                if slots[slot_time_name].lower() in named_times_synonyms_lowercase:
+                    index = named_times_synonyms_lowercase.index(slots[slot_time_name].lower())
+                    name = list(named_times_synonyms.keys())[index]
+                    value = named_times[named_times_synonyms[name]]
+                else:
+                    index = named_times_lowercase.index(slots[slot_time_name].lower())
+                    name = list(named_times.keys())[index]
+                    value = list(named_times.values())[index]
                 log.debug(value)
                 if isinstance(value, datetime.time):
                     log.debug("    named time seems to be a certain time")
@@ -99,7 +106,7 @@ def parse_intent_message(intent_message, config):
                     new_request.date_type = DateType.INTERVAL
                     new_request.start_time = value[0]
                     new_request.end_time = value[1]
-                    new_request.time_specified = key
+                    new_request.time_specified = name
             # was it hours and minutes (specified as "HH MM" by rhasspy intent)?
             elif isinstance(slots[slot_time_name], str) and ' ' in slots[slot_time_name]:
                 log.debug("    hours and minutes detected")
