@@ -32,6 +32,7 @@ class Weather:
             self.location = Location(config['Location'].get('City', "Berlin"))
             self.location.set_zipcode(config['Location'].get('Zipcode'), config['Location'].get('CountryCode'))
             self.units = config['General'].get('Units', "metric")
+            self.timezone = config['General'].get('Timezone', "Europe/Berlin")
             log.info("Config Loaded")
         except:
             self.status.set_status(StatusCode.CONFIG_ERROR)
@@ -48,7 +49,7 @@ class Weather:
             return request.status.status_response()
         
         log.info("Requesting weather")
-        forecast = get_weather(self.weather_api_key, request.location, self.units)
+        forecast = get_weather(self.weather_api_key, request.location, self.units, self.timezone)
         if forecast.status.is_error:
             return forecast.status.status_response()
         
@@ -75,9 +76,9 @@ class Weather:
         months = ["januar", "februar", "märz", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "dezember"]
         date_offset = ["heute", "morgen", "übermorgen"]
         time_range = {"morgen": (datetime.time(6, 0), datetime.time(10, 0)),"vormittag": (datetime.time(10, 0), datetime.time(12, 0)), "mittag": (datetime.time(12, 0), datetime.time(14, 0)), "nachmittag": (datetime.time(15, 0), datetime.time(18, 0)), "abend": (datetime.time(18, 0), datetime.time(22, 0)), "nacht": (datetime.time(22, 0), datetime.time(7, 0))}
-        today = datetime.datetime.now(pytz.timezone('Europe/Berlin')).date()
+        today = datetime.datetime.now(pytz.timezone(self.timezone)).date()
         #define default request
-        new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, intent, self.detail)
+        new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, intent, self.detail, self.timezone)
 
         # if a day was specified
         if "when_day" in intent_message["slots"] and intent_message["slots"]["when_day"] != "":

@@ -48,10 +48,11 @@ class WeatherRequest:
     string_end_time : str
     readable_end_time : str
     time_difference : int
+    timezone : str
         number of days between today and the requested date
     """
 
-    def __init__(self, date_type, grain, request_date, forecast_type, detail):
+    def __init__(self, date_type, grain, request_date, forecast_type, detail, timezone):
         """
         Parameters:
         date_type : DateType
@@ -72,6 +73,7 @@ class WeatherRequest:
         self.forecast_type = forecast_type
         self.detail = detail
         self.status = Status()
+        self.timezone = timezone
         
     
     def __str__(self): 
@@ -96,8 +98,8 @@ class WeatherRequest:
             # it is after 11:59PM of the day requested)
             if self.grain == Grain.HOUR and time == datetime.time.min:
                 self.request_date = self.request_date + datetime.timedelta(days=1)
-            elif self.grain == Grain.HOUR and self.request_date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() and \
-                datetime.datetime.now(pytz.timezone('Europe/Berlin')).time() > time and time < datetime.time(12,0):
+            elif self.grain == Grain.HOUR and self.request_date == datetime.datetime.now(pytz.timezone(self.timezone)).date() and \
+                datetime.datetime.now(pytz.timezone(self.timezone)).time() > time and time < datetime.time(12,0):
                return time.replace(hour=time.hour + 12)
             return time
         self.status.set_status(StatusCode.TIME_ERROR)

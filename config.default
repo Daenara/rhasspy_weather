@@ -2,6 +2,7 @@
 api=openweathermap
 Units=metric
 LevelOfDetail=False
+Timezone=Europe/Berlin
 
 [Location]
 City=Berlin

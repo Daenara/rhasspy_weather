@@ -46,7 +46,7 @@ class WeatherForecast:
         checks if a forecast for date exists
     """
 
-    def __init__(self):
+    def __init__(self, timezone):
         """
         Parameters:
         units : str
@@ -58,6 +58,7 @@ class WeatherForecast:
              
         self.status = Status()
         self.forecast = []
+        self.timezone = timezone
     
     # calculates the time for sunrise and sunset
     def calculate_sunrise_and_sunset(self, location):
@@ -130,7 +131,7 @@ class WeatherForecast:
 
         start = datetime.time(6,0)
         end = datetime.time(11,59)
-        if date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() and end < datetime.datetime.now(pytz.timezone('Europe/Berlin')).time():
+        if date == datetime.datetime.now(pytz.timezone(self.timezone)).date() and end < datetime.datetime.now(pytz.timezone(self.timezone)).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -146,7 +147,7 @@ class WeatherForecast:
 
         start = datetime.time(12,0)
         end = datetime.time(16,59)
-        if date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() and end < datetime.datetime.now(pytz.timezone('Europe/Berlin')).time():
+        if date == datetime.datetime.now(pytz.timezone(self.timezone)).date() and end < datetime.datetime.now(pytz.timezone(self.timezone)).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -162,7 +163,7 @@ class WeatherForecast:
 
         start = datetime.time(17,0)
         end = datetime.time(20,59)
-        if date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() and end < datetime.datetime.now(pytz.timezone('Europe/Berlin')).time():
+        if date == datetime.datetime.now(pytz.timezone(self.timezone)).date() and end < datetime.datetime.now(pytz.timezone(self.timezone)).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)

@@ -8,7 +8,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def get_weather(api_key, location, units):
+def get_weather(api_key, location, units, timezone):
     """gets weather from openweathermap API and parses it
     Returns 0 is everything worked, if not returns the error code
     Parameters:
@@ -18,7 +18,7 @@ def get_weather(api_key, location, units):
         
     """
     log.debug("parsing weather from openweathermap")
-    weather_forecast = WeatherForecast()
+    weather_forecast = WeatherForecast(timezone)
 
     if hasattr(location, "lat") and hasattr(location, "lon"):
         url_location = "lat={lat}&lon={lon}".format(lat=location.lat, lon=location.lon)
