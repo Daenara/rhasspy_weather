@@ -1,5 +1,4 @@
 import datetime
-import pytz
 import random
 from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
 from rhasspy_weather.status import Status, StatusCode
@@ -29,7 +28,7 @@ class WeatherReport:
         generates and returns the answer to the WeatherRequest as string
     """
 
-    def __init__(self, request, forecast):
+    def __init__(self, request, forecast, config):
         """
         Parameters:
         request : WeatherRequest
@@ -41,6 +40,7 @@ class WeatherReport:
         
         self.forecast = forecast
         self.request = request
+        self.config = config
         self.status = Status()
 
     def generate_report(self):
@@ -50,14 +50,14 @@ class WeatherReport:
         """
         log.debug("generating weather report - error: {0}".format(self.status.is_error))
         
-        if self.request.request_date < datetime.datetime.now(pytz.timezone(self.request.timezone)).date() or self.request.grain == Grain.HOUR and self.request.request_date == datetime.datetime.now(pytz.timezone(self.request.timezone)).date() \
-            and self.request.start_time < datetime.datetime.now(pytz.timezone(self.request.timezone)).time():
+        if self.request.request_date < datetime.datetime.now(self.config.timezone).date() or self.request.grain == Grain.HOUR and self.request.request_date == datetime.datetime.now(self.config.timezone).date() \
+            and self.request.start_time < datetime.datetime.now(self.config.timezone).time():
             log.debug("Can't get past weather, return with error message")
             self.status.set_status(StatusCode.PAST_WEATHER_ERROR) # Error: can't request forecast for the past
             return self.status.status_response()
         elif not self.forecast.has_weather_for_date(self.request.request_date):
             log.debug("No weather for today")
-            if self.request.request_date == datetime.datetime.now(pytz.timezone(self.request.timezone)).date():
+            if self.request.request_date == datetime.datetime.now(self.config.timezone).date():
                 if self.request.date_type == DateType.FIXED:
                     log.debug("only weather for one day was requested, we don't have weather for that day so return with error message")
                     self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR) # Error: day nearly over, no forecast in api response

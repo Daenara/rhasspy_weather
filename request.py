@@ -1,5 +1,4 @@
 import datetime
-import pytz
 from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
 from rhasspy_weather.status import Status, StatusCode
 
@@ -11,12 +10,12 @@ log = logging.getLogger(__name__)
 
 # Class holding all the information that parse_intent_message found
 # has many functions to return the information in
-# human- and machinereadable ways
+# human- and machine readable ways
 class WeatherRequest:
     """
     Class holding all the information that parse_intent_message found
     has many functions to return the information in 
-    human- and machinereadable ways
+    human- and machine readable ways
     Attributes:
     date_type : DateType
         Is the request for a fixed time or an interval
@@ -24,8 +23,8 @@ class WeatherRequest:
         How specific should the request be, days, hours
     request_date : datetime.date
         For when is the request
-    location : str
-        For where is the request
+    location : Location
+        Object containing location information
     requested : str
         Was a specific condition, item or temperature requested
     time_specified : str
@@ -36,8 +35,6 @@ class WeatherRequest:
         True if the location was specified, False if default location is used (used for output)
     forecast_type : ForecastType
         Type of request, full, temperature, condition or item
-    detail : bool
-        True for detailed answer, else use False
     start_time : datetime.time
     end_time : datetime.time
     weekday : str
@@ -48,32 +45,30 @@ class WeatherRequest:
     string_end_time : str
     readable_end_time : str
     time_difference : int
-    timezone : str
-        number of days between today and the requested date
     """
 
-    def __init__(self, date_type, grain, request_date, forecast_type, detail, timezone):
+    def __init__(self, date_type, grain, request_date, forecast_type, config):
         """
         Parameters:
         date_type : DateType
         grain : Grain
         request_date : datetime.date
         forecast_type : ForecastType
-        detail : bool
+        config : WeatherConfig
         """
         
         self.date_type = date_type
         self.grain = grain
         self.request_date = request_date
-        self.location = ""
+        self.__location = config.location
         self.requested = ""
         self.time_specified = ""
         self.date_specified = ""
         self.location_specified = False
         self.forecast_type = forecast_type
-        self.detail = detail
+        self.detail = config.detail
         self.status = Status()
-        self.timezone = timezone
+        self.__timezone = config.timezone
         
     
     def __str__(self): 
@@ -98,11 +93,19 @@ class WeatherRequest:
             # it is after 11:59PM of the day requested)
             if self.grain == Grain.HOUR and time == datetime.time.min:
                 self.request_date = self.request_date + datetime.timedelta(days=1)
-            elif self.grain == Grain.HOUR and self.request_date == datetime.datetime.now(pytz.timezone(self.timezone)).date() and \
-                datetime.datetime.now(pytz.timezone(self.timezone)).time() > time and time < datetime.time(12,0):
+            elif self.grain == Grain.HOUR and self.request_date == datetime.datetime.now(self.__timezone).date() and \
+                datetime.datetime.now(self.__timezone).time() > time and time < datetime.time(12,0):
                return time.replace(hour=time.hour + 12)
             return time
         self.status.set_status(StatusCode.TIME_ERROR)
+    
+    @property
+    def location(self):
+        return self.__location
+    @location.setter
+    def location(self, val):
+        self.__location = val
+        self.location_specified = True
     
     @property
     def grain(self):

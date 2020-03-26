@@ -8,7 +8,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def get_weather(api_key, location, units, timezone):
+def get_weather(location, config):
     """gets weather from openweathermap API and parses it
     Returns 0 is everything worked, if not returns the error code
     Parameters:
@@ -18,16 +18,16 @@ def get_weather(api_key, location, units, timezone):
         
     """
     log.debug("parsing weather from openweathermap")
-    weather_forecast = WeatherForecast(timezone)
+    weather_forecast = WeatherForecast(config)
 
     if hasattr(location, "lat") and hasattr(location, "lon"):
         url_location = "lat={lat}&lon={lon}".format(lat=location.lat, lon=location.lon)
-    elif hasattr(location, "zipcode") and hasattr(location, "country"):
-        url_location = "zip={zip},{country_code}".format(zip=location.zipcode, country_code=location.country)
+    elif hasattr(location, "zipcode") and hasattr(location, "country_code"):
+        url_location = "zip={zip},{country_code}".format(zip=location.zipcode, country_code=location.country_code)
     else:
-        url_location = "q={city_name}".format(city_name=location.name)
+        url_location = "q={city_name}".format(city_name=location.city)
     forecast_url = "http://api.openweathermap.org/data/2.5/forecast?{location}&APPID={api_key}&units={units}&lang=de".format(\
-        location=url_location, api_key=api_key, units=units)
+        location=url_location, api_key=config.api_key, units=config.units)
     try:
         response = requests.get(forecast_url)
         response = response.json()
@@ -45,7 +45,7 @@ def get_weather(api_key, location, units, timezone):
         # Parse the output of Open Weather Map's forecast endpoint
         if not (hasattr(location, "lat") and hasattr(location, "lon")):
             location.set_lat_and_lon(response["city"]["coord"]["lat"], response["city"]["coord"]["lon"])
-        weather_forecast.calculate_sunrise_and_sunset(location)
+        weather_forecast.calculate_sunrise_and_sunset(location.lat, location.lon)
         forecasts = {}
         for x in response["list"]:
             if str(datetime.date.fromtimestamp(x["dt"])) not in forecasts:

@@ -2,7 +2,6 @@ from rhasspy_weather.helpers import WeatherInterval
 from rhasspy_weather.status import Status, StatusCode
 import suntime
 import datetime
-import pytz
 
 import logging
 
@@ -21,11 +20,15 @@ class WeatherForecast:
         keeps track of errors throughout the program execution
     forecast : list[WeatherAtDate]
         list containing all the information from the API
-    units : str
-        the units the API should use
-    location : Location
-        a location object containing where the saved weather occurs
+    config : WeatherConfig
+        a configuration object
+    sunrise : datetime.time
+        time of the sunrise (only set after calculate_sunrise_and_sunset(lat, lon) was called)
+    sunset : datetime.time
+        time of the sunset (only set after calculate_sunrise_and_sunset(lat, lon) was called)
     Methods:
+    calculate_sunrise_and_sunset(lat, lon)
+        sets sunrise and sunset
     weather_during_daytime(request)
         returns WeatherInterval for a request only during daylight hours
     weather_for_day(date)
@@ -46,24 +49,22 @@ class WeatherForecast:
         checks if a forecast for date exists
     """
 
-    def __init__(self, timezone):
+    def __init__(self, config):
         """
         Parameters:
-        units : str
-            the units the API should use
-        location : Location
-            a location object containing where the saved weather occurs
+        config : WeatherConfig
+            a configuration object
         """
         log.debug("initializing forecast")
              
         self.status = Status()
         self.forecast = []
-        self.timezone = timezone
+        self.config = config
     
     # calculates the time for sunrise and sunset
-    def calculate_sunrise_and_sunset(self, location):
+    def calculate_sunrise_and_sunset(self, lat, lon):
         log.debug("Calculating Sunrise and Sunset - error: {0}".format(self.status.is_error))
-        sun = suntime.Sun(location.lat, location.lon)
+        sun = suntime.Sun(lat, lon)
         self.sunrise = sun.get_local_sunrise_time().time()
         self.sunset = sun.get_local_sunset_time().time()
 
@@ -131,7 +132,7 @@ class WeatherForecast:
 
         start = datetime.time(6,0)
         end = datetime.time(11,59)
-        if date == datetime.datetime.now(pytz.timezone(self.timezone)).date() and end < datetime.datetime.now(pytz.timezone(self.timezone)).time():
+        if date == datetime.datetime.now(self.config.timezone).date() and end < datetime.datetime.now(self.config.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -147,7 +148,7 @@ class WeatherForecast:
 
         start = datetime.time(12,0)
         end = datetime.time(16,59)
-        if date == datetime.datetime.now(pytz.timezone(self.timezone)).date() and end < datetime.datetime.now(pytz.timezone(self.timezone)).time():
+        if date == datetime.datetime.now(self.config.timezone).date() and end < datetime.datetime.now(self.config.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -163,7 +164,7 @@ class WeatherForecast:
 
         start = datetime.time(17,0)
         end = datetime.time(20,59)
-        if date == datetime.datetime.now(pytz.timezone(self.timezone)).date() and end < datetime.datetime.now(pytz.timezone(self.timezone)).time():
+        if date == datetime.datetime.now(self.config.timezone).date() and end < datetime.datetime.now(self.config.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)

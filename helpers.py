@@ -144,16 +144,16 @@ class WeatherCondition:
         
 # Datadump for a Location
 class Location:
-    def __init__(self, location_name):
-        self.name = location_name
+    def __init__(self, city):
+        self.city = city
 
     def set_lat_and_lon(self, lat, lon):
         self.lat = float(lat)
         self.lon = float(lon)
 
-    def set_zipcode(self, zipcode, country):
+    def set_zipcode(self, zipcode, country_code):
         self.zipcode = zipcode
-        self.country = country
+        self.country_code = country_code
         
 # my implementation of hermes-pythons Grain since that is the only thing I need from that package
 class Grain(Enum):

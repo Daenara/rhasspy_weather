@@ -1,13 +1,13 @@
 [General]
 api=openweathermap
-Units=metric
-LevelOfDetail=False
-Timezone=Europe/Berlin
+units=metric
+level_of_detail=False
+timezone=Europe/Berlin
 
 [Location]
-City=Berlin
-Zipcode=
-CountryCode=
+city=Berlin
+zipcode=
+country_code=
 lat=
 lon=
 
