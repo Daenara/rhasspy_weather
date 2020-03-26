@@ -63,14 +63,14 @@ Other than the scripts and the config you will need the intents. Here are mine (
 sentences.ini
 ```
 [GetWeatherForecast]
-day = (heute|morgen|[am:] ($rhasspy/days|((0..31) $rhasspy/months)))
-time = (früh|vormittag|mittag|nachmittag|abend|nacht|[um:] (0..24) [uhr:] [(0..59)])
-location = [(frankfurt|berlin|regensburg|london)]
+day = ($named_days|[am:] ($rhasspy/days|((0..31) $rhasspy/months))|in (0..7) Tagen)
+time = ($named_times|[um:] (0..24) [Uhr:] [(0..59)]|in (einer Stunde|(2..100) Stunden))
+location = [(Frankfurt|Berlin|Regensburg|London)]
 wie (ist|wird) das wetter [<day> {when_day}] [<time> {when_time}] [in <location> {location}]
 wie (ist|wird) [<day> {when_day}] [<time> {when_time}] das wetter [in <location> {location}]
 
 [GetWeatherForecastItem]
-brauche ich [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] [(eine|einen|ein) {article}] ($weather_items) {item}
+brauche ich [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] [(eine|einen|ein) {article}] $weather_items {item}
 
 [GetWeatherForecastCondition]
 gibt es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] (regen|schnee) {condition}
@@ -86,65 +86,50 @@ was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherFore
 slots
 ```
 {
-    "weather_item": [
-        "kaputze",
-        "regenmantel",
-        "paar stiefel",
-        "stiefel",
-        "schirm",
-        "winterjacke",
-        "sandalen",
-        "hut",
-        "kappe",
-        "sonnenschirm",
-        "handschuhe",
-        "schal",
-        "gummistiefel",
-        "sonnencreme",
-        "mütze",
-        "paar lange unterhosen",
-        "winterstiefel",
-        "sonnenhut",
-        "regenschirm",
-        "sonnenbrille",
-        "paar sandalen",
-        "paar gummistiefel",
-        "paar handschuhe",
-        "lange unterhose",
-        "mantel",
-        "halbschuhe",
-        "paar halbschuhe",
-        "paar winterstiefel"
+	"named_days": [
+        "übermorgen",
+        "morgen",
+        "heute"
+    ],
+    "named_times": [
+        "nacht",
+        "nachmittag",
+        "vormittag",
+        "früh",
+        "morgen",
+        "abend",
+        "mittag"
     ],
     "weather_items": [
-        "kaputze",
-        "regenmantel",
-        "paar stiefel",
-        "stiefel",
-        "schirm",
-        "winterjacke",
-        "sandalen",
-        "hut",
-        "kappe",
-        "sonnenschirm",
-        "handschuhe",
-        "schal",
-        "gummistiefel",
-        "sonnencreme",
-        "mütze",
-        "paar lange unterhosen",
-        "winterstiefel",
-        "sonnenhut",
-        "regenschirm",
-        "sonnenbrille",
-        "paar sandalen",
-        "paar gummistiefel",
-        "paar handschuhe",
-        "lange unterhose",
-        "mantel",
-        "halbschuhe",
-        "paar halbschuhe",
-        "paar winterstiefel"
+        "Regenmantel",
+        "Hut",
+        "Kaputze",
+        "paar Gummistiefel",
+        "Sonnenhut",
+        "Sonnenschirm",
+        "Mütze",
+        "Sonnencreme",
+        "Regenschirm",
+        "Schirm",
+        "paar lange Unterhosen",
+        "Stiefel",
+        "paar Handschuhe",
+        "lange Unterhosen",
+        "Handschuhe",
+        "Mantel",
+        "lange Unterhose",
+        "Halbschuhe",
+        "paar Halbschuhe",
+        "Gummistiefel",
+        "Schal",
+        "paar Stiefel",
+        "Winterstiefel",
+        "Sonnenbrille",
+        "Winterjacke",
+        "paar Sandalen",
+        "Kappe",
+        "paar Winterstiefel",
+        "Sandalen"
     ]
 }
 ```
@@ -170,9 +155,9 @@ On the other side there are a few items that can be queried for with rhasspy tha
  * ~~add location support~~
  * ~~add config file~~
  * make daily times in rhasspy_weather.py fit those in the weather logic (and use the logic already there to output the weather)
- * move custom data like weekdays, time definitions for midday, etc. and all language stuff to one file for easy access and easy translation
+ * ~~move custom data like weekdays, time definitions for midday, etc.~~ and all language stuff to one file for easy access and easy translation
  * fix the localized weekday problem again, this time using my custom array instead of a system locale that might not be installed
- * move the weather api(s) into a subfolder and only import and use the one that is specified in the config
+ * ~~move the weather api(s) into a subfolder and only import and use the one that is specified in the config~~
  * ~~rework error handling so errors are handed through everything, not only parts of it (errors while parsing the intent for example)~~
  * ~~figure out the data type of the errors owm gives back, one was an int and one was a string, or just make sure to cast them so they don't break the code~~ (hopefully)
  * move remaining slots from the sentences.ini to the slots
