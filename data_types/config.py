@@ -1,9 +1,10 @@
-from rhasspy_weather.status import Status, StatusCode
-from rhasspy_weather.helpers import Location
+from .location import Location
+from .status import Status, StatusCode
 import configparser
 import pytz
 import shutil
 import os
+import sys
 import logging
 
 log = logging.getLogger(__name__)
@@ -11,7 +12,8 @@ log = logging.getLogger(__name__)
 class WeatherConfig:
     def __init__(self):
         self.status = Status()
-        base_path = os.path.dirname(__file__)
+        base_path = os.path.join(os.path.dirname(sys.modules['__main__'].__file__), "rhasspy_weather")
+        #base_path = os.path.dirname(__file__)
         config_path = os.path.join(base_path, 'config.ini')
         default_config_path = os.path.join(base_path, 'config.default')
         config = configparser.ConfigParser(allow_no_value=True)

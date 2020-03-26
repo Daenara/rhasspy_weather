@@ -1,7 +1,8 @@
 import datetime
 import random
-from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
-from rhasspy_weather.status import Status, StatusCode
+from .enums import DateType, ForecastType, Grain
+from .location import Location
+from .status import Status, StatusCode
 
 import logging
 

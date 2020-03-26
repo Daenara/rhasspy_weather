@@ -1,5 +1,5 @@
-from rhasspy_weather.helpers import WeatherInterval
-from rhasspy_weather.status import Status, StatusCode
+from .interval import WeatherInterval
+from .status import Status, StatusCode
 import suntime
 import datetime
 

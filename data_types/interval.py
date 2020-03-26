@@ -1,10 +1,6 @@
-from enum import Enum
-
 import logging
 
 log = logging.getLogger(__name__)
-
-##########  Helper Classes ##########
 
 # Class used by WeatherReport and WeatherForecast
 # filled by WeatherForecast and used by WeatherReport
@@ -38,7 +34,7 @@ class WeatherInterval:
             self.weather_condition_list.append(weather_at_time.weather_condition_obj)
         self.increase_counter(weather_at_time.weather_condition)
 
-    # counts how many occurances of a certain weathertype there are
+    # counts how many occurrences of a certain weather type there are
     def increase_counter(self, counter):
         if counter == "Rain" or counter == "Drizzle": 
             self.__rain = self.__rain + 1
@@ -115,51 +111,3 @@ class WeatherInterval:
             else:
                 description = description + " und " + x.description
         return description
-        
-        
-# WeatherRequest for a fixed time or an interval?
-class DateType(Enum):
-    FIXED = "fixed"
-    INTERVAL = "interval"
-    
-    
-# What kind of WeatherRequest was made?
-class ForecastType(Enum):
-    FULL = "full"
-    TEMPERATURE = "temperature"
-    ITEM = "item"
-    CONDITION = "condition"
-    
-    
-# Datadump for a WeatherCondition
-class WeatherCondition:
-    def __init__(self, severity, description, condition):
-        self.severity = severity
-        self.description = description
-        self.condition = condition
-
-    def __eq__(self, other):
-        return self.description == other.description
-        
-        
-# Datadump for a Location
-class Location:
-    def __init__(self, city):
-        self.city = city
-
-    def set_lat_and_lon(self, lat, lon):
-        self.lat = float(lat)
-        self.lon = float(lon)
-
-    def set_zipcode(self, zipcode, country_code):
-        self.zipcode = zipcode
-        self.country_code = country_code
-        
-# my implementation of hermes-pythons Grain since that is the only thing I need from that package
-class Grain(Enum):
-    YEAR = 0
-    QUARTER = 1
-    MONTH = 2
-    WEEK = 3
-    DAY = 4
-    HOUR = 5

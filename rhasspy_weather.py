@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
-from rhasspy_weather.forecast import WeatherForecast
-from rhasspy_weather.report import WeatherReport
-from rhasspy_weather.config import WeatherConfig
+from .data_types.forecast import WeatherForecast
+from .data_types.report import WeatherReport
+from .data_types.config import WeatherConfig
 import rhasspy_weather.parser.rhasspy_intent as parser
 import logging
 

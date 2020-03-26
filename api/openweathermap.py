@@ -1,8 +1,9 @@
 import requests
 import datetime
-from rhasspy_weather.forecast import WeatherForecast
-from rhasspy_weather.helpers import WeatherCondition, Location
-from rhasspy_weather.status import StatusCode
+from rhasspy_weather.data_types.forecast import WeatherForecast 
+from rhasspy_weather.data_types.condition import WeatherCondition
+from rhasspy_weather.data_types.location import Location
+from rhasspy_weather.data_types.status import StatusCode
 
 import logging
 
