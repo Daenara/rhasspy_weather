@@ -10,6 +10,14 @@ log = logging.getLogger(__name__)
 def parse_intent_message(intent_message, config):
     intent = None
     
+    # if you changed the slot names in rhasspy, change them here, too
+    slot_day_name = "when_day"
+    slot_time_name = "when_time"
+    slot_location_name = "location"
+    slot_item_name = "item"
+    slot_condition_name = "condition"
+    slot_temperature_name = "temperature"
+    
     if "GetWeatherForecastCondition" == intent_message["intent"]["name"]:
         intent = ForecastType.CONDITION
     elif "GetWeatherForecastItem" == intent_message["intent"]["name"]:
@@ -29,26 +37,27 @@ def parse_intent_message(intent_message, config):
     new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, intent, config)
 
     # if a day was specified
-    if "when_day" in intent_message["slots"] and intent_message["slots"]["when_day"] != "":
+    slots = intent_message["slots"]
+    if slot_day_name in slots and slots[slot_day_name] != "":
         log.debug("it was a day specified")
         # is it today, tomorrow or the day after tomorrow (day in date_offset)?
-        if intent_message["slots"]["when_day"] in date_offset:
+        if slots[slot_day_name] in date_offset:
             log.debug("    day offset detected")
-            new_request.request_date = datetime.date.today() + datetime.timedelta(date_offset.index(intent_message["slots"]["when_day"]))
-            new_request.date_specified += intent_message["slots"]["when_day"]
+            new_request.request_date = datetime.date.today() + datetime.timedelta(date_offset.index(slots[slot_day_name]))
+            new_request.date_specified = slots[slot_day_name]
         # is a weekday named?
-        elif intent_message["slots"]["when_day"] in days:
+        elif slots[slot_day_name] in days:
             log.debug("    weekday detected")
             for x in range(7):
                 new_date = today + datetime.timedelta(x)
-                if intent_message["slots"]["when_day"] == days[new_date.weekday()]:
+                if slots[slot_day_name] == days[new_date.weekday()]:
                     new_request.request_date = new_date
-                    new_request.date_specified += "am " + intent_message["slots"]["when_day"]
+                    new_request.date_specified = "am " + slots[slot_day_name]
                     break
         # was a date specified (specified by rhasspy as "daynumber monthname")?
-        elif ' ' in intent_message["slots"]["when_day"]:
+        elif ' ' in slots[slot_day_name]:
             log.debug("    date detected")
-            day, month = intent_message["slots"]["when_day"].split()
+            day, month = slots[slot_day_name].split()
             new_request.date_specified = "am " + day + ". " + month
             # won't work when the year changes, fix that sometime
             try:
@@ -57,24 +66,24 @@ def parse_intent_message(intent_message, config):
                 new_request.status.set_status(StatusCode.DATE_ERROR)
         
         # if a time was specified
-        if "when_time" in intent_message["slots"] and intent_message["slots"]["when_time"] != "":
+        if slot_time_name in slots and slots[slot_time_name] != "":
             log.debug("it was a time specified")
             new_request.grain = Grain.HOUR
             # was something like midday specified (listed in time_range)?
-            if intent_message["slots"]["when_time"] in time_range:
+            if slots[slot_time_name] in time_range:
                 log.debug("    named time frame detected")
                 new_request.date_type = DateType.INTERVAL
-                new_request.start_time = time_range[intent_message["slots"]["when_time"]][0]
-                new_request.end_time = time_range[intent_message["slots"]["when_time"]][1]
-                new_request.time_specified += intent_message["slots"]["when_time"]
+                new_request.start_time = time_range[slots[slot_time_name]][0]
+                new_request.end_time = time_range[slots[slot_time_name]][1]
+                new_request.time_specified = slots[slot_time_name]
             # was it hours and minutes (specified as "HH MM" by rhasspy intent)?
-            elif isinstance(intent_message["slots"]["when_time"], str) and ' ' in intent_message["slots"]["when_time"]:
+            elif isinstance(slots[slot_time_name], str) and ' ' in slots[slot_time_name]:
                 log.debug("    hours and minutes detected")
-                new_request.start_time = datetime.datetime.strptime(intent_message["slots"]["when_time"], '%H %M').time()
+                new_request.start_time = datetime.datetime.strptime(slots[slot_time_name], '%H %M').time()
             # is it only an hour (no way to only specify minutes, if it is an int, it is hours)?
-            elif isinstance(intent_message["slots"]["when_time"], int):
+            elif isinstance(slots[slot_time_name], int):
                 log.debug("    hours detected")
-                new_request.start_time = datetime.time(intent_message["slots"]["when_time"], 0)
+                new_request.start_time = datetime.time(slots[slot_time_name], 0)
         else:
             log.debug("no time specified, getting weather for the full day")
     else:
@@ -82,19 +91,19 @@ def parse_intent_message(intent_message, config):
     
     # requested
     requested = None
-    if intent == ForecastType.CONDITION and "condition" in intent_message["slots"]:
-        requested = intent_message["slots"]["condition"]
-    elif intent == ForecastType.ITEM and "item" in intent_message["slots"]:
-        requested = intent_message["slots"]["item"]
-    elif intent == ForecastType.TEMPERATURE and "temperature" in intent_message["slots"]:
-        requested = intent_message["slots"]["temperature"]
+    if intent == ForecastType.CONDITION and slot_condition_name in slots:
+        requested = slots[slot_condition_name]
+    elif intent == ForecastType.ITEM and slot_item_name in slots:
+        requested = slots[slot_item_name]
+    elif intent == ForecastType.TEMPERATURE and slot_temperature_name in slots:
+        requested = slots[slot_temperature_name]
     if not requested == None:
         log.debug("there was a special request made")
         new_request.requested = requested.capitalize() # first letter uppercase because german nouns just are that way (and the weather_logic will break)
 
     # location
-    if "location" in intent_message["slots"]:
+    if slot_location_name in slots:
         log.debug("a location was specified")
-        new_request.location = Location(intent_message["slots"]["location"])
+        new_request.location = Location(slots[slot_location_name])
                 
     return new_request
