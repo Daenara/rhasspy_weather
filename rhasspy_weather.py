@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import datetime
+import pytz
 from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
 from rhasspy_weather.openweathermap import get_weather
 from rhasspy_weather.forecast import WeatherForecast
@@ -74,9 +75,9 @@ class Weather:
         months = ["januar", "februar", "märz", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "dezember"]
         date_offset = ["heute", "morgen", "übermorgen"]
         time_range = {"morgen": (datetime.time(6, 0), datetime.time(10, 0)),"vormittag": (datetime.time(10, 0), datetime.time(12, 0)), "mittag": (datetime.time(12, 0), datetime.time(14, 0)), "nachmittag": (datetime.time(15, 0), datetime.time(18, 0)), "abend": (datetime.time(18, 0), datetime.time(22, 0)), "nacht": (datetime.time(22, 0), datetime.time(7, 0))}
-        
+        today = datetime.datetime.now(pytz.timezone('Europe/Berlin')).date()
         #define default request
-        new_request = WeatherRequest(DateType.FIXED, Grain.DAY, datetime.date.today(), intent, self.detail)
+        new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, intent, self.detail)
 
         # if a day was specified
         if "when_day" in intent_message["slots"] and intent_message["slots"]["when_day"] != "":
@@ -89,7 +90,6 @@ class Weather:
             # is a weekday named?
             elif intent_message["slots"]["when_day"] in days:
                 log.debug("    weekday detected")
-                today = datetime.date.today();
                 for x in range(7):
                     new_date = today + datetime.timedelta(x)
                     if intent_message["slots"]["when_day"] == days[new_date.weekday()]:

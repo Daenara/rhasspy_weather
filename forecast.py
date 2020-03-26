@@ -2,6 +2,7 @@ from rhasspy_weather.helpers import WeatherInterval
 from rhasspy_weather.status import Status, StatusCode
 import suntime
 import datetime
+import pytz
 
 import logging
 
@@ -129,7 +130,7 @@ class WeatherForecast:
 
         start = datetime.time(6,0)
         end = datetime.time(11,59)
-        if date == datetime.datetime.now().date() and end < datetime.datetime.now().time():
+        if date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() and end < datetime.datetime.now(pytz.timezone('Europe/Berlin')).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -145,7 +146,7 @@ class WeatherForecast:
 
         start = datetime.time(12,0)
         end = datetime.time(16,59)
-        if date == datetime.datetime.now().date() and end < datetime.datetime.now().time():
+        if date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() and end < datetime.datetime.now(pytz.timezone('Europe/Berlin')).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -161,7 +162,7 @@ class WeatherForecast:
 
         start = datetime.time(17,0)
         end = datetime.time(20,59)
-        if date == datetime.datetime.now().date() and end < datetime.datetime.now().time():
+        if date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() and end < datetime.datetime.now(pytz.timezone('Europe/Berlin')).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -193,7 +194,7 @@ class WeatherForecast:
     # returns the forecast at the specified date
     def __get_forecast_for_date(self, date):
         log.debug("getting the complete forecast for a date - error: {0}".format(self.status.is_error))
-        
+        log.debug(date)
         if self.status.is_error:
             return self.status
         for x in self.forecast:

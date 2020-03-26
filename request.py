@@ -1,4 +1,5 @@
 import datetime
+import pytz
 from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
 from rhasspy_weather.status import Status, StatusCode
 
@@ -71,6 +72,7 @@ class WeatherRequest:
         self.forecast_type = forecast_type
         self.detail = detail
         self.status = Status()
+        
     
     def __str__(self): 
         return "(" + str(self.forecast_type) + ", " + str(self.date_type) + ", " + \
@@ -94,8 +96,8 @@ class WeatherRequest:
             # it is after 11:59PM of the day requested)
             if self.grain == Grain.HOUR and time == datetime.time.min:
                 self.request_date = self.request_date + datetime.timedelta(days=1)
-            elif self.grain == Grain.HOUR and self.request_date == datetime.datetime.now().date() and \
-                datetime.datetime.now().time() > time and time < datetime.time(12,0):
+            elif self.grain == Grain.HOUR and self.request_date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() and \
+                datetime.datetime.now(pytz.timezone('Europe/Berlin')).time() > time and time < datetime.time(12,0):
                return time.replace(hour=time.hour + 12)
             return time
         self.status.set_status(StatusCode.TIME_ERROR)

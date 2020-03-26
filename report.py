@@ -1,4 +1,5 @@
 import datetime
+import pytz
 import random
 from rhasspy_weather.helpers import DateType, ForecastType, Location, Grain
 from rhasspy_weather.status import Status, StatusCode
@@ -49,14 +50,14 @@ class WeatherReport:
         """
         log.debug("generating weather report - error: {0}".format(self.status.is_error))
         
-        if self.request.request_date < datetime.datetime.now().date() or self.request.grain == Grain.HOUR and self.request.request_date == datetime.datetime.now().date() \
-            and self.request.start_time < datetime.datetime.now().time():
+        if self.request.request_date < datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() or self.request.grain == Grain.HOUR and self.request.request_date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date() \
+            and self.request.start_time < datetime.datetime.now(pytz.timezone('Europe/Berlin')).time():
             log.debug("Can't get past weather, return with error message")
             self.status.set_status(StatusCode.PAST_WEATHER_ERROR) # Error: can't request forecast for the past
             return self.status.status_response()
         elif not self.forecast.has_weather_for_date(self.request.request_date):
             log.debug("No weather for today")
-            if self.request.request_date == datetime.datetime.now().date():
+            if self.request.request_date == datetime.datetime.now(pytz.timezone('Europe/Berlin')).date():
                 if self.request.date_type == DateType.FIXED:
                     log.debug("only weather for one day was requested, we don't have weather for that day so return with error message")
                     self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR) # Error: day nearly over, no forecast in api response
