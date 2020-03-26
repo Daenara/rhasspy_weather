@@ -91,7 +91,7 @@ was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherFore
 slots
 ```
 {
-	"named_days": [
+    "named_days": [
         "übermorgen",
         "morgen",
         "heute"
