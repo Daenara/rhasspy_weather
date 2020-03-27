@@ -1,9 +1,10 @@
 [General]
 api=openweathermap
+parser=rhasspy_intent
 units=metric
 level_of_detail=False
 timezone=Europe/Berlin
-locale=German
+locale=german
 
 [Location]
 city=Berlin

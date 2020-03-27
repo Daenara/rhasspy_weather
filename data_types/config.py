@@ -24,20 +24,42 @@ class WeatherConfig:
         if not (config.has_section("General") and config.has_section("Location")):
             log.error("At least one required section is missing. Please refer to 'config.default' for an example config.")
             self.status.set_status(StatusCode.CONFIG_ERROR)
-            return self
+            return None
         
         section_name_general = "General"
         if config.has_section(section_name_general):
             section_general = config[section_name_general]
             self.__detail = self.__get_required_option(section_general, "level_of_detail", False, "bool")
             self.__units = self.__get_required_option(section_general, "units", "metric")
-            self.__api = self.__get_required_option(section_general, "api", "openweathermap")
+            api = self.__get_required_option(section_general, "api", "openweathermap")
+            try:
+                name = "rhasspy_weather.api." + api
+                self.__api = __import__(name, fromlist=[''])
+            except:
+                log.error("There is no module in the api folder that matches the api name in your config.")
+                self.status.set_status(StatusCode.CONFIG_ERROR)
+                return None
+            parser = self.__get_required_option(section_general, "parser", "rhasspy_intent")
+            try:
+                name = "rhasspy_weather.parser." + parser
+                self.__parser = __import__(name, fromlist=[''])
+            except:
+                log.error("There is no module in the parser folder that matches the parser name in your config.")
+                self.status.set_status(StatusCode.CONFIG_ERROR)
+                return None
+            locale = self.__get_required_option(section_general, "locale", "german")
+            try:
+                name = "rhasspy_weather.locale." + locale
+                self.__locale = __import__(name, fromlist=[''])
+            except:
+                log.error("There is no module in the locale folder that matches the locale name in your config.")
+                self.status.set_status(StatusCode.CONFIG_ERROR)
+                return None         
             self.__timezone = pytz.timezone(self.__get_required_option(section_general, "timezone", "Europe/Berlin"))
-            self.__locale = self.__get_required_option(section_general, "locale", "German")
         else:
             log.error("Section [{0}] is missing from config. Please refer to 'config.default' for an example config.".format(section_name_general))
             self.status.set_status(StatusCode.CONFIG_ERROR)
-            return self
+            return None
             
         section_name_location = "Location"
         if config.has_section(section_name_location):
@@ -54,9 +76,9 @@ class WeatherConfig:
         else:
             log.error("Section [{0}] is missing from config. Please refer to 'config.default' for an example config.".format(section_name_location))
             self.status.set_status(StatusCode.CONFIG_ERROR)
-            return self
+            return None
         
-        if self.api == "openweathermap":
+        if api == "openweathermap":
             has_error = False
             section_name_openweathermap = "OpenWeatherMap"
             if config.has_section(section_name_openweathermap):
@@ -77,8 +99,8 @@ class WeatherConfig:
                 has_error = True
                 
             if has_error:
-                self.status.set_status(StatusCode.API_ERROR) # Error: something went wrong with the api call
-                return self
+                self.status.set_status(StatusCode.API_ERROR)
+                return None
         log.info("Config Loaded")
             
             
@@ -89,6 +111,10 @@ class WeatherConfig:
     @property
     def api(self):
         return self.__api
+        
+    @property
+    def parser(self):
+        return self.__parser
         
     @property
     def timezone(self):

@@ -16,10 +16,7 @@ def parse_intent_message(intent_message, config):
     slot_location_name = "location"
     slot_item_name = "item"
     slot_condition_name = "condition"
-    slot_temperature_name = "temperature"
-    
-    if config.locale in ["German", "german", "Deutsch", "deutsch", "de", "DE", "deDe"]:
-        from rhasspy_weather.locale import german as locale
+    slot_temperature_name = "temperature"   
     
     if "GetWeatherForecastCondition" == intent_message["intent"]["name"]:
         intent = ForecastType.CONDITION
@@ -39,14 +36,14 @@ def parse_intent_message(intent_message, config):
     slots = intent_message["slots"]
     if slot_day_name in slots and slots[slot_day_name] != "":
         log.debug("it was a day specified")
-        named_days_lowercase = [x.lower() for x in locale.named_days]
-        weekdays_lowercase = [x.lower() for x in locale.weekday_names]
+        named_days_lowercase = [x.lower() for x in config.locale.named_days]
+        weekdays_lowercase = [x.lower() for x in config.locale.weekday_names]
         # is it a named day (tomorrow, etc.)?
         if slots[slot_day_name].lower() in named_days_lowercase:
             log.debug("  named day detected")
             index = named_days_lowercase.index(slots[slot_day_name].lower())
-            key = list(locale.named_days.keys())[index]
-            value = list(locale.named_days.values())[index]
+            key = list(config.locale.named_days.keys())[index]
+            value = list(config.locale.named_days.values())[index]
             if isinstance(value, datetime.date):
                 log.debug("    named day seems to be a date")
                 self.status.set_status(StatusType.NOT_IMPLEMENTET_ERROR)
@@ -58,7 +55,7 @@ def parse_intent_message(intent_message, config):
         elif slots[slot_day_name].lower() in weekdays_lowercase:
             log.debug("  weekday detected")
             index = weekdays_lowercase.index(slots[slot_day_name].lower())
-            name = locale.weekday_names[index]
+            name = config.locale.weekday_names[index]
             for x in range(7):
                 new_date = today + datetime.timedelta(x)
                 if slots[slot_day_name].lower() == weekdays_lowercase[new_date.weekday()]:
@@ -69,10 +66,10 @@ def parse_intent_message(intent_message, config):
         elif ' ' in slots[slot_day_name]:
             log.debug("  date detected")
             day, month = slots[slot_day_name].split()
-            months_lowercase = [x.lower() for x in locale.month_names]
+            months_lowercase = [x.lower() for x in config.locale.month_names]
             if month.lower() in months_lowercase:
                 index = months_lowercase.index(month.lower())
-                name = locale.month_names[index]
+                name = config.locale.month_names[index]
                 new_request.date_specified = "am " + day + ". " + name
                 # won't work when the year changes, fix that sometime
                 try:
@@ -85,20 +82,20 @@ def parse_intent_message(intent_message, config):
             log.debug("it was a time specified")
             new_request.grain = Grain.HOUR
             
-            named_times_lowercase = [x.lower() for x in locale.named_times]
-            named_times_synonyms_lowercase = [x.lower() for x in locale.named_times_synonyms]
+            named_times_lowercase = [x.lower() for x in config.locale.named_times]
+            named_times_synonyms_lowercase = [x.lower() for x in config.locale.named_times_synonyms]
             named_times_combined = named_times_lowercase + named_times_synonyms_lowercase
             # was something like midday specified (listed in locale.named_times or in locale.named_times_synonyms)?
             if isinstance(slots[slot_time_name], str) and slots[slot_time_name].lower() in named_times_combined:
                 log.debug("  named time frame detected")
                 if slots[slot_time_name].lower() in named_times_synonyms_lowercase:
                     index = named_times_synonyms_lowercase.index(slots[slot_time_name].lower())
-                    name = list(locale.named_times_synonyms.keys())[index]
-                    value = locale.named_times[locale.named_times_synonyms[name]]
+                    name = list(config.locale.named_times_synonyms.keys())[index]
+                    value = config.locale.named_times[config.locale.named_times_synonyms[name]]
                 else:
                     index = named_times_lowercase.index(slots[slot_time_name].lower())
-                    name = list(locale.named_times.keys())[index]
-                    value = list(locale.named_times.values())[index]
+                    name = list(config.locale.named_times.keys())[index]
+                    value = list(config.locale.named_times.values())[index]
                 log.debug(value)
                 if isinstance(value, datetime.time):
                     log.debug("    named time seems to be a certain time")

@@ -2,7 +2,6 @@
 from .data_types.forecast import WeatherForecast
 from .data_types.report import WeatherReport
 from .data_types.config import WeatherConfig
-import rhasspy_weather.parser.rhasspy_intent as parser
 import logging
 
 log = logging.getLogger(__name__)
@@ -15,14 +14,12 @@ def get_weather_forecast(intent_message):
         return config.status.status_response()
     
     log.info("Parsing rhasspy intent")
-    request = parser.parse_intent_message(intent_message, config)
+    request = config.parser.parse_intent_message(intent_message, config)
     if request.status.is_error:
         return request.status.status_response()
     
     log.info("Requesting weather")
-    if config.api == "openweathermap":
-        import rhasspy_weather.api.openweathermap as api
-    forecast = api.get_weather(request.location, config)
+    forecast = config.api.get_weather(request.location, config)
     if forecast.status.is_error:
         return forecast.status.status_response()
     
