@@ -29,7 +29,7 @@ class WeatherReport:
         generates and returns the answer to the WeatherRequest as string
     """
 
-    def __init__(self, request, forecast, config):
+    def __init__(self, request, forecast):
         """
         Parameters:
         request : WeatherRequest
@@ -39,9 +39,11 @@ class WeatherReport:
         """
         log.debug("weather report initialized")
         
-        self.forecast = forecast
-        self.request = request
-        self.config = config
+        self.__forecast = forecast
+        self.__request = request
+        from rhasspy_weather.globals import config
+        self.__timezone = config.timezone
+        self.__locale = config.locale
         self.status = Status()
 
     def generate_report(self):
@@ -51,39 +53,39 @@ class WeatherReport:
         """
         log.debug("generating weather report - error: {0}".format(self.status.is_error))
         
-        if self.request.request_date < datetime.datetime.now(self.config.timezone).date() or self.request.grain == Grain.HOUR and self.request.request_date == datetime.datetime.now(self.config.timezone).date() \
-            and self.request.start_time < datetime.datetime.now(self.config.timezone).time():
+        if self.__request.request_date < datetime.datetime.now(self.__timezone).date() or self.__request.grain == Grain.HOUR and self.__request.request_date == datetime.datetime.now(self.__timezone).date() \
+            and self.__request.start_time < datetime.datetime.now(self.__timezone).time():
             log.debug("Can't get past weather, return with error message")
-            self.status.set_status(StatusCode.PAST_WEATHER_ERROR) # Error: can't request forecast for the past
+            self.status.set_status(StatusCode.PAST_WEATHER_ERROR)
             return self.status.status_response()
-        elif not self.forecast.has_weather_for_date(self.request.request_date):
+        elif not self.__forecast.has_weather_for_date(self.__request.request_date):
             log.debug("No weather for today")
-            if self.request.request_date == datetime.datetime.now(self.config.timezone).date():
-                if self.request.date_type == DateType.FIXED:
+            if self.__request.request_date == datetime.datetime.now(self.__timezone).date():
+                if self.__request.date_type == DateType.FIXED:
                     log.debug("only weather for one day was requested, we don't have weather for that day so return with error message")
                     self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR) # Error: day nearly over, no forecast in api response
                     return self.status.status_response()
-                elif self.request.request_date == DateType.INTERVAL:
+                elif self.__request.request_date == DateType.INTERVAL:
                     log.debug("handle intervals that span over night here")
                     self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
                     return self.status.status_response()
-                    #if self.forecast.has_weather_for_date(self.request.request_date + datetime.timedelta(days=1)):
+                    #if self.__forecast.has_weather_for_date(self.__request.request_date + datetime.timedelta(days=1)):
                     #    log.debug("weather for tomorrow was requested as well so we are good to continue")
             else:
-                self.status.set_status(StatusCode.FUTURE_WEATHER_ERROR) # Error: to many days in advance
+                self.status.set_status(StatusCode.FUTURE_WEATHER_ERROR)
                 return self.status.status_response()
         
-        if not (self.request.grain == Grain.DAY or self.request.grain == Grain.HOUR):
+        if not (self.__request.grain == Grain.DAY or self.__request.grain == Grain.HOUR):
             self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
             return self.status.status_response()
     
-        if self.request.forecast_type == ForecastType.TEMPERATURE:
+        if self.__request.forecast_type == ForecastType.TEMPERATURE:
             response = self.__generate_temperature_report()
-        elif self.request.forecast_type == ForecastType.CONDITION:
+        elif self.__request.forecast_type == ForecastType.CONDITION:
             response = self.__generate_condition_report()
-        elif self.request.forecast_type == ForecastType.FULL:
+        elif self.__request.forecast_type == ForecastType.FULL:
            response = self.__generate_full_report()
-        elif self.request.forecast_type == ForecastType.ITEM:
+        elif self.__request.forecast_type == ForecastType.ITEM:
             response = self.__generate_item_report()
 
         return response
@@ -93,15 +95,15 @@ class WeatherReport:
     def __generate_full_report(self):
         log.debug("generating full report - error: {0}".format(self.status.is_error))
         response = ""
-        if self.request.date_type == DateType.FIXED:
-            if self.request.grain == Grain.DAY:
+        if self.__request.date_type == DateType.FIXED:
+            if self.__request.grain == Grain.DAY:
                 response = self.__generate_full_report_day()
-            elif self.request.grain == Grain.HOUR:
-                weather = self.forecast.weather_at_time(self.request.request_date, self.request.start_time)
+            elif self.__request.grain == Grain.HOUR:
+                weather = self.__forecast.weather_at_time(self.__request.request_date, self.__request.start_time)
                 response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)
                 response = response + " " + self.__answer_temperature(weather.min_temperature).format(when="", where="")
-        elif self.request.date_type == DateType.INTERVAL: 
-            weather = self.forecast.weather_for_interval(self.request.request_date, self.request.start_time, self.request.end_time)
+        elif self.__request.date_type == DateType.INTERVAL: 
+            weather = self.__forecast.weather_for_interval(self.__request.request_date, self.__request.start_time, self.__request.end_time)
             response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)
             response = response + " " + self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when="", where="")
         return response
@@ -111,15 +113,15 @@ class WeatherReport:
     def __generate_temperature_report(self):
         log.debug("generating temperature report - error: {0}".format(self.status.is_error))
         response = ""
-        if self.request.date_type == DateType.FIXED:
-            if self.request.grain == Grain.DAY:
+        if self.__request.date_type == DateType.FIXED:
+            if self.__request.grain == Grain.DAY:
                 response = self.__generate_temperature_report_day()
-            elif self.request.grain == Grain.HOUR:
+            elif self.__request.grain == Grain.HOUR:
                 response = ""
-                weather = self.forecast.weather_at_time(self.request.request_date, self.request.start_time)
+                weather = self.__forecast.weather_at_time(self.__request.request_date, self.__request.start_time)
                 response = self.__answer_temperature(weather.min_temperature).format(when=self.__output_date_and_time, where=self.__output_location)
-        elif self.request.date_type == DateType.INTERVAL: 
-            weather = self.forecast.weather_for_interval(self.request.request_date, self.request.start_time, self.request.end_time)
+        elif self.__request.date_type == DateType.INTERVAL: 
+            weather = self.__forecast.weather_for_interval(self.__request.request_date, self.__request.start_time, self.__request.end_time)
             response = self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when=self.__output_date_and_time, where=self.__output_location)
         return response
 
@@ -128,14 +130,14 @@ class WeatherReport:
     def __generate_condition_report(self):
         log.debug("generating condition report - error: {0}".format(self.status.is_error))
         response = ""
-        if self.request.date_type == DateType.FIXED:
-            if self.request.grain == Grain.DAY:
+        if self.__request.date_type == DateType.FIXED:
+            if self.__request.grain == Grain.DAY:
                 response = self.__generate_condition_report_day()
-            elif self.request.grain == Grain.HOUR:
-                weather_at_time = self.forecast.weather_at_time(self.request.request_date, self.request.start_time)
+            elif self.__request.grain == Grain.HOUR:
+                weather_at_time = self.__forecast.weather_at_time(self.__request.request_date, self.__request.start_time)
                 response = self.__answer_condition(weather_at_time).format(when=self.__output_date_and_time, where=self.__output_location)
-        elif self.request.date_type == DateType.INTERVAL: 
-            weather = self.forecast.weather_for_interval(self.request.request_date, self.request.start_time, self.request.end_time)
+        elif self.__request.date_type == DateType.INTERVAL: 
+            weather = self.__forecast.weather_for_interval(self.__request.request_date, self.__request.start_time, self.__request.end_time)
             response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)
         return response
 
@@ -143,74 +145,66 @@ class WeatherReport:
     # called by generate_report()
     def __generate_item_report(self):
         log.debug("generating item report - error: {0}".format(self.status.is_error))
-        rain = ["Regenmantel", "Schirm", "Gummistiefel", "Halbschuhe", "Kaputze", "Hut", "Regenschirm"]
-        warm = ["Sonnenbrille", "Sonnencreme", "Sonnenschirm", "Kappe", "Sonnenhut", "Sandalen"]
-        cold = ["Winterstiefel", "Mantel", "Schal", "Handschuhe", "Mütze"]
-        item = self.request.requested
-        if self.request.requested in ["Regenmantel", "Schirm", "Hut", "Sonnenhut", "Mantel", "Schal", "Sonnenschirm", "Regenschirm"]:
-            item = "ein " + item + " ist"
-        elif self.request.requested in ["Kaputze", "Kappe", "Mütze", "Sonnenbrille"]:
-            item = "eine " + item + " ist"
-        elif self.request.requested in ["Gummistiefel", "Halbschuhe", "Sandalen", "Handschuhe", "Winterstiefel"]:
-            item = item + " sind"
-        elif self.request.requested in ["Sonnencreme"]:
-            item = item + " ist"
-        response = ""
-        if self.request.date_type == DateType.FIXED:
-            if self.request.grain == Grain.DAY:
-                weather = self.forecast.weather_for_day(self.request.request_date)
-            elif self.request.grain == Grain.HOUR:
-                weather = self.forecast.weather_at_time(self.request.request_date, self.request.start_time)
-        elif self.request.date_type == DateType.INTERVAL:
-            weather = self.forecast.weather_for_interval(self.request.request_date, self.request.start_time, self.request.end_time)
-        if self.request.requested in rain:
+
+        item = self.__request.requested
+        
+        if self.__request.date_type == DateType.FIXED:
+            if self.__request.grain == Grain.DAY:
+                weather = self.__forecast.weather_for_day(self.__request.request_date)
+            elif self.__request.grain == Grain.HOUR:
+                weather = self.__forecast.weather_at_time(self.__request.request_date, self.__request.start_time)
+        elif self.__request.date_type == DateType.INTERVAL:
+            weather = self.__forecast.weather_for_interval(self.__request.request_date, self.__request.start_time, self.__request.end_time)
+        
+        
+        if self.__request.requested in self.__locale.rain_items:
             if weather.is_rain_chance:
-                response = "Es könnte {when} {where} regnen, {item} keine schlechte Idee."
+                response_type = "rain"
             else:
-                response = "Es ist {when} {where} kein Regen gemeldet. {item} also vermutlich unnötig."
-        elif self.request.requested in warm:
-            day_weather = self.forecast.weather_during_daytime(self.request)
+                response_type = "no_rain"
+        elif self.__request.requested in self.__locale.warm_items:
+            day_weather = self.__forecast.weather_during_daytime(self.__request)
             if day_weather.is_clear:
                 if weather.max_temperature >= 20:
-                    response = "Es ist {when} warm {where} und tagsüber kommt die Sonne raus. {item} daher eine gute Idee."
+                    response_type = "warm_and_sunny"
                 else:
-                    response = "Es ist {when} {where} nicht sonderlich warm aber trotzdem sonnig. {item} vielleicht trotzdem nützlich."
+                    response_type = "not_warm_and_sunny"
             else:
-                response = "Es ist {when} {where} nicht unbedingt sonnig. {item} vermutlich eher überflüssig."
-        elif self.request.requested in cold:
+                response_type = "not_sunny"
+        elif self.__request.requested in self.__locale.cold_items:
             if weather.max_temperature < 5:
-                response = "Es ist {when} kalt {where}. {item} daher eine gute Idee."
+                response_type = "cold"
             else:
-                response = "Es ist {when} {where} nicht sonderlich kalt. {item} daher eher unnötig."
+                response_type = "not_cold"
         else:
-            return "Ich bin mir nicht sicher, was ein " + self.request.requested + " ist, tut mir leid."
-        return response.format(when=self.__output_date_and_time, where=self.__output_location, item=item)
+            response_type = "unknown_items"
+        return random.choice(self.__locale.item_answers[response_type]).format(when=self.__output_date_and_time, where=self.__output_location, item=self.__locale.format_item_for_output(item))
 
     # returns a string response with the weatherforecast for a full day
     # if detail=True in the config this answer may be rather long
     # called by __generate_full_report()
     def __generate_full_report_day(self):
         log.debug("generating full day report - error: {0}".format(self.status.is_error))
-        if self.request.detail:
+        if self.__request.detail:
             response = "Der Wetter-Bericht {when} {where}: ".format(when=self.__output_date_and_time,where=self.__output_location)
-            morning = self.forecast.weather_morning(self.request.request_date)
+            morning = self.__forecast.weather_morning(self.__request.request_date)
             if morning is not None:
                 response = response + self.__answer_condition(morning).format(when="Morgens", where="")
                 response = response + " " + self.__answer_temperature(morning.min_temperature, morning.max_temperature).format(when="", where="") + " "
-            noon = self.forecast.weather_noon(self.request.request_date)
+            noon = self.__forecast.weather_noon(self.__request.request_date)
             if noon is not None:
                 response = response + self.__answer_condition(noon).format(when="Mittags", where="")
                 response = response + " " + self.__answer_temperature(noon.min_temperature, noon.max_temperature).format(when="", where="") + " "
-            evening = self.forecast.weather_evening(self.request.request_date)
+            evening = self.__forecast.weather_evening(self.__request.request_date)
             if evening is not None:
                 response = response + self.__answer_condition(evening).format(when="Abends", where="")
                 response = response + " " + self.__answer_temperature(evening.min_temperature, evening.max_temperature).format(when="", where="") + " "
-            night = self.forecast.weather_night(self.request.request_date)
+            night = self.__forecast.weather_night(self.__request.request_date)
             if night is not None:
                 response = response + self.__answer_condition(night).format(when="Nachts", where="")
                 response = response + " " + self.__answer_temperature(night.min_temperature, night.max_temperature).format(when="", where="")
         else:
-            weather_for_day = self.forecast.weather_for_day(self.request.request_date)
+            weather_for_day = self.__forecast.weather_for_day(self.__request.request_date)
             response = self.__answer_condition(weather_for_day).format(when=self.__output_date_and_time, where=self.__output_location)
             response = response + " " + self.__answer_temperature(weather_for_day.min_temperature, weather_for_day.max_temperature).format(when="", where="")
         return response
@@ -220,22 +214,22 @@ class WeatherReport:
     # called by __generate_temperature_report()
     def __generate_temperature_report_day(self):
         log.debug("generating temperature day report - error: {0}".format(self.status.is_error))
-        if self.request.detail:
+        if self.__request.detail:
             response = "Die Temperatur {when} {where}. ".format(when=self.__output_date_and_time,where=self.__output_location)
-            morning = self.forecast.weather_morning(self.request.request_date)
+            morning = self.__forecast.weather_morning(self.__request.request_date)
             if morning is not None:
                 response = response + " " + self.__answer_temperature(morning.min_temperature, morning.max_temperature).format(when="Morgens", where="") + " "
-            noon = self.forecast.weather_noon(self.request.request_date)
+            noon = self.__forecast.weather_noon(self.__request.request_date)
             if noon is not None:
                 response = response + " " + self.__answer_temperature(noon.min_temperature, noon.max_temperature).format(when="Mittags", where="") + " "
-            evening = self.forecast.weather_evening(self.request.request_date)
+            evening = self.__forecast.weather_evening(self.__request.request_date)
             if evening is not None:
                 response = response + " " + self.__answer_temperature(evening.min_temperature, evening.max_temperature).format(when="Abends", where="") + " "
-            night = self.forecast.weather_night(self.request.request_date)
+            night = self.__forecast.weather_night(self.__request.request_date)
             if night is not None:
                 response = response + " " + self.__answer_temperature(night.min_temperature, night.max_temperature).format(when="Nachts", where="")
         else:
-            weather = self.forecast.weather_for_day(self.request.request_date)
+            weather = self.__forecast.weather_for_day(self.__request.request_date)
             response = self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when=self.__output_date_and_time, where=self.__output_location)
         return response
 
@@ -244,22 +238,22 @@ class WeatherReport:
     # called by __generate_condition_report()
     def __generate_condition_report_day(self):
         log.debug("generating condition day report - error: {0}".format(self.status.is_error))
-        if self.request.detail:
+        if self.__request.detail:
             response = "Das Wetter {when} {where}. ".format(when=self.__output_date_and_time,where=self.__output_location)
-            morning = self.forecast.weather_morning(self.request.request_date)
+            morning = self.__forecast.weather_morning(self.__request.request_date)
             if morning is not None:
                 response = response + self.__answer_condition(morning).format(when="Morgens", where="") + " "
-            noon = self.forecast.weather_noon(self.request.request_date)
+            noon = self.__forecast.weather_noon(self.__request.request_date)
             if noon is not None:
                 response = response + self.__answer_condition(noon).format(when="Mittags", where="") + " "
-            evening = self.forecast.weather_evening(self.request.request_date)
+            evening = self.__forecast.weather_evening(self.__request.request_date)
             if evening is not None:
                 response = response + self.__answer_condition(evening).format(when="Abends", where="") + " "
-            night = self.forecast.weather_night(self.request.request_date)
+            night = self.__forecast.weather_night(self.__request.request_date)
             if night is not None:
                 response = response + self.__answer_condition(night).format(when="Nachts", where="")
         else:
-            weather = self.forecast.weather_for_day(self.request.request_date)
+            weather = self.__forecast.weather_for_day(self.__request.request_date)
             response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)
         return response
 
@@ -314,34 +308,34 @@ class WeatherReport:
         sun_false = ["Nein, {when} {where} scheint keine Sonne. Das Wetter ist: {weather}."]
         mist_true = ["Ja, {when} {where} ist es neblig."]
         mist_false = ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."]
-        if self.request.forecast_type == ForecastType.CONDITION:
-            if self.request.requested == "Regen":
+        if self.__request.forecast_type == ForecastType.CONDITION:
+            if self.__request.requested == "Regen":
                 if weather_obj.is_rain_chance:
                     return random.choice(rain_true).format(when="{when}", where="{where}")
                 else:
                     return random.choice(rain_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
-            elif self.request.requested == "Schnee":
+            elif self.__request.requested == "Schnee":
                 if weather_obj.is_rain_chance:
                     return random.choice(snow_true).format(when="{when}", where="{where}")
                 else:
                     return random.choice(snow_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
-            elif self.request.requested == "Sonne":
-                day_weather = self.forecast.weather_during_daytime(self.request)
+            elif self.__request.requested == "Sonne":
+                day_weather = self.__forecast.weather_during_daytime(self.__request)
                 if day_weather is not None and day_weather.is_clear:
                     return random.choice(sun_true).format(when="{when}", where="{where}")
                 else:
                     return random.choice(sun_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
-            elif self.request.requested == "Gewitter":
+            elif self.__request.requested == "Gewitter":
                 if weather_obj.is_thunderstorm_chance:
                     return random.choice(thunderstorm_true).format(when="{when}", where="{where}")
                 else:
                     return random.choice(thunderstorm_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
-            elif self.request.requested == "Nebel":
+            elif self.__request.requested == "Nebel":
                 if weather_obj.is_misty:
                     return random.choice(mist_true).format(when="{when}", where="{where}")
                 else:
                     return random.choice(mist_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
-            elif self.request.requested == "Wolken":
+            elif self.__request.requested == "Wolken":
                 if weather_obj.is_cloudy:
                     return random.choice(cloud_true).format(when="{when}", where="{where}")
                 else:
@@ -352,43 +346,43 @@ class WeatherReport:
     def __output_date_and_time(self):
         log.debug("generating time and date for response - error: {0}".format(self.status.is_error))
         # set date and time to default values
-        date = "am " + self.request.readable_date
+        date = "am " + self.__request.readable_date
         time = ""
         
         # check if the user wanted a specific time/date
         userdefined_date = False
         userdefined_time = False
-        if self.request.date_specified != "":
-            date = self.request.date_specified
+        if self.__request.date_specified != "":
+            date = self.__request.date_specified
             userdefined_date = True
-        if self.request.time_specified != "":
-            time = self.request.time_specified
+        if self.__request.time_specified != "":
+            time = self.__request.time_specified
             userdefined_time = True
             
         # make the output date more pretty if the user did not ask for something specific
         if not userdefined_date:
             # determine date
-            if self.request.time_difference == 0:
+            if self.__request.time_difference == 0:
                 date = "heute"
-            elif self.request.time_difference == 1:
+            elif self.__request.time_difference == 1:
                 date = "morgen"
             else:
-                temp_day = datetime.datetime.today().weekday() + self.request.time_difference
+                temp_day = datetime.datetime.today().weekday() + self.__request.time_difference
                 if temp_day < 7:
-                    date = "am " + self.request.weekday
+                    date = "am " + self.__request.weekday
                 elif temp_day < 14:
-                    date = "nächste Woche " + self.request.weekday
+                    date = "nächste Woche " + self.__request.weekday
         # make the output time more pretty if the user did not ask for something specific
         if not userdefined_time:
             # determine time
-            if self.request.grain == Grain.HOUR:
-                time = "um " + self.request.readable_start_time + " Uhr"
+            if self.__request.grain == Grain.HOUR:
+                time = "um " + self.__request.readable_start_time + " Uhr"
                 
-        if self.request.grain == Grain.HOUR:
+        if self.__request.grain == Grain.HOUR:
             return date + " " + time
         return date
 
     @property
     def __output_location(self):
         log.debug("generating location for response - error: {0}".format(self.status.is_error))
-        return "in {0}".format(self.request.location.name) if self.request.location_specified else ""
+        return "in {0}".format(self.__request.location.name) if self.__request.location_specified else ""

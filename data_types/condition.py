@@ -1,4 +1,3 @@
-# Datadump for a WeatherCondition
 class WeatherCondition:
     def __init__(self, severity, description, condition):
         self.severity = severity

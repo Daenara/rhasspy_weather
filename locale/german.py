@@ -1,5 +1,10 @@
 import datetime
+from rhasspy_weather.data_types.status import StatusCode
 
+# used in interval.py to combine two kinds of weather
+combine_word = "und"
+
+# used in parsers
 weekday_names = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"]
 month_names = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
 named_days = {"heute":0, "morgen":1, "übermorgen":2}
@@ -14,3 +19,57 @@ named_times = {
 named_times_synonyms = {
     "früh": "Morgen"
 }
+
+# used in status.py to output status messages
+status_response = {
+    StatusCode.NORMAL: ["Sieht alles normal aus."],
+    StatusCode.NO_NETWORK_ERROR: ["Es ist leider kein Internet verfügbar.", 
+                                  "Ich bin nicht mit dem Internet verbunden.", 
+                                  "Es ist kein Internet vorhanden."],
+    StatusCode.API_ERROR: ["Das Wetter konnte nicht abgerufen werden. Vermutlich ist der API-Schlüssel ungültig.", 
+                           "Fehler beim Abrufen. Der API-Schlüssel ist ungültig."],
+    StatusCode.FUTURE_WEATHER_ERROR: ["So weit in die Zukunft kenne ich das Wetter nicht.",
+                                      "Ich kann nicht soweit in die Zukunft sehen.",
+                                      "Das Wetter für diesen Tag wurde noch nicht beschlossen.",
+                                      "Dieses Datum liegt zu weit in der Zukunft."],
+    StatusCode.NOT_IMPLEMENTED_ERROR: ["Diese Funktion wird noch nicht unterstützt.", 
+                                      "Ich weiß nicht wie ich diese Anfrage verarbeiten soll."],
+    StatusCode.LOCATION_ERROR: ["Ich kann die angegebene Stadt nich finden. Vielleicht habe ich sie nicht richtig verstanden"],
+    StatusCode.PAST_WEATHER_ERROR : ["Ich kann dir das Wetter aus der Vergangenheit leider nicht sagen."],
+    StatusCode.NO_WEATHER_FOR_DAY_ERROR: ["Es ist so kurz vor Mitternacht, dass ich das Wetter für heute nicht abrufen kann."],
+    StatusCode.DATE_ERROR: ["Irgendwas stimmt mit dem Datum nicht."],
+    StatusCode.API_TIMEOUT_ERROR: ["Mit diesem API-Schlüssel wurden zu viele Anfragen gesenden. Versuche es später erneut."],
+    StatusCode.CONFIG_ERROR: ["Es gab ein Problem beim Laden der Konfigurationsdatei."],
+    StatusCode.TIME_ERROR: ["Irgendwas stimmt mit der angegebenen Zeit nicht."],
+    StatusCode.GENERAL_ERROR: ["Es ist ein Fehler aufgetreten.", "Hier ist ein Fehler aufgetreten."]
+}
+
+# used in report.py
+
+# items
+rain_items = ["Regenmantel", "Schirm", "Gummistiefel", "Halbschuhe", "Kaputze", "Hut", "Regenschirm"]
+warm_items = ["Sonnenbrille", "Sonnencreme", "Sonnenschirm", "Kappe", "Sonnenhut", "Sandalen"]
+cold_items = ["Winterstiefel", "Mantel", "Schal", "Handschuhe", "Mütze"]
+
+item_answers = {
+    "rain": ["Es könnte {when} {where} regnen, {item} keine schlechte Idee.", "Es könnte {when} {where} Regen geben. {item} keine schlechte Idee."],
+    "no_rain": ["Es ist {when} {where} kein Regen gemeldet. {item} also vermutlich unnötig."],
+    "warm_and_sunny": ["Es ist {when} warm {where} und tagsüber kommt die Sonne raus. {item} daher eine gute Idee."],
+    "not_warm_and_sunny": ["Es ist {when} {where} nicht sonderlich warm aber trotzdem sonnig. {item} vielleicht trotzdem nützlich."],
+    "not_sunny": ["Es ist {when} {where} nicht unbedingt sonnig. {item} vermutlich eher überflüssig."],
+    "cold": ["Es ist {when} kalt {where}. {item} daher eine gute Idee."],
+    "not_cold": ["Es ist {when} {where} nicht sonderlich kalt. {item} daher eher unnötig."],
+    "unknown_item": ["Ich bin mir nicht sicher, was ein {item} ist, tut mir leid."]
+}
+
+def format_item_for_output(item):
+    if item in ["Regenmantel", "Schirm", "Hut", "Sonnenhut", "Mantel", "Schal", "Sonnenschirm", "Regenschirm"]:
+        return "ein " + item + " ist"
+    elif item in ["Kaputze", "Kappe", "Mütze", "Sonnenbrille"]:
+        return "eine " + item + " ist"
+    elif item in ["Gummistiefel", "Halbschuhe", "Sandalen", "Handschuhe", "Winterstiefel"]:
+        return item + " sind"
+    elif item in ["Sonnencreme"]:
+        return item + " ist"
+    else: 
+        return item

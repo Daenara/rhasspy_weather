@@ -7,8 +7,10 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def parse_intent_message(intent_message, config):
+def parse_intent_message(intent_message):
     intent = None
+    
+    from rhasspy_weather.globals import config
     
     # if you changed the slot names in rhasspy, change them here, too
     slot_day_name = "when_day"
@@ -30,7 +32,7 @@ def parse_intent_message(intent_message, config):
     # date and time
     today = datetime.datetime.now(config.timezone).date()
     #define default request
-    new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, intent, config)
+    new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, intent)
 
     # if a day was specified
     slots = intent_message["slots"]

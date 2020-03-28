@@ -5,11 +5,12 @@ from rhasspy_weather.data_types.condition import WeatherCondition
 from rhasspy_weather.data_types.location import Location
 from rhasspy_weather.data_types.status import StatusCode
 
+
 import logging
 
 log = logging.getLogger(__name__)
 
-def get_weather(location, config):
+def get_weather(location):
     """gets weather from openweathermap API and parses it
     Returns 0 is everything worked, if not returns the error code
     Parameters:
@@ -19,7 +20,8 @@ def get_weather(location, config):
         
     """
     log.debug("parsing weather from openweathermap")
-    weather_forecast = WeatherForecast(config)
+    from rhasspy_weather.globals import config
+    weather_forecast = WeatherForecast()
 
     if hasattr(location, "lat") and hasattr(location, "lon"):
         url_location = "lat={lat}&lon={lon}".format(lat=location.lat, lon=location.lon)

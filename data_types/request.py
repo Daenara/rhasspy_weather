@@ -47,20 +47,20 @@ class WeatherRequest:
     time_difference : int
     """
 
-    def __init__(self, date_type, grain, request_date, forecast_type, config):
+    def __init__(self, date_type, grain, request_date, forecast_type):
         """
         Parameters:
         date_type : DateType
         grain : Grain
         request_date : datetime.date
         forecast_type : ForecastType
-        config : WeatherConfig
         """
         
+        from rhasspy_weather.globals import config
+        self.__location = config.location
         self.date_type = date_type
         self.grain = grain
         self.request_date = request_date
-        self.__location = config.location
         self.requested = ""
         self.time_specified = ""
         self.date_specified = ""

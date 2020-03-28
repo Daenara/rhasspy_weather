@@ -1,5 +1,6 @@
 from .interval import WeatherInterval
 from .status import Status, StatusCode
+from rhasspy_weather.globals import config
 import suntime
 import datetime
 
@@ -49,17 +50,13 @@ class WeatherForecast:
         checks if a forecast for date exists
     """
 
-    def __init__(self, config):
-        """
-        Parameters:
-        config : WeatherConfig
-            a configuration object
-        """
+    def __init__(self):
         log.debug("initializing forecast")
              
         self.status = Status()
         self.forecast = []
-        self.config = config
+        from rhasspy_weather.globals import config
+        self.__timezone = config.timezone
     
     # calculates the time for sunrise and sunset
     def calculate_sunrise_and_sunset(self, lat, lon):
@@ -132,7 +129,7 @@ class WeatherForecast:
 
         start = datetime.time(6,0)
         end = datetime.time(11,59)
-        if date == datetime.datetime.now(self.config.timezone).date() and end < datetime.datetime.now(self.config.timezone).time():
+        if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -148,7 +145,7 @@ class WeatherForecast:
 
         start = datetime.time(12,0)
         end = datetime.time(16,59)
-        if date == datetime.datetime.now(self.config.timezone).date() and end < datetime.datetime.now(self.config.timezone).time():
+        if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)
@@ -164,7 +161,7 @@ class WeatherForecast:
 
         start = datetime.time(17,0)
         end = datetime.time(20,59)
-        if date == datetime.datetime.now(self.config.timezone).date() and end < datetime.datetime.now(self.config.timezone).time():
+        if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
         weather_for_interval = weather.get_weather_for_interval(start, end)

@@ -109,5 +109,6 @@ class WeatherInterval:
             if description == "":
                 description = x.description
             else:
-                description = description + " und " + x.description
+                from rhasspy_weather.globals import config
+                description = description + " " + config.locale.combine_word + " " + x.description
         return description

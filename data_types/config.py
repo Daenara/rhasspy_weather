@@ -48,13 +48,14 @@ class WeatherConfig:
                 self.status.set_status(StatusCode.CONFIG_ERROR)
                 return None
             locale = self.__get_required_option(section_general, "locale", "german")
-            try:
-                name = "rhasspy_weather.locale." + locale
-                self.__locale = __import__(name, fromlist=[''])
-            except:
-                log.error("There is no module in the locale folder that matches the locale name in your config.")
-                self.status.set_status(StatusCode.CONFIG_ERROR)
-                return None         
+            #try:
+            name = "rhasspy_weather.locale." + locale
+            log.debug(name)
+            self.__locale = __import__(name, fromlist=[''])
+            #except:
+            #    log.error("There is no module in the locale folder that matches the locale name in your config.")
+            #    self.status.set_status(StatusCode.CONFIG_ERROR)
+            #    return None         
             self.__timezone = pytz.timezone(self.__get_required_option(section_general, "timezone", "Europe/Berlin"))
         else:
             log.error("Section [{0}] is missing from config. Please refer to 'config.default' for an example config.".format(section_name_general))
