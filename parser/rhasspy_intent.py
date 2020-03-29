@@ -1,38 +1,39 @@
 import datetime
-from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
-from rhasspy_weather.data_types.status import Status, StatusCode
-from rhasspy_weather.data_types.location import Location
-from rhasspy_weather.data_types.condition import ConditionType
-
 import logging
+
+from rhasspy_weather.data_types.condition import ConditionType
+from rhasspy_weather.data_types.location import Location
+from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
+from rhasspy_weather.data_types.status import StatusCode
 
 log = logging.getLogger(__name__)
 
+
 def parse_intent_message(intent_message):
     intent = None
-    
+
     from rhasspy_weather.globals import config
-    
+
     # if you changed the slot names in rhasspy, change them here, too
     slot_day_name = "when_day"
     slot_time_name = "when_time"
     slot_location_name = "location"
     slot_item_name = "item"
     slot_condition_name = "condition"
-    slot_temperature_name = "temperature"   
-    
+    slot_temperature_name = "temperature"
+
     if "GetWeatherForecastCondition" == intent_message["intent"]["name"]:
         intent = ForecastType.CONDITION
     elif "GetWeatherForecastItem" == intent_message["intent"]["name"]:
         intent = ForecastType.ITEM
     elif "GetWeatherForecastTemperature" == intent_message["intent"]["name"]:
         intent = ForecastType.TEMPERATURE
-    elif  "GetWeatherForecast" == intent_message["intent"]["name"]:
+    elif "GetWeatherForecast" == intent_message["intent"]["name"]:
         intent = ForecastType.FULL
-    
-    # date and time
+
     today = datetime.datetime.now(config.timezone).date()
-    #define default request
+
+    # define default request
     new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, intent)
 
     # if a day was specified
@@ -49,7 +50,7 @@ def parse_intent_message(intent_message):
             value = list(config.locale.named_days.values())[index]
             if isinstance(value, datetime.date):
                 log.debug("    named day seems to be a date")
-                self.status.set_status(StatusType.NOT_IMPLEMENTET_ERROR)
+                new_request.status.set_status(StatusCode.NOT_IMPLEMENTET_ERROR)
             elif isinstance(value, int):
                 log.debug("    named day seems to be an offset from today")
                 new_request.request_date = datetime.date.today() + datetime.timedelta(value)
@@ -76,15 +77,15 @@ def parse_intent_message(intent_message):
                 new_request.date_specified = "am " + day + ". " + name
                 # won't work when the year changes, fix that sometime
                 try:
-                    new_request.request_date = datetime.date(datetime.date.today().year, index+1, int(day))
+                    new_request.request_date = datetime.date(datetime.date.today().year, index + 1, int(day))
                 except ValueError:
                     new_request.status.set_status(StatusCode.DATE_ERROR)
-        
+
         # if a time was specified
         if slot_time_name in slots and slots[slot_time_name] != "":
             log.debug("it was a time specified")
             new_request.grain = Grain.HOUR
-            
+
             named_times_lowercase = [x.lower() for x in config.locale.named_times]
             named_times_synonyms_lowercase = [x.lower() for x in config.locale.named_times_synonyms]
             named_times_combined = named_times_lowercase + named_times_synonyms_lowercase
@@ -102,7 +103,7 @@ def parse_intent_message(intent_message):
                 log.debug(value)
                 if isinstance(value, datetime.time):
                     log.debug("    named time seems to be a certain time")
-                    self.status.set_status(StatusType.NOT_IMPLEMENTET_ERROR)
+                    new_request.status.set_status(StatusCode.NOT_IMPLEMENTET_ERROR)
                 elif isinstance(value, tuple):
                     log.debug("    named time seems to be an interval")
                     new_request.date_type = DateType.INTERVAL
@@ -125,7 +126,7 @@ def parse_intent_message(intent_message):
             log.debug("no time specified, getting weather for the full day")
     else:
         log.debug("no day specified, using today as default")
-    
+
     # requested
     requested = None
     if intent == ForecastType.CONDITION and slot_condition_name in slots:
@@ -138,7 +139,7 @@ def parse_intent_message(intent_message):
     elif intent == ForecastType.TEMPERATURE and slot_temperature_name in slots:
         if slots[slot_temperature_name] in config.locale.requested_temperature:
             requested = config.locale.requested_temperature[slots[slot_temperature_name]]
-    if not requested == None:
+    if requested is not None:
         log.debug("there was a special request made")
         new_request.requested = requested
 
@@ -146,5 +147,5 @@ def parse_intent_message(intent_message):
     if slot_location_name in slots and slots[slot_location_name] != "":
         log.debug("a location was specified")
         new_request.location = Location(slots[slot_location_name])
-                
+
     return new_request

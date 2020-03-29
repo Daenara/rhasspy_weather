@@ -1,24 +1,21 @@
-from .interval import WeatherInterval
-from .status import Status, StatusCode
-from rhasspy_weather.globals import config
-import suntime
 import datetime
-
 import logging
+
+import suntime
+
+from .interval import WeatherInterval
+from .status import Status
 
 log = logging.getLogger(__name__)
 
-##########  Weather Forecast ##########
 
-# Class responsible for getting an forecast from an API and saving it
-# in itself in my own weather format (a list of WeatherAtDate objects).
-# has functions to get the weather at a specific day, time or interval
 class WeatherForecast:
     """
     A class requesting and containing data from the API
+
     Attributes:
-    error : Error
-        keeps track of errors throughout the program execution
+    status : Status
+        contains the status code
     forecast : list[WeatherAtDate]
         list containing all the information from the API
     config : WeatherConfig
@@ -52,12 +49,12 @@ class WeatherForecast:
 
     def __init__(self):
         log.debug("initializing forecast")
-             
+
         self.status = Status()
         self.forecast = []
         from rhasspy_weather.globals import config
         self.__timezone = config.timezone
-    
+
     # calculates the time for sunrise and sunset
     def calculate_sunrise_and_sunset(self, lat, lon):
         log.debug("Calculating Sunrise and Sunset - error: {0}".format(self.status.is_error))
@@ -86,7 +83,7 @@ class WeatherForecast:
                         return weather.get_weather_for_interval(self.sunrise, request.end_time)
         else:
             return weather.get_weather_for_interval(self.sunrise, self.sunset)
-    
+
     def weather_for_day(self, date):
         """returns the weather for a whole day
         Parameters:
@@ -104,7 +101,7 @@ class WeatherForecast:
             time : datetime.time
         """
         log.debug("getting weather at a certain time - error: {0}".format(self.status.is_error))
-        
+
         weather = self.__get_forecast_for_date(date)
         return weather.get_weather_for_interval(time, time)
 
@@ -116,7 +113,7 @@ class WeatherForecast:
             end : datetime.time
         """
         log.debug("getting weather for an interval - error: {0}".format(self.status.is_error))
-        
+
         weather = self.__get_forecast_for_date(date)
         return weather.get_weather_for_interval(start, end)
 
@@ -127,8 +124,8 @@ class WeatherForecast:
         """
         log.debug("getting weather for the morning - error: {0}".format(self.status.is_error))
 
-        start = datetime.time(6,0)
-        end = datetime.time(11,59)
+        start = datetime.time(6, 0)
+        end = datetime.time(11, 59)
         if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
@@ -143,8 +140,8 @@ class WeatherForecast:
         """
         log.debug("getting weather for noon - error: {0}".format(self.status.is_error))
 
-        start = datetime.time(12,0)
-        end = datetime.time(16,59)
+        start = datetime.time(12, 0)
+        end = datetime.time(16, 59)
         if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
@@ -159,8 +156,8 @@ class WeatherForecast:
         """
         log.debug("getting weather for the evening - error: {0}".format(self.status.is_error))
 
-        start = datetime.time(17,0)
-        end = datetime.time(20,59)
+        start = datetime.time(17, 0)
+        end = datetime.time(20, 59)
         if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
             return None
         weather = self.__get_forecast_for_date(date)
@@ -175,22 +172,23 @@ class WeatherForecast:
         """
         log.debug("getting weather for the night - error: {0}".format(self.status.is_error))
 
-        start = datetime.time(21,0)
-        end = datetime.time(5,59)
-        if self.has_weather_for_date(date) == True:
+        start = datetime.time(21, 0)
+        end = datetime.time(5, 59)
+        if self.has_weather_for_date(date):
             part_one = self.__get_forecast_for_date(date).get_weather_for_interval(start, datetime.time.max)
-            if self.has_weather_for_date(date + datetime.timedelta(days=1)) == True:
+            if self.has_weather_for_date(date + datetime.timedelta(days=1)):
                 part_two = self.__get_forecast_for_date(date + datetime.timedelta(days=1)).get_weather_for_interval(datetime.time.min, end, part_one)
                 part_two.switch = True
                 return part_two
             part_one.switch = True
             return part_one
-        elif self.has_weather_for_date(date + datetime.timedelta(days=1)) == True:
+        elif self.has_weather_for_date(date + datetime.timedelta(days=1)):
             part_two = self.__get_forecast_for_date(date + datetime.timedelta(days=1)).get_weather_for_interval(datetime.time.min, end)
             part_two.switch = True
-            return part_two       
+            return part_two
 
-    # returns the forecast at the specified date
+            # returns the forecast at the specified date
+
     def __get_forecast_for_date(self, date):
         log.debug("getting the complete forecast for a date - error: {0}".format(self.status.is_error))
         if self.status.is_error:
@@ -209,8 +207,8 @@ class WeatherForecast:
         log.debug("checking if there is weather for the date - error: {0}".format(self.status.is_error))
 
         return self.__get_forecast_for_date(date) is not None
-        
-####  Classes ####
+
+    # Subclasses
 
     # saves the weather data at a specific date (list of WeatherAtTime)
     class WeatherAtDate:
@@ -218,22 +216,22 @@ class WeatherForecast:
             self.date = date
             self.weather = []
             self.interval = 3
-        
-        def __str__(self): 
+
+        def __str__(self):
             str_weather = ""
             for x in self.weather:
                 str_weather = str_weather + str(x) + "\n"
             return self.string_date + ":\n" + str_weather
+
         # saves the weather into a new WeatherAtTime Object and adds it to the
         # list
         def parse_weather(self, time, temperature, weather_condition_list, pressure, humidity, wind_speed, wind_direction):
             for x in range(len(time)):
-                self.weather.append(WeatherForecast.WeatherAtDate.WeatherAtTime(time[x], temperature[x], weather_condition_list[x], \
-                    pressure[x], humidity[x], wind_speed[x], wind_direction[x], self.interval))
-        
+                self.weather.append(WeatherForecast.WeatherAtDate.WeatherAtTime(time[x], temperature[x], weather_condition_list[x], pressure[x], humidity[x], wind_speed[x], wind_direction[x], self.interval))
+
         # returns the weather during the specified interval
         def get_weather_for_interval(self, from_time, to_time, weather_for_interval=None):
-            if weather_for_interval == None:
+            if weather_for_interval is None:
                 weather_for_interval = WeatherInterval()
             elif type(weather_for_interval) == int:
                 return weather_for_interval
@@ -247,28 +245,28 @@ class WeatherForecast:
         @property
         def string_date(self):
             return self.date.strftime("%Y-%m-%d")
-            
+
         @property
         def entries(self):
             return len(self.weather)
-    
-        ####  Classes ####
-        
+
+        # Subclasses
+
         # saves the weather data at a specific time
         class WeatherAtTime:
             def __init__(self, time, temperature, weather_condition_obj, pressure, humidity, wind_speed, wind_direction, interval):
                 self.interval = interval
-                self.time = time 
+                self.time = time
                 self.temperature = temperature
                 self.weather_condition_obj = weather_condition_obj
                 self.pressure = pressure
                 self.humidity = humidity
                 self.wind_speed = wind_speed
                 self.wind_direction = wind_direction
-                
-            def __str__(self): 
+
+            def __str__(self):
                 return "[" + str(self.string_time) + ", " + str(self.temperature) + ", " + str(self.weather_condition) + \
-                    ", " + str(self.weather_description) + ", " + str(self.pressure) + ", " + str(self.wind_speed) + ", " + str(self.wind_direction) + "]"
+                       ", " + str(self.weather_description) + ", " + str(self.pressure) + ", " + str(self.wind_speed) + ", " + str(self.wind_direction) + "]"
 
             def __repr__(self):
                 return self.weather_condition
@@ -278,7 +276,7 @@ class WeatherForecast:
                 return self.weather_condition_obj.condition
 
             @property
-            def weather_serveity(self):
+            def weather_severity(self):
                 return self.weather_condition_obj.severity
 
             @property
@@ -288,6 +286,7 @@ class WeatherForecast:
             @property
             def time(self):
                 return self.__time
+
             @time.setter
             def time(self, val):
                 if type(val) is datetime.time:
@@ -295,7 +294,7 @@ class WeatherForecast:
                 elif type(val) is str:
                     self.__time = datetime.datetime.strptime(val, "%H:%M:%S").time()
                 if self.__time.hour + self.interval > 23:
-                        self.end_time = datetime.time.max
+                    self.end_time = datetime.time.max
                 else:
                     self.end_time = datetime.time(self.__time.hour + self.interval, 59)
 

@@ -1,8 +1,9 @@
-from rhasspy_weather.data_types.condition import ConditionType
-
 import logging
 
+from rhasspy_weather.data_types.condition import ConditionType
+
 log = logging.getLogger(__name__)
+
 
 # Class used by WeatherReport and WeatherForecast
 # filled by WeatherForecast and used by WeatherReport
@@ -37,7 +38,7 @@ class WeatherInterval:
 
     # counts how many occurrences of a certain weather type there are
     def __increase_counter(self, condition_type):
-        if condition_type == ConditionType.RAIN: 
+        if condition_type == ConditionType.RAIN:
             self.__rain = self.__rain + 1
         elif condition_type == ConditionType.THUNDERSTORM:
             self.__thunderstorm = self.__thunderstorm + 1
@@ -70,7 +71,7 @@ class WeatherInterval:
     def is_misty(self):
         return self.__mist > 0
 
-    @property 
+    @property
     def is_clear(self):
         return self.__clear > 0
 
@@ -93,24 +94,24 @@ class WeatherInterval:
             # is short so there is an option to only add one of those (the one
             # that occurs more often, if both occur at the same frequency, clouds 
             # are added)
-            if clouds_and_clear_exclusive == True: 
+            if clouds_and_clear_exclusive:
                 if x.condition_type == ConditionType.CLOUDS:
                     if self.__clouds >= self.__clear:
                         self.__add_element_to_condition_list(x, selected)
                 if x.condition_type == ConditionType.CLEAR:
                     if self.__clear > self.__clouds:
-                        
                         self.__add_element_to_condition_list(x, selected)
             else:
                 self.__add_element_to_condition_list(x, selected)
-        
+
         conditions = []
         for x in selected:
             conditions.append(x.description)
         return conditions
-     
+
     # makes sure that only one element of a condition type is in the list (the most severe one)
-    def __add_element_to_condition_list(self, element, condition_list):
+    @staticmethod
+    def __add_element_to_condition_list(element, condition_list):
         if len(condition_list) == 0:
             condition_list.append(element)
         else:
@@ -122,4 +123,3 @@ class WeatherInterval:
                             condition_list.append(element)
             else:
                 condition_list.append(element)
-        

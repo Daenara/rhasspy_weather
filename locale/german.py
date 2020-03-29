@@ -1,21 +1,22 @@
 import datetime
-from rhasspy_weather.data_types.status import StatusCode
+
 from rhasspy_weather.data_types.condition import ConditionType
+from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
 temperature_warm_from = 20
-temparature_cold_to = 5
+temperature_cold_to = 5
 
 # used in parsers
-weekday_names = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"]
+weekday_names = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 month_names = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
-named_days = {"heute":0, "morgen":1, "übermorgen":2}
+named_days = {"heute": 0, "morgen": 1, "übermorgen": 2}
 named_times = {
     "Morgen": (datetime.time(6, 0), datetime.time(10, 0)),
-    "Vormittag": (datetime.time(10, 0), datetime.time(12, 0)), 
-    "Mittag": (datetime.time(12, 0), datetime.time(14, 0)), 
-    "Nachmittag": (datetime.time(15, 0), datetime.time(18, 0)), 
-    "Abend": (datetime.time(18, 0), datetime.time(22, 0)), 
+    "Vormittag": (datetime.time(10, 0), datetime.time(12, 0)),
+    "Mittag": (datetime.time(12, 0), datetime.time(14, 0)),
+    "Nachmittag": (datetime.time(15, 0), datetime.time(18, 0)),
+    "Abend": (datetime.time(18, 0), datetime.time(22, 0)),
     "Nacht": (datetime.time(22, 0), datetime.time(7, 0))
 }
 named_times_synonyms = {
@@ -38,19 +39,19 @@ requested_temperature = {
 # used in status.py to output status messages
 status_response = {
     StatusCode.NORMAL: ["Sieht alles normal aus."],
-    StatusCode.NO_NETWORK_ERROR: ["Es ist leider kein Internet verfügbar.", 
-                                  "Ich bin nicht mit dem Internet verbunden.", 
+    StatusCode.NO_NETWORK_ERROR: ["Es ist leider kein Internet verfügbar.",
+                                  "Ich bin nicht mit dem Internet verbunden.",
                                   "Es ist kein Internet vorhanden."],
-    StatusCode.API_ERROR: ["Das Wetter konnte nicht abgerufen werden. Vermutlich ist der API-Schlüssel ungültig.", 
+    StatusCode.API_ERROR: ["Das Wetter konnte nicht abgerufen werden. Vermutlich ist der API-Schlüssel ungültig.",
                            "Fehler beim Abrufen. Der API-Schlüssel ist ungültig."],
     StatusCode.FUTURE_WEATHER_ERROR: ["So weit in die Zukunft kenne ich das Wetter nicht.",
                                       "Ich kann nicht soweit in die Zukunft sehen.",
                                       "Das Wetter für diesen Tag wurde noch nicht beschlossen.",
                                       "Dieses Datum liegt zu weit in der Zukunft."],
-    StatusCode.NOT_IMPLEMENTED_ERROR: ["Diese Funktion wird noch nicht unterstützt.", 
-                                      "Ich weiß nicht wie ich diese Anfrage verarbeiten soll."],
+    StatusCode.NOT_IMPLEMENTED_ERROR: ["Diese Funktion wird noch nicht unterstützt.",
+                                       "Ich weiß nicht wie ich diese Anfrage verarbeiten soll."],
     StatusCode.LOCATION_ERROR: ["Ich kann die angegebene Stadt nich finden. Vielleicht habe ich sie nicht richtig verstanden"],
-    StatusCode.PAST_WEATHER_ERROR : ["Ich kann dir das Wetter aus der Vergangenheit leider nicht sagen."],
+    StatusCode.PAST_WEATHER_ERROR: ["Ich kann dir das Wetter aus der Vergangenheit leider nicht sagen."],
     StatusCode.NO_WEATHER_FOR_DAY_ERROR: ["Es ist so kurz vor Mitternacht, dass ich das Wetter für heute nicht abrufen kann."],
     StatusCode.DATE_ERROR: ["Irgendwas stimmt mit dem Datum nicht."],
     StatusCode.API_TIMEOUT_ERROR: ["Mit diesem API-Schlüssel wurden zu viele Anfragen gesenden. Versuche es später erneut."],
@@ -59,14 +60,16 @@ status_response = {
     StatusCode.GENERAL_ERROR: ["Es ist ein Fehler aufgetreten.", "Hier ist ein Fehler aufgetreten."]
 }
 
+
 # used in report.py
 
 def format_output_location(location):
     return "in {0}".format(location.capitalize())
-    
+
+
 def format_output_date(request):
     date = "am " + request.readable_date
-    
+
     if request.time_difference == 0:
         date = "heute"
     elif request.time_difference == 1:
@@ -78,9 +81,11 @@ def format_output_date(request):
         elif temp_day < 14:
             date = "nächste Woche " + request.weekday
     return date
-    
+
+
 def format_output_time(request):
-   return "um " + request.readable_start_time + " Uhr"
+    return "um " + request.readable_start_time + " Uhr"
+
 
 # temperature report
 
@@ -89,38 +94,40 @@ temperature_answers = {
     "cold_false": ["Nein, {when} {where} wird es nicht kalt. Die Temperatur ist {temperature}."],
     "warm_true": ["Ja, {when} {where} wird es warm. Die Temperatur ist {temperature}."],
     "warm_false": ["Nein, {when} {where} wird es nicht warm. Die Temperatur ist {temperature}."],
-    "general_temperature": ["Die Temperatur {when} {where} ist {temperature}.", 
-                            "Es hat {where} {temperature} {when}.", 
-                            "Es hat {where} {when} {temperature}.", 
+    "general_temperature": ["Die Temperatur {when} {where} ist {temperature}.",
+                            "Es hat {where} {temperature} {when}.",
+                            "Es hat {where} {when} {temperature}.",
                             "Es hat {when} {temperature} {where}."]
 }
 
-def format_temperature_output(min, max):
-    if min == max:
-        return str(min) + " Grad"
+
+def format_temperature_output(min_temperature, max_temperature):
+    if min_temperature == max_temperature:
+        return str(min_temperature) + " Grad"
     else:
-        return "zwischen " + str(min) + " und " + str(max) + " Grad"
+        return "zwischen " + str(min_temperature) + " und " + str(max_temperature) + " Grad"
+
 
 # condition report
 
 condition_answers = {
-    "general_weather": ["Das Wetter {when} {where}: {weather}.", 
-               "{when} {where} ist das Wetter: {weather}.", 
-               "Wetter {when} {where}: {weather}."],
+    "general_weather": ["Das Wetter {when} {where}: {weather}.",
+                        "{when} {where} ist das Wetter: {weather}.",
+                        "Wetter {when} {where}: {weather}."],
     "rain_true": ["Ja, {when} wird es {where} regnen.",
-                 "Ja, {when} gibt es {where} Regen.",
-                 "Ja, es regnet {when} {where}.",
-                 "Ja, {when} regnet es {where}."],
+                  "Ja, {when} gibt es {where} Regen.",
+                  "Ja, es regnet {when} {where}.",
+                  "Ja, {when} regnet es {where}."],
     "rain_false": ["Nein, es regnet {when} {where} nicht. Das Wetter ist: {weather}.",
-                  "Nein, {when} regnet es {where} nicht. Stattdessen ist das Wetter: {weather}.",
-                  "Nein, {when} gibt es keinen Regen {where}. Das Wetter ist: {weather}."],
+                   "Nein, {when} regnet es {where} nicht. Stattdessen ist das Wetter: {weather}.",
+                   "Nein, {when} gibt es keinen Regen {where}. Das Wetter ist: {weather}."],
     "snow_true": ["Ja, {when} wird es {where} schneien.",
-                 "Ja, {when} gibt es {where} Schnee.",
-                 "Ja, es schneit {when} {where}.",
-                 "Ja, {when} schneit es {where}."],
+                  "Ja, {when} gibt es {where} Schnee.",
+                  "Ja, es schneit {when} {where}.",
+                  "Ja, {when} schneit es {where}."],
     "snow_false": ["Nein, es schneit {when} {where} nicht. Das Wetter ist: {weather}.",
-                  "Nein, {when} schneit es {where} nicht. Stattdessen ist das Wetter: {weather}.",
-                  "Nein, {when} gibt es keinen Schnee {where}. Das Wetter ist: {weather}."],
+                   "Nein, {when} schneit es {where} nicht. Stattdessen ist das Wetter: {weather}.",
+                   "Nein, {when} gibt es keinen Schnee {where}. Das Wetter ist: {weather}."],
     "thunderstorm_true": ["Ja, {when} gibt es {where} Gewitter."],
     "thunderstorm_false": ["Nein, {when} {where} gewittert es nicht. Das Wetter ist: {weather}."],
     "clouds_true": ["Ja, {when} kann es {where} bewölkt sein."],
@@ -131,6 +138,7 @@ condition_answers = {
     "mist_false": ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."],
     "unknown_condition": ["Ich weiß nicht, was genau du wissen willst. Hier das allgemeine Wetter: {weather}"]
 }
+
 
 def combine_conditions(conditions):
     if isinstance(conditions, list):
@@ -144,6 +152,7 @@ def combine_conditions(conditions):
                 combined += ", " + x
             combined += " und " + conditions[-1]
             return combined
+
 
 # items
 rain_items = ["Regenmantel", "Schirm", "Gummistiefel", "Halbschuhe", "Kaputze", "Hut", "Regenschirm"]
@@ -161,6 +170,7 @@ item_answers = {
     "unknown_item": ["Ich bin mir nicht sicher, was ein {item} ist, tut mir leid."]
 }
 
+
 def format_item_for_output(item):
     if item in ["Regenmantel", "Schirm", "Hut", "Sonnenhut", "Mantel", "Schal", "Sonnenschirm", "Regenschirm"]:
         return "ein " + item + " ist"
@@ -170,5 +180,5 @@ def format_item_for_output(item):
         return item + " sind"
     elif item in ["Sonnencreme"]:
         return item + " ist"
-    else: 
+    else:
         return item

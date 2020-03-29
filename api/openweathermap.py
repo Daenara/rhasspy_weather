@@ -1,18 +1,18 @@
-import requests
 import datetime
-from rhasspy_weather.data_types.forecast import WeatherForecast 
-from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
-from rhasspy_weather.data_types.location import Location
-from rhasspy_weather.data_types.status import StatusCode
-
-
 import logging
+
+import requests
+
+from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
+from rhasspy_weather.data_types.forecast import WeatherForecast
+from rhasspy_weather.data_types.status import StatusCode
 
 log = logging.getLogger(__name__)
 
+
 def get_weather(location):
     """gets weather from openweathermap API and parses it
-    Returns 0 is everything worked, if not returns the error code
+
     Parameters:
     weather_api_key : str
         API key for openweathermap
@@ -29,33 +29,32 @@ def get_weather(location):
         url_location = "zip={zip},{country_code}".format(zip=location.zipcode, country_code=location.country_code)
     else:
         url_location = "q={city_name}".format(city_name=location.city)
-    forecast_url = "http://api.openweathermap.org/data/2.5/forecast?{location}&APPID={api_key}&units={units}&lang=de".format(\
-        location=url_location, api_key=config.api_key, units=config.units)
+    forecast_url = "http://api.openweathermap.org/data/2.5/forecast?{location}&APPID={api_key}&units={units}&lang=de".format(location=url_location, api_key=config.api_key, units=config.units)
     try:
         response = requests.get(forecast_url)
         response = response.json()
 
         if str(response["cod"]) == "401":
-            weather_forecast.status.set_status(StatusCode.API_ERROR) # Error: something went wrong with the api call
+            weather_forecast.status.set_status(StatusCode.API_ERROR)
             return weather_forecast
         elif str(response["cod"]) == "429":
-            weather_forecast.status.set_status(StatusCode.API_TIMEOUT_ERROR) # Error: request limit exceeded
+            weather_forecast.status.set_status(StatusCode.API_TIMEOUT_ERROR)
             return weather_forecast
         elif str(response["cod"]) == "404":
-            weather_forecast.status.set_status(StatusCode.LOCATION_ERROR) # Error: location not found
+            weather_forecast.status.set_status(StatusCode.LOCATION_ERROR)
             return weather_forecast
-            
+
         # Parse the output of Open Weather Map's forecast endpoint
         if not (hasattr(location, "lat") and hasattr(location, "lon")):
             location.set_lat_and_lon(response["city"]["coord"]["lat"], response["city"]["coord"]["lon"])
         weather_forecast.calculate_sunrise_and_sunset(location.lat, location.lon)
-        forecasts = {}
+        forecasts = { }
         for x in response["list"]:
             if str(datetime.date.fromtimestamp(x["dt"])) not in forecasts:
                 forecasts[str(datetime.date.fromtimestamp(x["dt"]))] = \
                     list(filter(lambda forecast: datetime.date.fromtimestamp(forecast["dt"]) == datetime.date.fromtimestamp(x["dt"]), response["list"]))
-                
-        for key,forecast in forecasts.items():
+
+        for key, forecast in forecasts.items():
             condition_list = []
             weather_condition = [x["weather"][0]["main"] for x in forecast]
             weather_description = [x["weather"][0]["description"] for x in forecast]
@@ -64,80 +63,86 @@ def get_weather(location):
                 temp_condition = WeatherCondition(__get_severity_from_open_weather_map_id(weather_id[x]), weather_description[x], weather_condition[x], __get_condition_type(weather_id[x]))
                 condition_list.append(temp_condition)
             tmp = WeatherForecast.WeatherAtDate(datetime.datetime.strptime(key, "%Y-%m-%d").date())
-            tmp.parse_weather([datetime.datetime.strptime(x, "%H:%M:%S").time() for x in [x["dt_txt"].split(" ")[1] for x in forecast]],\
-               [x["main"]["temp"] for x in forecast], condition_list, [x["main"]["pressure"] for x in forecast],[x["main"]["humidity"] for x in forecast],\
-               [x["wind"]["speed"] for x in forecast],[x["wind"]["deg"] for x in forecast])
+            tmp.parse_weather(
+                [datetime.datetime.strptime(x, "%H:%M:%S").time() for x in [x["dt_txt"].split(" ")[1] for x in forecast]],
+                [x["main"]["temp"] for x in forecast], condition_list, [x["main"]["pressure"] for x in forecast],
+                [x["main"]["humidity"] for x in forecast],
+                [x["wind"]["speed"] for x in forecast],
+                [x["wind"]["deg"] for x in forecast]
+            )
             weather_forecast.forecast.append(tmp)
     except (requests.exceptions.ConnectionError, ValueError):
-        forecast.status.set_status(NO_NETWORK_ERROR) # Error: No internet connection
+        weather_forecast.status.set_status(StatusCode.NO_NETWORK_ERROR)
     return weather_forecast
-        
-# parses the weather condition into my own format (WeatherConditon)
-def __get_severity_from_open_weather_map_id(id):
-    if id == 210: return 0 # light thunderstorm
-    if id == 211: return 1 # thunderstorm
-    if id == 230: return 3 # thunderstorm with light drizzle
-    if id == 231: return 4 # thunderstorm with drizzle
-    if id == 232: return 5 # thunderstorm with heavy drizzle
-    if id == 200: return 6 # thunderstorm with light rain
-    if id == 201: return 7 # thunderstorm with rain
-    if id == 202: return 8 # thunderstorm with heavy rain
-    if id == 212: return 9 # heavy thunderstorm
-    if id == 221: return 10 # ragged thunderstorm
 
-    if id == 300: return 0 # light drizzle
-    if id == 301: return 1 # drizzle
-    if id == 321: return 1 # shower drizzle
-    if id == 302: return 2 # heavy intensity drizzle
-    if id == 310: return 3 # light intensity drizzle rain
-    if id == 311: return 4 # drizzle rain
-    if id == 312: return 5 # heavy intensity drizzle rain
-    if id == 313: return 6 # shower rain and drizzle
-    if id == 314: return 7 # heavy shower rain and drizzle
 
-    if id == 500: return 0 # light rain
-    if id == 520: return 0 # light intensity shower rain
-    if id == 501: return 1 # moderate rain
-    if id == 521: return 1 # shower rain
-    if id == 511: return 1 # freezing rain
-    if id == 502: return 2 # heavy intensity rain
-    if id == 522: return 2 # heavy intensity shower rain
-    if id == 503: return 3 # very heavy rain
-    if id == 531: return 3 # ragged shower rain
-    if id == 504: return 4 # extreme rain
+# parses the weather condition into my own format (WeatherCondition)
+def __get_severity_from_open_weather_map_id(owm_id):
+    if owm_id == 210: return 0  # light thunderstorm
+    if owm_id == 211: return 1  # thunderstorm
+    if owm_id == 230: return 3  # thunderstorm with light drizzle
+    if owm_id == 231: return 4  # thunderstorm with drizzle
+    if owm_id == 232: return 5  # thunderstorm with heavy drizzle
+    if owm_id == 200: return 6  # thunderstorm with light rain
+    if owm_id == 201: return 7  # thunderstorm with rain
+    if owm_id == 202: return 8  # thunderstorm with heavy rain
+    if owm_id == 212: return 9  # heavy thunderstorm
+    if owm_id == 221: return 10  # ragged thunderstorm
 
-    if id == 600: return 0 # light snow
-    if id == 620: return 0 # light shower snow
-    if id == 612: return 0 # light shower sleet
-    if id == 615: return 1 # light rain and snow
-    if id == 601: return 1 # snow
-    if id == 621: return 1 # shower snow
-    if id == 611: return 1 # sleet
-    if id == 613: return 1 # shower sleet
-    if id == 616: return 2 # rain and snow
-    if id == 602: return 2 # heavy snow
-    if id == 622: return 2 # heavy shower snow
+    if owm_id == 300: return 0  # light drizzle
+    if owm_id == 301: return 1  # drizzle
+    if owm_id == 321: return 1  # shower drizzle
+    if owm_id == 302: return 2  # heavy intensity drizzle
+    if owm_id == 310: return 3  # light intensity drizzle rain
+    if owm_id == 311: return 4  # drizzle rain
+    if owm_id == 312: return 5  # heavy intensity drizzle rain
+    if owm_id == 313: return 6  # shower rain and drizzle
+    if owm_id == 314: return 7  # heavy shower rain and drizzle
 
-    if id == 801: return 0 # few clouds: 11-25%
-    if id == 802: return 1 # scattered clouds: 25-50%
-    if id == 803: return 2 # broken clouds: 51-84%
-    if id == 804: return 3 # overcast clouds: 85-100%
-   
+    if owm_id == 500: return 0  # light rain
+    if owm_id == 520: return 0  # light intensity shower rain
+    if owm_id == 501: return 1  # moderate rain
+    if owm_id == 521: return 1  # shower rain
+    if owm_id == 511: return 1  # freezing rain
+    if owm_id == 502: return 2  # heavy intensity rain
+    if owm_id == 522: return 2  # heavy intensity shower rain
+    if owm_id == 503: return 3  # very heavy rain
+    if owm_id == 531: return 3  # ragged shower rain
+    if owm_id == 504: return 4  # extreme rain
+
+    if owm_id == 600: return 0  # light snow
+    if owm_id == 620: return 0  # light shower snow
+    if owm_id == 612: return 0  # light shower sleet
+    if owm_id == 615: return 1  # light rain and snow
+    if owm_id == 601: return 1  # snow
+    if owm_id == 621: return 1  # shower snow
+    if owm_id == 611: return 1  # sleet
+    if owm_id == 613: return 1  # shower sleet
+    if owm_id == 616: return 2  # rain and snow
+    if owm_id == 602: return 2  # heavy snow
+    if owm_id == 622: return 2  # heavy shower snow
+
+    if owm_id == 801: return 0  # few clouds: 11-25%
+    if owm_id == 802: return 1  # scattered clouds: 25-50%
+    if owm_id == 803: return 2  # broken clouds: 51-84%
+    if owm_id == 804: return 3  # overcast clouds: 85-100%
+
     return 0
-    
-def __get_condition_type(id):
-    first_digit = int(str(id)[0])
+
+
+def __get_condition_type(owm_id):
+    first_digit = int(str(owm_id)[0])
     if first_digit == 2:
         return ConditionType.THUNDERSTORM
     elif first_digit == 3 or first_digit == 5:
         return ConditionType.RAIN
     elif first_digit == 6:
         return ConditionType.SNOW
-    elif id == 800:
+    elif owm_id == 800:
         return ConditionType.CLEAR
     elif first_digit == 8:
         return ConditionType.CLOUDS
-    elif id == 701 or id == 741:
+    elif owm_id == 701 or owm_id == 741:
         return ConditionType.MIST
     else:
         return ConditionType.MISC
