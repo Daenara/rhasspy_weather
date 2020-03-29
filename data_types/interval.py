@@ -6,7 +6,7 @@ log = logging.getLogger(__name__)
 # filled by WeatherForecast and used by WeatherReport
 # to generate the answer to the request
 class WeatherInterval:
-    def __init__(self, switch=False):
+    def __init__(self):
         self.min_temperature = 99
         self.max_temperature = 0
         self.weather_condition_list = []
@@ -21,7 +21,6 @@ class WeatherInterval:
         self.__clouds = 0
         self.__clear = 0
         self.__change_count = 0
-        self.switch = switch
 
     # puts information into itself
     def add_information(self, weather_at_time):
@@ -32,10 +31,10 @@ class WeatherInterval:
             self.min_temperature = weather_at_time.temperature
         if weather_at_time.weather_condition_obj not in self.weather_condition_list:
             self.weather_condition_list.append(weather_at_time.weather_condition_obj)
-        self.increase_counter(weather_at_time.weather_condition)
+        self.__increase_counter(weather_at_time.weather_condition)
 
     # counts how many occurrences of a certain weather type there are
-    def increase_counter(self, counter):
+    def __increase_counter(self, counter):
         if counter == "Rain" or counter == "Drizzle": 
             self.__rain = self.__rain + 1
         elif counter == "Thunderstorm":
@@ -77,38 +76,48 @@ class WeatherInterval:
     def contains_information(self):
         return self.__change_count > 0
 
-    # puts together the output string from the
-    #conditions saved in weather_condition_list
-    @property
-    def weather_description(self):
+    # creates a list of condition descriptions to be used in output
+    def get_output_condition_list(self, clouds_and_clear_exclusive=False):
+        if len(self.weather_condition_list) == 0:
+            log.error("Empty interval. There should be something here")
+            return []
+        elif len(self.weather_condition_list) == 1:
+            return [self.weather_condition_list[0].description]
+
         selected = []
         for x in self.weather_condition_list:
-            if selected == []:
-                selected.append(x)
+            # clear sky and clouds in the same interval seems like it might be
+            # something that could be mutual exclusive, at least if the interval
+            # is short so there is an option to only add one of those (the one
+            # that occurs more often, if both occur at the same frequency, clouds 
+            # are added)
+            if clouds_and_clear_exclusive == True: 
+                if x.condition == "Clouds":
+                    if self.__clouds >= self.__clear:
+                        self.__add_element_to_condition_list(x, selected)
+                if x.condition == "Clear":
+                    if self.__clear > self.__clouds:
+                        
+                        self.__add_element_to_condition_list(x, selected)
             else:
-                for y in selected:
-                    if x.condition == y.condition:
-                        if x.severity > y.severity:
-                            selected.remove(y)
-                            selected.append(x)
-                    else:
-                        if self.switch:
-                            # clear sky and clouds in the same period of time
-                            # seems fishy so lets remove the clear sky if we
-                            # know about clouds
-                            if y.condition == "Clear" and x.condition == "Clouds":
-                                selected.remove(y)
-                            # still fishy so if we already have clouds lets not
-                            # add a clear sky
-                            if not (x.condition == "Clear" and y.condition == "Clouds"):
-                                selected.append(x)
-                        else:
-                            selected.append(x)
-        description = ""
+                self.__add_element_to_condition_list(x, selected)
+        
+        conditions = []
         for x in selected:
-            if description == "":
-                description = x.description
+            conditions.append(x.description)
+        return conditions
+     
+    # makes sure that only one element of a condition type is in the list (the most severe one)
+    def __add_element_to_condition_list(self, element, condition_list):
+        if len(condition_list) == 0:
+            condition_list.append(element)
+        else:
+            if element.condition in [x.condition for x in condition_list]:
+                for x in condition_list[:]:
+                    if x.condition == element.condition:
+                        if element.severity > x.severity:
+                            condition_list.remove(x)
+                            condition_list.append(element)
             else:
-                from rhasspy_weather.globals import config
-                description = description + " " + config.locale.combine_word + " " + x.description
-        return description
+                condition_list.append(element)
+        

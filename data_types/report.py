@@ -309,38 +309,39 @@ class WeatherReport:
         mist_true = ["Ja, {when} {where} ist es neblig."]
         mist_false = ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."]
         if self.__request.forecast_type == ForecastType.CONDITION:
+            output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
             if self.__request.requested == "Regen":
                 if weather_obj.is_rain_chance:
                     return random.choice(rain_true).format(when="{when}", where="{where}")
                 else:
-                    return random.choice(rain_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
+                    return random.choice(rain_false).format(weather=output_conditions, when="{when}", where="{where}")
             elif self.__request.requested == "Schnee":
                 if weather_obj.is_rain_chance:
                     return random.choice(snow_true).format(when="{when}", where="{where}")
                 else:
-                    return random.choice(snow_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
+                    return random.choice(snow_false).format(weather=output_conditions, when="{when}", where="{where}")
             elif self.__request.requested == "Sonne":
                 day_weather = self.__forecast.weather_during_daytime(self.__request)
                 if day_weather is not None and day_weather.is_clear:
                     return random.choice(sun_true).format(when="{when}", where="{where}")
                 else:
-                    return random.choice(sun_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
+                    return random.choice(sun_false).format(weather=output_conditions, when="{when}", where="{where}")
             elif self.__request.requested == "Gewitter":
                 if weather_obj.is_thunderstorm_chance:
                     return random.choice(thunderstorm_true).format(when="{when}", where="{where}")
                 else:
-                    return random.choice(thunderstorm_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
+                    return random.choice(thunderstorm_false).format(weather=output_conditions, when="{when}", where="{where}")
             elif self.__request.requested == "Nebel":
                 if weather_obj.is_misty:
                     return random.choice(mist_true).format(when="{when}", where="{where}")
                 else:
-                    return random.choice(mist_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
+                    return random.choice(mist_false).format(output_conditions, when="{when}", where="{where}")
             elif self.__request.requested == "Wolken":
                 if weather_obj.is_cloudy:
                     return random.choice(cloud_true).format(when="{when}", where="{where}")
                 else:
-                    return random.choice(cloud_false).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
-        return random.choice(weather).format(weather=weather_obj.weather_description, when="{when}", where="{where}")
+                    return random.choice(cloud_false).format(weather=output_conditions, when="{when}", where="{where}")
+        return random.choice(weather).format(weather=output_conditions, when="{when}", where="{where}")
 
     @property
     def __output_date_and_time(self):

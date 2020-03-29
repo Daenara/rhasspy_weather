@@ -270,6 +270,9 @@ class WeatherForecast:
                 return "[" + str(self.string_time) + ", " + str(self.temperature) + ", " + str(self.weather_condition) + \
                     ", " + str(self.weather_description) + ", " + str(self.pressure) + ", " + str(self.wind_speed) + ", " + str(self.wind_direction) + "]"
 
+            def __repr__(self):
+                return self.weather_condition
+
             @property
             def weather_condition(self):
                 return self.weather_condition_obj.condition

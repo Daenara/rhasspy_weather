@@ -6,3 +6,9 @@ class WeatherCondition:
 
     def __eq__(self, other):
         return self.description == other.description
+        
+    def __str__(self):
+        return "[" + str(self.condition) + ", " + str(self.severity) + ", " + str(self.description) + "]"
+        
+    def __repr__(self):
+        return "[" + str(self.condition) + ", " + str(self.severity) + ", " + str(self.description) + "]"

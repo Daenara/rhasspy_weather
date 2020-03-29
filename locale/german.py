@@ -2,6 +2,19 @@ import datetime
 from rhasspy_weather.data_types.status import StatusCode
 
 # used in interval.py to combine two kinds of weather
+def combine_conditions(conditions):
+    if isinstance(conditions, list):
+        if len(conditions) == 0:
+            return ""
+        elif len(conditions) == 1:
+            return conditions[0]
+        else:
+            combined = conditions[0]
+            for x in conditions[1:-1]:
+                combined += ", " + x
+            combined += " und " + conditions[-1]
+            return combined
+            
 combine_word = "und"
 
 # used in parsers
