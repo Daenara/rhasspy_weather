@@ -16,20 +16,30 @@ Just open an issue and supply me with the sentence that produced the bug.
 ## Setup
 I personally have created a folder called "custom_commands" in my rhasspy profile folder, put a custom_commands.py in there and made a subfolder there holding the contents of this repository. The setup for a custom command in rhasspy 2.4 is described [here](https://rhasspy.readthedocs.io/en/latest/intent-handling/#command). It is important to note that rhasspy will only answer if forward_to_hass is true. If you don't use homeassistant then you need to figure out another way to read the answer. For rhasspy 2.4 you can call the /api/text-to-speech in the speech(text) function instead of adding to the dictionary. If you have rhasspy 2.5 running you can also use mqtt instead of the api to read out the answer.
 
-custom_commands.py
-```
+<details>
+<summary>custom_commands.py (click to expand)</summary>
+<p>
+
+```python
 #!/usr/bin/python3
 
 import sys
 import json
-from rhasspy_weather.rhasspy_weather import Weather
+import datetime
+import pytz
+import rhasspy_weather.rhasspy_weather as weather
 
-# optional logging
 import os
 import logging
 
 logging_format = '%(asctime)s - %(levelname)-5s - %(name)s.%(funcName)s[%(lineno)d]: %(message)s'
 logging.basicConfig(filename=os.path.join(os.path.dirname(__file__), 'output.log'), format=logging_format, datefmt="%Y-%m-%d %H:%M:%S", level=logging.INFO)
+
+def customTime(*args):
+    converted = datetime.datetime.now(pytz.timezone('Europe/Berlin'))
+    return converted.timetuple()
+
+logging.Formatter.converter = customTime
 
 log = logging.getLogger(__name__)
 
@@ -49,14 +59,16 @@ o = json.loads(sys.stdin.read())
 intent = o["intent"]["name"]
 
 if intent.startswith("GetWeatherForecast"):
-	log.info("Detected Weather Intent")
-    weather = Weather()
+    log.info("Detected Weather Intent")
     forecast = weather.get_weather_forecast(o)
     speech(forecast)
 
 # convert dict to json and print to stdout
 print(json.dumps(o))
 ```
+
+</p>
+</details>
 
 You need a config file for the scripts to do anything. Either run the command script once after you added it or manually rename the "config.default" file to "config.ini" and edit it to your liking. 
 
@@ -65,7 +77,10 @@ If "LevelOfDetail" is set to True and you query the weather, temperature and so 
 
 Other than the scripts and the config you will need the intents. Here are mine (changes might break the scripts so please only change things if you know what you are doing):
 
-sentences.ini
+<details>
+<summary>sentences.ini (click to expand)</summary>
+<p>
+
 ```
 [GetWeatherForecast]
 day = ($named_days|[am:] ($rhasspy/days|((0..31) $rhasspy/months))|in (0..7) Tagen)
@@ -78,9 +93,9 @@ wie (ist|wird) [<day> {when_day}] [<time> {when_time}] das wetter [in <location>
 brauche ich [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] [(eine|einen|ein) {article}] $weather_items {item}
 
 [GetWeatherForecastCondition]
-gibt es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] (regen|schnee) {condition}
-scheint [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] die (sonne) {condition}
-(stürmt|schneit|regnet) {condition} es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
+gibt es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] $weather_condition {condition}
+scheint [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] die $weather_condition {condition}
+$weather_condition {condition} es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
 
 [GetWeatherForecastTemperature]
 (ist|wird) es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] (warm|kalt) {temperature}
@@ -88,7 +103,13 @@ wie (warm|kalt) {temperature} (ist|wird) es [<GetWeatherForecast.day> {when_day}
 was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
 ```
 
-slots
+</p>
+</details>
+
+<details>
+<summary>Slots (click to expand)</summary>
+<p>
+    
 ```
 {
     "named_days": [
@@ -106,38 +127,53 @@ slots
         "mittag"
     ],
     "weather_items": [
-        "Regenmantel",
-        "Hut",
-        "Kaputze",
-        "paar Gummistiefel",
-        "Sonnenhut",
-        "Sonnenschirm",
-        "Mütze",
-        "Sonnencreme",
-        "Regenschirm",
-        "Schirm",
-        "paar lange Unterhosen",
-        "Stiefel",
-        "paar Handschuhe",
-        "lange Unterhosen",
-        "Handschuhe",
-        "Mantel",
-        "lange Unterhose",
-        "Halbschuhe",
-        "paar Halbschuhe",
-        "Gummistiefel",
-        "Schal",
-        "paar Stiefel",
-        "Winterstiefel",
-        "Sonnenbrille",
-        "Winterjacke",
-        "paar Sandalen",
-        "Kappe",
-        "paar Winterstiefel",
-        "Sandalen"
+        "regenmantel",
+        "hut",
+        "kaputze",
+        "paar gummistiefel",
+        "sonnenhut",
+        "sonnenschirm",
+        "mütze",
+        "sonnencreme",
+        "regenschirm",
+        "schirm",
+        "paar lange unterhosen",
+        "stiefel",
+        "paar handschuhe",
+        "lange unterhosen",
+        "handschuhe",
+        "mantel",
+        "lange unterhose",
+        "halbschuhe",
+        "paar halbschuhe",
+        "gummistiefel",
+        "schal",
+        "paar stiefel",
+        "winterstiefel",
+        "sonnenbrille",
+        "winterjacke",
+        "paar sandalen",
+        "kappe",
+        "paar winterstiefel",
+        "sandalen"
+    ],
+    "weather_condition": [
+        "regen",
+        "schnee",
+        "nebel",
+        "wolken",
+        "gewitter",
+        "sonne",
+        "wind",
+        "stürmt:wind",
+        "regnet:regen",
+        "schneit:schnee"
     ]
 }
 ```
+    
+</p>
+</details>
 
 ## Usage
 If everything is set up you can query the weather from rhasspy with sentences like
@@ -161,7 +197,7 @@ On the other side there are a few items that can be queried for with rhasspy tha
  * ~~add config file~~
  * make daily times in rhasspy_weather.py fit those in the weather logic (and use the logic already there to output the weather)
  * ~~move custom data like weekdays, time definitions for midday, etc.~~ and all language stuff to one file for easy access and easy translation
- * fix the localized weekday problem again, this time using my custom array instead of a system locale that might not be installed
+ * ~~fix the localized weekday problem again, this time using my custom array instead of a system locale that might not be installed~~
  * ~~move the weather api(s) into a subfolder and only import and use the one that is specified in the config~~
  * ~~rework error handling so errors are handed through everything, not only parts of it (errors while parsing the intent for example)~~
  * ~~figure out the data type of the errors owm gives back, one was an int and one was a string, or just make sure to cast them so they don't break the code~~ (hopefully)
@@ -169,4 +205,4 @@ On the other side there are a few items that can be queried for with rhasspy tha
  * clean up and add to the sentences
  * add in new items to the logic
  * clean up code
- * add/fix custom answers for weather conditions
+ * ~~add/fix custom answers for weather conditions~~
