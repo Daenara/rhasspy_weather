@@ -2,6 +2,10 @@ import datetime
 from rhasspy_weather.data_types.status import StatusCode
 from rhasspy_weather.data_types.condition import ConditionType
 
+# general stuff
+temperature_warm_from = 20
+temparature_cold_to = 5
+
 # used in parsers
 weekday_names = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"]
 month_names = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
@@ -25,6 +29,10 @@ requested_condition = {
     "gewitter": ConditionType.THUNDERSTORM,
     "sonne": ConditionType.CLEAR,
     "wind": ConditionType.WIND
+}
+requested_temperature = {
+    "warm": "warm",
+    "kalt": "cold"
 }
 
 # used in status.py to output status messages
@@ -52,6 +60,49 @@ status_response = {
 }
 
 # used in report.py
+
+def format_output_location(location):
+    return "in {0}".format(location.capitalize())
+    
+def format_output_date(request):
+    date = "am " + request.readable_date
+    
+    if request.time_difference == 0:
+        date = "heute"
+    elif request.time_difference == 1:
+        date = "morgen"
+    else:
+        temp_day = datetime.datetime.today().weekday() + request.time_difference
+        if temp_day < 7:
+            date = "am " + request.weekday
+        elif temp_day < 14:
+            date = "nächste Woche " + request.weekday
+    return date
+    
+def format_output_time(request):
+    if request.grain == Grain.HOUR:
+       time = "um " + request.readable_start_time + " Uhr"
+    else:
+        time = ""
+    return time
+# temperature report
+
+temperature_answers = {
+    "cold_true": ["Ja, {when} {where} wird es kalt. Die Temperatur ist {temperature}."],
+    "cold_false": ["Nein, {when} {where} wird es nicht kalt. Die Temperatur ist {temperature}."],
+    "warm_true": ["Ja, {when} {where} wird es warm. Die Temperatur ist {temperature}."],
+    "warm_false": ["Nein, {when} {where} wird es nicht warm. Die Temperatur ist {temperature}."],
+    "general_temperature": ["Die Temperatur {when} {where} ist {temperature}.", 
+                            "Es hat {where} {temperature} {when}.", 
+                            "Es hat {where} {when} {temperature}.", 
+                            "Es hat {when} {temperature} {where}."]
+}
+
+def format_temperature_output(min, max):
+    if min == max:
+        return str(min) + " Grad"
+    else:
+        return "zwischen " + str(min) + " und " + str(max) + " Grad"
 
 # condition report
 

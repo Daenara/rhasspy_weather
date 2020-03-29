@@ -136,7 +136,8 @@ def parse_intent_message(intent_message):
     elif intent == ForecastType.ITEM and slot_item_name in slots:
         requested = slots[slot_item_name].capitalize()
     elif intent == ForecastType.TEMPERATURE and slot_temperature_name in slots:
-        requested = slots[slot_temperature_name].capitalize()
+        if slots[slot_temperature_name] in config.locale.requested_temperature:
+            requested = config.locale.requested_temperature[slots[slot_temperature_name]]
     if not requested == None:
         log.debug("there was a special request made")
         new_request.requested = requested

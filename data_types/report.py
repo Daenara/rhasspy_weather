@@ -165,14 +165,14 @@ class WeatherReport:
         elif self.__request.requested in self.__locale.warm_items:
             day_weather = self.__forecast.weather_during_daytime(self.__request)
             if day_weather.is_clear:
-                if weather.max_temperature >= 20:
+                if weather.max_temperature >= self.__locale.temperature_warm_from:
                     response_type = "warm_and_sunny"
                 else:
                     response_type = "not_warm_and_sunny"
             else:
                 response_type = "not_sunny"
         elif self.__request.requested in self.__locale.cold_items:
-            if weather.max_temperature < 5:
+            if weather.max_temperature < self.__locale.temperature_cold_to:
                 response_type = "cold"
             else:
                 response_type = "not_cold"
@@ -233,7 +233,7 @@ class WeatherReport:
             response = self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when=self.__output_date_and_time, where=self.__output_location)
         return response
 
-    # returns a string response with the weatherconditions for a full day
+    # returns a string response with the weather conditions for a full day
     # if detail=True in the config this answer may be rather long
     # called by __generate_condition_report()
     def __generate_condition_report_day(self):
@@ -261,32 +261,36 @@ class WeatherReport:
     # time
     def __answer_temperature(self, min_temp, max_temp=""):
         log.debug("generating response for temperature - error: {0}".format(self.status.is_error))
-        temperature_fix = ["Die Temperatur {when} {where} ist {temp} Grad.", 
-                            "Es hat {where} {temp} Grad {when}.", 
-                            "Es hat {where} {when} {temp} Grad.", 
-                            "Es hat {when} {temp} Grad {where}."]
-        temperature_minmax = ["Die Temperatur {when} {where} ist zwischen {min} und {max} Grad. ",
-                              #"Die Höchsttemperatur wird {when} {where} {max}
-                              #Grad sein und die Tiefsttemperatur {min} Grad.",
-                              "{when} {where} Temperaturen zwischen {min} und {max} Grad.",
-                              "Die Temperatur {when} {where} liegt zwischen {min} und {max} Grad. "]
+        
         if max_temp == "":
             max_temp = min_temp
         min_temp = int(min_temp)
         max_temp = int(max_temp)
-        if min_temp == max_temp:
-            return random.choice(temperature_fix).format(temp=min_temp, when="{when}", where="{where}")
+        
+        if self.__request.requested == "cold":
+            if min_temp <= self.__locale.temparature_cold_to:
+                response_type = "cold_true"
+            else:
+                response_type = "cold_false"
+        elif self.__request.requested == "warm":
+            if min_temp >= self.__locale.temperature_warm_from:
+                response_type = "warm_true"
+            else:
+                response_type = "warm_false"
         else:
-            return random.choice(temperature_minmax).format(min=min_temp, max=max_temp, when="{when}", where="{where}")
+            response_type = "general_temperature"
+        
+        return random.choice(self.__locale.temperature_answers[response_type]).format(temperature=self.__locale.format_temperature_output(min_temp, max_temp), when="{when}", where="{where}")
+
 
     # returns a string with the weather condition and placeholders for location
     # and time
     def __answer_condition(self, weather_obj):
         log.debug("generating response for condition - error: {0}".format(self.status.is_error))
         from rhasspy_weather.data_types.condition import ConditionType
+        response_type = "general_weather"
+        output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
         if self.__request.forecast_type == ForecastType.CONDITION:
-            output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
-            log.debug(output_conditions)
             if self.__request.requested == ConditionType.RAIN:
                 if weather_obj.is_rain_chance:
                     response_type = "rain_true"
@@ -324,9 +328,7 @@ class WeatherReport:
                 return self.status.status_response()
             elif self.__request.requested == ConditionType.UNKNOWN:
                 response_type = "unknown_condition"
-            else:
-                response_type = "general_weather"
-  
+ 
         return random.choice(self.__locale.condition_answers[response_type]).format(weather=output_conditions, when="{when}", where="{where}")
 
     @property
@@ -372,4 +374,4 @@ class WeatherReport:
     @property
     def __output_location(self):
         log.debug("generating location for response - error: {0}".format(self.status.is_error))
-        return "in {0}".format(self.__request.location.name) if self.__request.location_specified else ""
+        return self.__locale.format_output_location(self.__request.location.name) if self.__request.location_specified else ""
