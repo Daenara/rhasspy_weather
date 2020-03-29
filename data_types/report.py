@@ -350,6 +350,7 @@ class WeatherReport:
     @staticmethod
     def __format_response(response):
         response = response.replace(" .", ".")
+        response = response.replace("   ", " ")
         response = response.replace("  ", " ")
         response = response.replace(" :", ":")
         response = response[0].capitalize() + response[1:]
