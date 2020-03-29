@@ -1,7 +1,6 @@
 import datetime
 import random
 from .request import DateType, ForecastType, Grain
-from .location import Location
 from .status import Status, StatusCode
 
 import logging
@@ -287,10 +286,11 @@ class WeatherReport:
     # and time
     def __answer_condition(self, weather_obj):
         log.debug("generating response for condition - error: {0}".format(self.status.is_error))
-        from rhasspy_weather.data_types.condition import ConditionType
+        
         response_type = "general_weather"
         output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
         if self.__request.forecast_type == ForecastType.CONDITION:
+            from .condition import ConditionType
             if self.__request.requested == ConditionType.RAIN:
                 if weather_obj.is_rain_chance:
                     response_type = "rain_true"
@@ -334,9 +334,6 @@ class WeatherReport:
     @property
     def __output_date_and_time(self):
         log.debug("generating time and date for response - error: {0}".format(self.status.is_error))
-        # set date and time to default values
-        date = "am " + self.__request.readable_date
-        time = ""
         
         # check if the user wanted a specific time/date
         userdefined_date = False
@@ -350,22 +347,10 @@ class WeatherReport:
             
         # make the output date more pretty if the user did not ask for something specific
         if not userdefined_date:
-            # determine date
-            if self.__request.time_difference == 0:
-                date = "heute"
-            elif self.__request.time_difference == 1:
-                date = "morgen"
-            else:
-                temp_day = datetime.datetime.today().weekday() + self.__request.time_difference
-                if temp_day < 7:
-                    date = "am " + self.__request.weekday
-                elif temp_day < 14:
-                    date = "nächste Woche " + self.__request.weekday
+            date = self.__locale.format_output_date(self.__request)
         # make the output time more pretty if the user did not ask for something specific
         if not userdefined_time:
-            # determine time
-            if self.__request.grain == Grain.HOUR:
-                time = "um " + self.__request.readable_start_time + " Uhr"
+            time = self.__locale.format_output_time(self.__request)
                 
         if self.__request.grain == Grain.HOUR:
             return date + " " + time
