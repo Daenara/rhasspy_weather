@@ -1,22 +1,6 @@
 import datetime
 from rhasspy_weather.data_types.status import StatusCode
 
-# used in interval.py to combine two kinds of weather
-def combine_conditions(conditions):
-    if isinstance(conditions, list):
-        if len(conditions) == 0:
-            return ""
-        elif len(conditions) == 1:
-            return conditions[0]
-        else:
-            combined = conditions[0]
-            for x in conditions[1:-1]:
-                combined += ", " + x
-            combined += " und " + conditions[-1]
-            return combined
-            
-combine_word = "und"
-
 # used in parsers
 weekday_names = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"]
 month_names = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
@@ -58,6 +42,49 @@ status_response = {
 }
 
 # used in report.py
+
+# condition report
+
+condition_answers = {
+    "general_weather": ["Das Wetter {when} {where}: {weather}.", 
+               "{when} {where} ist das Wetter: {weather}.", 
+               "Wetter {when} {where}: {weather}."],
+    "rain_true": ["Ja, {when} wird es {where} regnen.",
+                 "Ja, {when} gibt es {where} Regen.",
+                 "Ja, es regnet {when} {where}.",
+                 "Ja, {when} regnet es {where}."],
+    "rain_false": ["Nein, es regnet {when} {where} nicht. Das Wetter ist: {weather}.",
+                  "Nein, {when} regnet es {where} nicht. Stattdessen ist das Wetter: {weather}.",
+                  "Nein, {when} gibt es keinen Regen {where}. Das Wetter ist: {weather}."],
+    "snow_true": ["Ja, {when} wird es {where} schneien.",
+                 "Ja, {when} gibt es {where} Schnee.",
+                 "Ja, es schneit {when} {where}.",
+                 "Ja, {when} schneit es {where}."],
+    "snow_false": ["Nein, es schneit {when} {where} nicht. Das Wetter ist: {weather}.",
+                  "Nein, {when} schneit es {where} nicht. Stattdessen ist das Wetter: {weather}.",
+                  "Nein, {when} gibt es keinen Schnee {where}. Das Wetter ist: {weather}."],
+    "thunderstorm_true": ["Ja, {when} gibt es {where} Gewitter."],
+    "thunderstorm_false": ["Nein, {when} {where} gewittert es nicht. Das Wetter ist: {weather}."],
+    "clouds_true": ["Ja, {when} kann es {where} bewölkt sein."],
+    "clouds_false": ["Nein, {when} {where} ist es nicht bewölkt. Das Wetter ist: {weather}."],
+    "sun_true": ["Ja, {when} {where} scheint die Sonne."],
+    "sun_false": ["Nein, {when} {where} scheint keine Sonne. Das Wetter ist: {weather}."],
+    "mist_true": ["Ja, {when} {where} ist es neblig."],
+    "mist_false": ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."]
+}
+
+def combine_conditions(conditions):
+    if isinstance(conditions, list):
+        if len(conditions) == 0:
+            return ""
+        elif len(conditions) == 1:
+            return conditions[0]
+        else:
+            combined = conditions[0]
+            for x in conditions[1:-1]:
+                combined += ", " + x
+            combined += " und " + conditions[-1]
+            return combined
 
 # items
 rain_items = ["Regenmantel", "Schirm", "Gummistiefel", "Halbschuhe", "Kaputze", "Hut", "Regenschirm"]
