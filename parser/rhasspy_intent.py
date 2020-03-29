@@ -64,7 +64,7 @@ def parse_intent_message(intent_message):
                 new_date = today + datetime.timedelta(x)
                 if slots[slot_day_name].lower() == weekdays_lowercase[new_date.weekday()]:
                     new_request.request_date = new_date
-                    new_request.date_specified = "am " + name
+                    new_request.date_specified = config.locale.format_userdefined_date(name)
                     break
         # was a date specified (specified by rhasspy as "daynumber monthname")?
         elif ' ' in slots[slot_day_name]:
@@ -74,7 +74,7 @@ def parse_intent_message(intent_message):
             if month.lower() in months_lowercase:
                 index = months_lowercase.index(month.lower())
                 name = config.locale.month_names[index]
-                new_request.date_specified = "am " + day + ". " + name
+                new_request.date_specified = config.locale.format_userdefined_date(day + ". " + name)
                 # won't work when the year changes, fix that sometime
                 try:
                     new_request.request_date = datetime.date(datetime.date.today().year, index + 1, int(day))
@@ -114,12 +114,12 @@ def parse_intent_message(intent_message):
             elif isinstance(slots[slot_time_name], str) and ' ' in slots[slot_time_name]:
                 log.debug("    hours and minutes detected")
                 new_request.start_time = datetime.datetime.strptime(slots[slot_time_name], '%H %M').time()
-                new_request.time_specified = "um " + str(new_request.start_time.hour) + " Uhr " + str(new_request.start_time.minute)
+                new_request.time_specified = config.locale.format_userdefined_time(new_request.start_time.hour, new_request.start_time.minute)
             # is it only an hour (no way to only specify minutes, if it is an int, it is hours)?
             elif isinstance(slots[slot_time_name], int):
                 log.debug("    hours detected")
                 new_request.start_time = datetime.time(slots[slot_time_name], 0)
-                new_request.time_specified = "um " + str(new_request.start_time.hour) + " Uhr"
+                new_request.time_specified = config.locale.format_userdefined_time(new_request.start_time.hour)
             else:
                 new_request.grain = Grain.DAY
         else:

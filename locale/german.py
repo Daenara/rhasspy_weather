@@ -36,6 +36,17 @@ requested_temperature = {
     "kalt": "cold"
 }
 
+
+def format_userdefined_date(date):
+    return "am" + date
+
+
+def format_userdefined_time(hour, minutes=""):
+    if minutes == "":
+        return "um " + str(hour) + " Uhr"
+    return "um " + str(hour) + " Uhr " + str(minutes)
+
+
 # used in status.py to output status messages
 status_response = {
     StatusCode.NORMAL: ["Sieht alles normal aus."],
