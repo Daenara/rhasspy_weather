@@ -69,6 +69,7 @@ class WeatherRequest:
         self.detail = config.detail
         self.status = Status()
         self.__timezone = config.timezone
+        self.__locale = config.locale
         
     
     def __str__(self): 
@@ -163,7 +164,7 @@ class WeatherRequest:
     
     @property
     def weekday(self):
-        return self.request_date.strftime("%A")
+        return self.__locale.weekday_names[self.request_date.weekday()]
         
     @property
     def readable_date(self):

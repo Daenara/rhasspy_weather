@@ -80,11 +80,8 @@ def format_output_date(request):
     return date
     
 def format_output_time(request):
-    if request.grain == Grain.HOUR:
-       time = "um " + request.readable_start_time + " Uhr"
-    else:
-        time = ""
-    return time
+   return "um " + request.readable_start_time + " Uhr"
+
 # temperature report
 
 temperature_answers = {

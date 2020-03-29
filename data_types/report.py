@@ -338,20 +338,23 @@ class WeatherReport:
         # check if the user wanted a specific time/date
         userdefined_date = False
         userdefined_time = False
-        if self.__request.date_specified != "":
-            date = self.__request.date_specified
-            userdefined_date = True
-        if self.__request.time_specified != "":
-            time = self.__request.time_specified
-            userdefined_time = True
+        # if self.__request.date_specified != "":
+            # date = self.__request.date_specified
+            # userdefined_date = True
+        # if self.__request.time_specified != "":
+            # time = self.__request.time_specified
+            # userdefined_time = True
             
         # make the output date more pretty if the user did not ask for something specific
         if not userdefined_date:
             date = self.__locale.format_output_date(self.__request)
         # make the output time more pretty if the user did not ask for something specific
         if not userdefined_time:
-            time = self.__locale.format_output_time(self.__request)
-                
+            if self.__request.grain == Grain.HOUR:
+                time = self.__locale.format_output_time(self.__request)
+            else:
+                time = ""
+                   
         if self.__request.grain == Grain.HOUR:
             return date + " " + time
         return date
