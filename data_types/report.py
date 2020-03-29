@@ -87,7 +87,7 @@ class WeatherReport:
         elif self.__request.forecast_type == ForecastType.ITEM:
             response = self.__generate_item_report()
 
-        return response
+        return self.__format_response(response)
     
     # returns the answer to a question about the weather
     # called by generate_report()
@@ -363,3 +363,10 @@ class WeatherReport:
     def __output_location(self):
         log.debug("generating location for response - error: {0}".format(self.status.is_error))
         return self.__locale.format_output_location(self.__request.location.name) if self.__request.location_specified else ""
+        
+    def __format_response(self, response):
+        response = response.replace(" .", ".")
+        response = response.replace("  ", " ")
+        response = response.replace(" :", ":")
+        response = response[0].capitalize() + response[1:]
+        return response
