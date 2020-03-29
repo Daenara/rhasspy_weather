@@ -283,40 +283,47 @@ class WeatherReport:
     # and time
     def __answer_condition(self, weather_obj):
         log.debug("generating response for condition - error: {0}".format(self.status.is_error))
-
+        from rhasspy_weather.data_types.condition import ConditionType
         if self.__request.forecast_type == ForecastType.CONDITION:
             output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
-            if self.__request.requested == "Regen":
+            log.debug(output_conditions)
+            if self.__request.requested == ConditionType.RAIN:
                 if weather_obj.is_rain_chance:
                     response_type = "rain_true"
                 else:
                     response_type = "rain_false"
-            elif self.__request.requested == "Schnee":
-                if weather_obj.is_rain_chance:
+            elif self.__request.requested == ConditionType.SNOW:
+                if weather_obj.is_snow_chance:
                     response_type = "snow_true"
                 else:
                     response_type = "snow_false"
-            elif self.__request.requested == "Sonne":
+            elif self.__request.requested == ConditionType.CLEAR:
                 day_weather = self.__forecast.weather_during_daytime(self.__request)
                 if day_weather is not None and day_weather.is_clear:
                     response_type = "sun_true"
                 else:
                     response_type = "sun_false"
-            elif self.__request.requested == "Gewitter":
+            elif self.__request.requested == ConditionType.THUNDERSTORM:
                 if weather_obj.is_thunderstorm_chance:
                     response_type = "thunderstorm_true"
                 else:
                     response_type = "thunderstorm_false"
-            elif self.__request.requested == "Nebel":
+            elif self.__request.requested == ConditionType.MIST:
                 if weather_obj.is_misty:
                     response_type = "mist_true"
                 else:
                     response_type = "mist_false"
-            elif self.__request.requested == "Wolken":
+            elif self.__request.requested == ConditionType.CLOUDS:
                 if weather_obj.is_cloudy:
                     response_type = "clouds_true"
                 else:
                     response_type = "clouds_false"
+            elif self.__request.requested == ConditionType.WIND:
+                log.error("condition wind not implemented yet")
+                self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
+                return self.status.status_response()
+            elif self.__request.requested == ConditionType.UNKNOWN:
+                response_type = "unknown_condition"
             else:
                 response_type = "general_weather"
   

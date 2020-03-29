@@ -1,5 +1,6 @@
 import datetime
 from rhasspy_weather.data_types.status import StatusCode
+from rhasspy_weather.data_types.condition import ConditionType
 
 # used in parsers
 weekday_names = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"]
@@ -15,6 +16,15 @@ named_times = {
 }
 named_times_synonyms = {
     "früh": "Morgen"
+}
+requested_condition = {
+    "regen": ConditionType.RAIN,
+    "schnee": ConditionType.SNOW,
+    "nebel": ConditionType.MIST,
+    "wolken": ConditionType.CLOUDS,
+    "gewitter": ConditionType.THUNDERSTORM,
+    "sonne": ConditionType.CLEAR,
+    "wind": ConditionType.WIND
 }
 
 # used in status.py to output status messages
@@ -70,7 +80,8 @@ condition_answers = {
     "sun_true": ["Ja, {when} {where} scheint die Sonne."],
     "sun_false": ["Nein, {when} {where} scheint keine Sonne. Das Wetter ist: {weather}."],
     "mist_true": ["Ja, {when} {where} ist es neblig."],
-    "mist_false": ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."]
+    "mist_false": ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."],
+    "unknown_condition": ["Ich weiß nicht, was genau du wissen willst. Hier das allgemeine Wetter: {weather}"]
 }
 
 def combine_conditions(conditions):

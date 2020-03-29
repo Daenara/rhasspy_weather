@@ -1,8 +1,11 @@
+from enum import Enum
+
 class WeatherCondition:
-    def __init__(self, severity, description, condition):
+    def __init__(self, severity, description, condition, condition_type):
         self.severity = severity
         self.description = description
         self.condition = condition
+        self.condition_type = condition_type
 
     def __eq__(self, other):
         return self.description == other.description
@@ -12,3 +15,14 @@ class WeatherCondition:
         
     def __repr__(self):
         return "[" + str(self.condition) + ", " + str(self.severity) + ", " + str(self.description) + "]"
+        
+class ConditionType(Enum):
+    RAIN = "rain"
+    SNOW = "snow"
+    CLOUDS = "clouds"
+    MIST = "mist"
+    THUNDERSTORM = "thunderstorm"
+    CLEAR = "clear"
+    WIND = "wind"
+    MISC = "misc"
+    UNKNOWN = "unknown"

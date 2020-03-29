@@ -2,6 +2,7 @@ import datetime
 from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
 from rhasspy_weather.data_types.status import Status, StatusCode
 from rhasspy_weather.data_types.location import Location
+from rhasspy_weather.data_types.condition import ConditionType
 
 import logging
 
@@ -128,14 +129,17 @@ def parse_intent_message(intent_message):
     # requested
     requested = None
     if intent == ForecastType.CONDITION and slot_condition_name in slots:
-        requested = slots[slot_condition_name]
+        if slots[slot_condition_name] in config.locale.requested_condition:
+            requested = config.locale.requested_condition[slots[slot_condition_name]]
+        else:
+            requested = ConditionType.UNKNOWN
     elif intent == ForecastType.ITEM and slot_item_name in slots:
-        requested = slots[slot_item_name]
+        requested = slots[slot_item_name].capitalize()
     elif intent == ForecastType.TEMPERATURE and slot_temperature_name in slots:
-        requested = slots[slot_temperature_name]
+        requested = slots[slot_temperature_name].capitalize()
     if not requested == None:
         log.debug("there was a special request made")
-        new_request.requested = requested.capitalize() # first letter uppercase because german nouns just are that way (and the weather_logic will break)
+        new_request.requested = requested
 
     # location
     if slot_location_name in slots and slots[slot_location_name] != "":

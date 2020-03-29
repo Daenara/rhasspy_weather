@@ -1,7 +1,7 @@
 import requests
 import datetime
 from rhasspy_weather.data_types.forecast import WeatherForecast 
-from rhasspy_weather.data_types.condition import WeatherCondition
+from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
 from rhasspy_weather.data_types.location import Location
 from rhasspy_weather.data_types.status import StatusCode
 
@@ -61,7 +61,7 @@ def get_weather(location):
             weather_description = [x["weather"][0]["description"] for x in forecast]
             weather_id = [x["weather"][0]["id"] for x in forecast]
             for x in range(len(weather_condition)):
-                temp_condition = WeatherCondition(__get_severity_from_open_weather_map_id(weather_id[x]), weather_description[x], weather_condition[x])
+                temp_condition = WeatherCondition(__get_severity_from_open_weather_map_id(weather_id[x]), weather_description[x], weather_condition[x], __get_condition_type(weather_id[x]))
                 condition_list.append(temp_condition)
             tmp = WeatherForecast.WeatherAtDate(datetime.datetime.strptime(key, "%Y-%m-%d").date())
             tmp.parse_weather([datetime.datetime.strptime(x, "%H:%M:%S").time() for x in [x["dt_txt"].split(" ")[1] for x in forecast]],\
@@ -124,3 +124,20 @@ def __get_severity_from_open_weather_map_id(id):
     if id == 804: return 3 # overcast clouds: 85-100%
    
     return 0
+    
+def __get_condition_type(id):
+    first_digit = int(str(id)[0])
+    if first_digit == 2:
+        return ConditionType.THUNDERSTORM
+    elif first_digit == 3 or first_digit == 5:
+        return ConditionType.RAIN
+    elif first_digit == 6:
+        return ConditionType.SNOW
+    elif id == 800:
+        return ConditionType.CLEAR
+    elif first_digit == 8:
+        return ConditionType.CLOUDS
+    elif id == 701 or id == 741:
+        return ConditionType.MIST
+    else:
+        return ConditionType.MISC

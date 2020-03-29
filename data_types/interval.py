@@ -1,3 +1,5 @@
+from rhasspy_weather.data_types.condition import ConditionType
+
 import logging
 
 log = logging.getLogger(__name__)
@@ -31,21 +33,21 @@ class WeatherInterval:
             self.min_temperature = weather_at_time.temperature
         if weather_at_time.weather_condition_obj not in self.weather_condition_list:
             self.weather_condition_list.append(weather_at_time.weather_condition_obj)
-        self.__increase_counter(weather_at_time.weather_condition)
+        self.__increase_counter(weather_at_time.weather_condition_obj.condition_type)
 
     # counts how many occurrences of a certain weather type there are
-    def __increase_counter(self, counter):
-        if counter == "Rain" or counter == "Drizzle": 
+    def __increase_counter(self, condition_type):
+        if condition_type == ConditionType.RAIN: 
             self.__rain = self.__rain + 1
-        elif counter == "Thunderstorm":
+        elif condition_type == ConditionType.THUNDERSTORM:
             self.__thunderstorm = self.__thunderstorm + 1
-        elif counter == "Snow":
+        elif condition_type == ConditionType.SNOW:
             self.__snow = self.__snow + 1
-        elif counter == "Clouds":
+        elif condition_type == ConditionType.CLOUDS:
             self.__clouds = self.__clouds + 1
-        elif counter == "Clear":
+        elif condition_type == ConditionType.CLEAR:
             self.__clear = self.__clear + 1
-        elif counter == "Mist":
+        elif condition_type == ConditionType.MIST:
             self.__mist = self.__mist + 1
 
     @property
@@ -92,10 +94,10 @@ class WeatherInterval:
             # that occurs more often, if both occur at the same frequency, clouds 
             # are added)
             if clouds_and_clear_exclusive == True: 
-                if x.condition == "Clouds":
+                if x.condition_type == ConditionType.CLOUDS:
                     if self.__clouds >= self.__clear:
                         self.__add_element_to_condition_list(x, selected)
-                if x.condition == "Clear":
+                if x.condition_type == ConditionType.CLEAR:
                     if self.__clear > self.__clouds:
                         
                         self.__add_element_to_condition_list(x, selected)
