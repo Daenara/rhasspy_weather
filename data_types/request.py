@@ -195,7 +195,7 @@ class WeatherRequest:
 
     @property
     def time_difference(self):
-        time_difference = (self.request_date - datetime.date.today()).days
+        time_difference = (self.request_date - datetime.datetime.now(self.__timezone).date()).days
         if self.grain == Grain.HOUR and self.start_time == datetime.time(0, 0, 0):
             return time_difference - 1
         return time_difference
