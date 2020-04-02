@@ -4,7 +4,7 @@ from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
-temperature_warm_from = 20
+temperature_warm_from = 20  # TODO: discuss, this should go into the config.ini - values don't make sense for example in Brazil 
 temperature_cold_to = 5
 
 # used in parsers
@@ -26,10 +26,11 @@ requested_condition = {
     "rain": ConditionType.RAIN,
     "snow": ConditionType.SNOW,
     "mist": ConditionType.MIST,
-    "clouds": ConditionType.CLOUDS,
+    "fog": ConditionType.MIST, # TODO: what about haze, hazy, misty, foggy?
+    "clouds": ConditionType.CLOUDS, # TODO: cloudy?
     "thunderstorm": ConditionType.THUNDERSTORM,
     "sun": ConditionType.CLEAR,
-    "wind": ConditionType.WIND
+    "wind": ConditionType.WIND # TODO: windy, stormy
 }
 requested_temperature = {
     "warm": "warm",
@@ -43,23 +44,27 @@ def format_userdefined_date(date):
 
 def format_userdefined_time(hour, minutes=""):
     if minutes == "":
-        return "at " + str(hour) + " o'clock"
-    return "at " + str(hour) + str(minutes)
+        return "at {} o'clock {}m".format(hour%12, "a" if hour < 12 else "p")
+    return "at {} {:02d}".format(hour, minutes)
 
 
 # used in status.py to output status messages
 status_response = {
-    StatusCode.NORMAL: ["Everything seems okay."],
-    StatusCode.NO_NETWORK_ERROR: ["I don't have network."],
-    StatusCode.API_ERROR: ["API Key faulty."],
-    StatusCode.FUTURE_WEATHER_ERROR: ["I don't know the weather this far ahead."],
+    StatusCode.NORMAL: ["Everything seems to be okay."],
+    StatusCode.NO_NETWORK_ERROR: ["I don't have network.", 
+        "I seem not be connected to the internet."],
+    StatusCode.API_ERROR: ["There is a problem with the API Key.", 
+        "the API key is invalid."],
+    StatusCode.FUTURE_WEATHER_ERROR: ["I don't know the weather this far ahead.",
+        "There is not prediction data for your requested date yet."],
     StatusCode.NOT_IMPLEMENTED_ERROR: ["This function is not implemented."],
     StatusCode.LOCATION_ERROR: ["I can't find the location."],
-    StatusCode.PAST_WEATHER_ERROR: ["I don't know the weather of the past."],
+    StatusCode.PAST_WEATHER_ERROR: ["I don't know the weather of the past.",
+    "I am a forecasting service not a historian."],
     StatusCode.NO_WEATHER_FOR_DAY_ERROR: ["There seems to be no weather for today."],
     StatusCode.DATE_ERROR: ["Something is wrong with the date."],
     StatusCode.API_TIMEOUT_ERROR: ["API Key was used to often, try again later."],
-    StatusCode.CONFIG_ERROR: ["There seems to be something wrong with the config."],
+    StatusCode.CONFIG_ERROR: ["There seems to be something wrong with the configuration file."],
     StatusCode.TIME_ERROR: ["Something is wrong with the time."],
     StatusCode.GENERAL_ERROR: ["Something went wrong."]
 }
@@ -94,19 +99,19 @@ def format_output_time(request):
 # temperature report
 
 temperature_answers = {
-    "cold_true": ["Yes, it will be cold {where} {when}. Temperature will be {temperature}."],
-    "cold_false": ["No, {when} {where} will not be cold. Temperature will be {temperature}."],
-    "warm_true": ["Yes, it will be warm {where} {when}. Temperature will be {temperature}."],
-    "warm_false": ["No, {when} {where} will not be warm. Temperature will be {temperature}."],
+    "cold_true": ["Yes, it will be cold {where} {when}. The temperature will be {temperature}."],
+    "cold_false": ["No, {when} {where} will not be cold. The temperature will be {temperature}."],
+    "warm_true": ["Yes, it will be warm {where} {when}. The temperature will be {temperature}."],
+    "warm_false": ["No, {when} {where} will not be warm. The temperature will be {temperature}."],
     "general_temperature": ["The temperature {when} {where} is {temperature}."]
 }
 
 
 def format_temperature_output(min_temperature, max_temperature):
     if min_temperature == max_temperature:
-        return str(min_temperature) + " degree"
+        return str(min_temperature) + " degrees"  # TODO: add Celsius/centigrade?
     else:
-        return "between " + str(min_temperature) + " and " + str(max_temperature) + " degree"
+        return "between " + str(min_temperature) + " and " + str(max_temperature) + " degrees"
 
 
 # condition report
@@ -144,30 +149,31 @@ def combine_conditions(conditions):
 
 
 # items
-rain_items = ["umbrella", "raincoat"]
-warm_items = ["sunglasses", "sunscreen"]
-cold_items = ["boots", "scarf"]
+rain_items = ["umbrella", "raincoat", "rubber boots"]
+warm_items = ["sunglasses", "sunscreen", "sandals"]
+cold_items = ["boots", "scarf", "gloves"]
 
 item_answers = {
-    "rain": ["It could be rainy {when} {where}, {item} might be a good idea."],
-    "no_rain": ["There should be no rain {when} {where}. {item} might be useless."],
+    "rain": ["It could be rainy {when} {where}. Taking {item} might be a good idea."],
+    "no_rain": ["There should be no rain {when} {where}. {item} is probably not necessary.",
+        "No, you will most likely not need {item}. No rain is expected {when} {where}."],
     "warm_and_sunny": ["It will be warm {when} {where} and the sun might come out during the day. {item} might be a good idea."],
     "not_warm_and_sunny": ["It will not exactly be warm {when} {where} but it might still be sunny. {item} could still be useful."],
-    "not_sunny": ["It will not be sunny {when} {where}. {item} might be useless."],
+    "not_sunny": ["It will not be sunny {when} {where}. {item} might be necessary."],
     "cold": ["It will be cold {when} {where}. {item} might be a good idea."],
-    "not_cold": ["It will not be {when} {where} so {item} might not help."],
-    "unknown_item": ["I have no idea what {item} is, I'm sorry."]
+    "not_cold": ["It will not be cold {when} {where}, so {item} might not help."],
+    "unknown_item": ["I have no idea what {item} is, I am sorry."]
 }
 
 
 def format_item_for_output(item):
     if item in ["umbrella"]:
-        return "an " + item + " is"
+        return "an " + item
     elif item in ["boots", "sunglasses"]:
-        return item + " are"
+        return item
     elif item in ["scarf", "raincoat"]:
-        return "a" + item + " is"
+        return "a " + item
     elif item in ["sunscreen"]:
-        return item + "is"
+        return item
     else:
         return item

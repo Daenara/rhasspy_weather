@@ -173,7 +173,7 @@ class WeatherReport:
             else:
                 response_type = "not_cold"
         else:
-            response_type = "unknown_items"
+            response_type = "unknown_item"
         return random.choice(self.__locale.item_answers[response_type]).format(when=self.__output_date_and_time, where=self.__output_location, item=self.__locale.format_item_for_output(item))
 
     # returns a string response with the weather forecast for a full day if detail=True in the config this answer may be rather long
@@ -260,7 +260,7 @@ class WeatherReport:
         max_temp = int(max_temp)
 
         if self.__request.requested == "cold":
-            if min_temp <= self.__locale.temparature_cold_to:
+            if min_temp <= self.__locale.temperature_cold_to:
                 response_type = "cold_true"
             else:
                 response_type = "cold_false"
