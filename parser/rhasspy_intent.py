@@ -50,7 +50,7 @@ def parse_intent_message(intent_message):
             value = list(config.locale.named_days.values())[index]
             if isinstance(value, datetime.date):
                 log.debug("    named day seems to be a date")
-                new_request.status.set_status(StatusCode.NOT_IMPLEMENTET_ERROR)
+                new_request.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
             elif isinstance(value, int):
                 log.debug("    named day seems to be an offset from today")
                 new_request.request_date = datetime.date.today() + datetime.timedelta(value)
@@ -103,7 +103,7 @@ def parse_intent_message(intent_message):
                 log.debug(value)
                 if isinstance(value, datetime.time):
                     log.debug("    named time seems to be a certain time")
-                    new_request.status.set_status(StatusCode.NOT_IMPLEMENTET_ERROR)
+                    new_request.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
                 elif isinstance(value, tuple):
                     log.debug("    named time seems to be an interval")
                     new_request.date_type = DateType.INTERVAL
