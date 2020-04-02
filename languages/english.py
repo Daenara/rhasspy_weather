@@ -4,7 +4,7 @@ from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
-temperature_warm_from = 20
+temperature_warm_from = 20  # TODO: discuss, this should go into the config.ini - values don't make sense for example in Brazil 
 temperature_cold_to = 5
 
 # used in parsers
@@ -26,10 +26,11 @@ requested_condition = {
     "rain": ConditionType.RAIN,
     "snow": ConditionType.SNOW,
     "mist": ConditionType.MIST,
-    "clouds": ConditionType.CLOUDS,
+    "fog": ConditionType.MIST, # TODO: what about haze, hazy, misty, foggy?
+    "clouds": ConditionType.CLOUDS, # TODO: cloudy?
     "thunderstorm": ConditionType.THUNDERSTORM,
     "sun": ConditionType.CLEAR,
-    "wind": ConditionType.WIND
+    "wind": ConditionType.WIND # TODO: windy, stormy
 }
 requested_temperature = {
     "warm": "warm",
@@ -98,10 +99,10 @@ def format_output_time(request):
 # temperature report
 
 temperature_answers = {
-    "cold_true": ["Yes, it will be cold {where} {when}. Temperature will be {temperature}."],
-    "cold_false": ["No, {when} {where} will not be cold. Temperature will be {temperature}."],
-    "warm_true": ["Yes, it will be warm {where} {when}. Temperature will be {temperature}."],
-    "warm_false": ["No, {when} {where} will not be warm. Temperature will be {temperature}."],
+    "cold_true": ["Yes, it will be cold {where} {when}. The temperature will be {temperature}."],
+    "cold_false": ["No, {when} {where} will not be cold. The temperature will be {temperature}."],
+    "warm_true": ["Yes, it will be warm {where} {when}. The temperature will be {temperature}."],
+    "warm_false": ["No, {when} {where} will not be warm. The temperature will be {temperature}."],
     "general_temperature": ["The temperature {when} {where} is {temperature}."]
 }
 
