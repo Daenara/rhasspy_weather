@@ -12,6 +12,7 @@ language_code = "en"
 weekday_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 named_days = {"today": 0, "tomorrow": 1, "the day after tomorrow": 2}
+named_days_synonyms = {}
 named_times = {
     "morning": (datetime.time(6, 0), datetime.time(12, 0)),
     "midday": datetime.time(12, 0),

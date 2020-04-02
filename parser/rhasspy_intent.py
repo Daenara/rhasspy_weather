@@ -42,19 +42,27 @@ def parse_intent_message(intent_message):
         log.debug("it was a day specified")
         named_days_lowercase = [x.lower() for x in config.locale.named_days]
         weekdays_lowercase = [x.lower() for x in config.locale.weekday_names]
+        named_days_synonyms_lowercase = [x.lower() for x in config.locale.named_times_synonyms]
+        named_days_combined = named_days_lowercase + named_days_synonyms_lowercase
         # is it a named day (tomorrow, etc.)?
-        if slots[slot_day_name].lower() in named_days_lowercase:
+        if slots[slot_day_name].lower() in named_days_combined:
             log.debug("  named day detected")
-            index = named_days_lowercase.index(slots[slot_day_name].lower())
-            key = list(config.locale.named_days.keys())[index]
-            value = list(config.locale.named_days.values())[index]
+            if slots[slot_day_name].lower() in named_days_synonyms_lowercase:
+                index = named_days_synonyms_lowercase.index(slots[slot_day_name].lower())
+                name = list(config.locale.named_days_synonyms.keys())[index]
+                value = config.locale.named_days[config.locale.named_days_synonyms[name]]
+            else:
+                index = named_days_lowercase.index(slots[slot_day_name].lower())
+                name = list(config.locale.named_days.keys())[index]
+                value = list(config.locale.named_days.values())[index]
             if isinstance(value, datetime.date):
                 log.debug("    named day seems to be a date")
-                new_request.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
+                new_request.request_date = value
+                new_request.date_specified = name
             elif isinstance(value, int):
                 log.debug("    named day seems to be an offset from today")
                 new_request.request_date = datetime.date.today() + datetime.timedelta(value)
-                new_request.date_specified = key
+                new_request.date_specified = name
         # is a weekday named?
         elif slots[slot_day_name].lower() in weekdays_lowercase:
             log.debug("  weekday detected")
