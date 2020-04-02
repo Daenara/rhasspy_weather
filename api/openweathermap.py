@@ -29,7 +29,7 @@ def get_weather(location):
         url_location = "zip={zip},{country_code}".format(zip=location.zipcode, country_code=location.country_code)
     else:
         url_location = "q={city_name}".format(city_name=location.city)
-    forecast_url = "http://api.openweathermap.org/data/2.5/forecast?{location}&APPID={api_key}&units={units}&lang=de".format(location=url_location, api_key=config.api_key, units=config.units)
+    forecast_url = "http://api.openweathermap.org/data/2.5/forecast?{location}&APPID={api_key}&units={units}&lang={country_code}".format(location=url_location, api_key=config.api_key, units=config.units, country_code=config.location.country_code)
     try:
         response = requests.get(forecast_url)
         response = response.json()
