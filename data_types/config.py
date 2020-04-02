@@ -52,7 +52,7 @@ class WeatherConfig:
                 return None
             locale = self.__get_required_option(section_general, "locale", "german")
             # try:
-            name = "rhasspy_weather.locale." + locale
+            name = "rhasspy_weather.languages." + locale
             log.debug(name)
             self.__locale = __import__(name, fromlist=[''])
             # except:
