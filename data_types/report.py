@@ -260,7 +260,7 @@ class WeatherReport:
         max_temp = int(max_temp)
 
         if self.__request.requested == "cold":
-            if min_temp <= self.__locale.temparature_cold_to:
+            if min_temp <= self.__locale.temperature_cold_to:
                 response_type = "cold_true"
             else:
                 response_type = "cold_false"
