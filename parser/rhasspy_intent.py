@@ -103,7 +103,8 @@ def parse_intent_message(intent_message):
                 log.debug(value)
                 if isinstance(value, datetime.time):
                     log.debug("    named time seems to be a certain time")
-                    new_request.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
+                    new_request.start_time = value
+                    new_request.time_specified = name
                 elif isinstance(value, tuple):
                     log.debug("    named time seems to be an interval")
                     new_request.date_type = DateType.INTERVAL
