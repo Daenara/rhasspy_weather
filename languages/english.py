@@ -6,6 +6,7 @@ from rhasspy_weather.data_types.status import StatusCode
 # general stuff
 temperature_warm_from = 20  # TODO: discuss, this should go into the config.ini - values don't make sense for example in Brazil 
 temperature_cold_to = 5
+language_code = "en"
 
 # used in parsers
 weekday_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
