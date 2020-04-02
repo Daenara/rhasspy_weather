@@ -13,7 +13,7 @@ month_names = ["January", "February", "March", "April", "May", "June", "July", "
 named_days = {"today": 0, "tomorrow": 1, "the day after tomorrow": 2}
 named_times = {
     "morning": (datetime.time(6, 0), datetime.time(12, 0)),
-    "noon": datetime.time(12, 0),
+    "midday": datetime.time(12, 0),
     "afternoon": (datetime.time(12, 0), datetime.time(18, 0)),
     "evening": (datetime.time(18, 0), datetime.time(22, 0)),
     "night": (datetime.time(22, 0), datetime.time(6, 0)),
