@@ -1,10 +1,10 @@
 import datetime
 import logging
 
+from rhasspy_weather import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.location import Location
 from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
-from rhasspy_weather.data_types.status import StatusCode
 
 log = logging.getLogger(__name__)
 
@@ -83,11 +83,7 @@ def parse_intent_message(intent_message):
                 index = months_lowercase.index(month.lower())
                 name = config.locale.month_names[index]
                 new_request.date_specified = config.locale.format_userdefined_date(day + ". " + name)
-                # won't work when the year changes, fix that sometime
-                try:
-                    new_request.request_date = datetime.date(datetime.date.today().year, index + 1, int(day))
-                except ValueError:
-                    new_request.status.set_status(StatusCode.DATE_ERROR)
+                new_request.request_date = utils.get_date_with_year(int(day), index + 1)
 
         # if a time was specified
         if slot_time_name in slots and slots[slot_time_name] != "":
