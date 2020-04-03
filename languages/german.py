@@ -169,8 +169,9 @@ def combine_conditions(conditions):
 
 # items
 rain_items = ["Regenmantel", "Schirm", "Gummistiefel", "Halbschuhe", "Kaputze", "Hut", "Regenschirm"]
-warm_items = ["Sonnenbrille", "Sonnencreme", "Sonnenschirm", "Kappe", "Sonnenhut", "Sandalen"]
-cold_items = ["Winterstiefel", "Mantel", "Schal", "Handschuhe", "Mütze"]
+warm_items = ["T-Shirt", "Sandalen", "kurze Hosen", "leichte Kleidung"]
+cold_items = ["Winterstiefel", "Mantel", "Schal", "Handschuhe", "Mütze", "dicke Kleidung", "Stiefel", "lange Hosen", "lange Unterhosen", "Fleece"]
+sun_items = ["Sonnenhut", "Sonnenschirm", "Kappe", "Sonnenbrille", "Sonnencreme"]
 
 item_answers = {
     "rain": ["Es könnte {when} {where} regnen, {item} keine schlechte Idee.", "Es könnte {when} {where} Regen geben. {item} keine schlechte Idee."],
@@ -178,6 +179,9 @@ item_answers = {
     "warm_and_sunny": ["Es ist {when} warm {where} und tagsüber kommt die Sonne raus. {item} daher eine gute Idee."],
     "not_warm_and_sunny": ["Es ist {when} {where} nicht sonderlich warm aber trotzdem sonnig. {item} vielleicht trotzdem nützlich."],
     "not_sunny": ["Es ist {when} {where} nicht unbedingt sonnig. {item} vermutlich eher überflüssig."],
+    "nighttime": ["Es ist {when} {where} dunkel. Im Dunkeln ist {item} unnötig"],
+    "warm": ["Es ist {when} warm {where}. {item} daher eine gute Idee."],
+    "not_warm": ["Es ist {when} {where} nicht sonderlich warm. {item} vermutlich unnötig."],
     "cold": ["Es ist {when} kalt {where}. {item} daher eine gute Idee."],
     "not_cold": ["Es ist {when} {where} nicht sonderlich kalt. {item} daher eher unnötig."],
     "unknown_item": ["Ich bin mir nicht sicher, was ein {item} ist, tut mir leid."]
@@ -185,13 +189,13 @@ item_answers = {
 
 
 def format_item_for_output(item):
-    if item in ["Regenmantel", "Schirm", "Hut", "Sonnenhut", "Mantel", "Schal", "Sonnenschirm", "Regenschirm"]:
+    if item in ["Regenmantel", "Schirm", "Hut", "Sonnenhut", "Mantel", "Schal", "Sonnenschirm", "Regenschirm", "T-Shirt", "Fleece"]:
         return "ein " + item + " ist"
     elif item in ["Kaputze", "Kappe", "Mütze", "Sonnenbrille"]:
         return "eine " + item + " ist"
-    elif item in ["Gummistiefel", "Halbschuhe", "Sandalen", "Handschuhe", "Winterstiefel"]:
+    elif item in ["Gummistiefel", "Halbschuhe", "Sandalen", "Handschuhe", "Winterstiefel", "Stiefel", "kurze Hosen", "lange Hosen", "lange Unterhosen"]:
         return item + " sind"
-    elif item in ["Sonnencreme"]:
+    elif item in ["Sonnencreme", "dicke Kleidung", "leichte Kleidung"]:
         return item + " ist"
     else:
         return item

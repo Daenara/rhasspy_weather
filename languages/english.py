@@ -152,18 +152,19 @@ def combine_conditions(conditions):
 
 # items
 rain_items = ["umbrella", "raincoat", "rubber boots"]
-warm_items = ["sunglasses", "sunscreen", "sandals"]
+warm_items = ["sandals"]
+sun_items = ["sunglasses", "sunscreen"]
 cold_items = ["boots", "scarf", "gloves"]
 
 item_answers = {
-    "rain": ["It could be rainy {when} {where}. Taking {item} might be a good idea.",
-        "Yes, taking {item} {when} {where} makes sense."],
-    "no_rain": ["There should be no rain {when} {where}. {item} is probably not necessary.",
-        "No, you will most likely not need {item}. No rain is expected {when} {where}."],
+    "rain": ["It could be rainy {when} {where}. Taking {item} might be a good idea.", "Yes, taking {item} {when} {where} makes sense."],
+    "no_rain": ["There should be no rain {when} {where}. {item} is probably not necessary.", "No, you will most likely not need {item}. No rain is expected {when} {where}."],
     "warm_and_sunny": ["It will be warm {when} {where} and the sun might come out during the day. {item} might be a good idea."],
     "not_warm_and_sunny": ["It will not exactly be warm {when} {where} but it might still be sunny. {item} could still be useful."],
-    "not_sunny": ["It will not be sunny {when} {where}. {item} might not be necessary.",
-        "There is not going to be a lot of sunshine {when} {where}. Therefore, you might not need {item}."],
+    "not_sunny": ["It will not be sunny {when} {where}. {item} might not be necessary.", "There is not going to be a lot of sunshine {when} {where}. Therefore, you might not need {item}."],
+    "nighttime": ["It is dark {when} {where} so you won't need {item}."],
+    "warm": ["It will be warm {when} {where}. {item} might be a good idea."],
+    "not_warm": ["It will not be warm {when} {where}, so {item} might not help."],
     "cold": ["It will be cold {when} {where}. {item} might be a good idea."],
     "not_cold": ["It will not be cold {when} {where}, so {item} might not help."],
     "unknown_item": ["I have no idea what {item} is, I am sorry."]

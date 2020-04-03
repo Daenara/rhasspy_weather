@@ -70,7 +70,7 @@ class WeatherRequest:
     def __str__(self):
         return "(" + str(self.forecast_type) + ", " + str(self.date_type) + ", " + \
                str(self.grain) + ", " + self.string_date + ", " + str(self.start_time) + \
-               ", " + str(self.end_time) + ", " + self.location + ", " + self.requested + ", " + str(self.detail) + ")"
+               ", " + str(self.end_time) + ", " + self.location.name + ", " + self.requested + ", " + str(self.detail) + ")"
 
     def __get_valid_time(self, val):
         time = None

@@ -145,6 +145,8 @@ class WeatherReport:
         item = self.__request.requested
         weather = None
 
+        log.debug("Request: %s", str(self.__request))
+
         if self.__request.date_type == DateType.FIXED:
             if self.__request.grain == Grain.DAY:
                 weather = self.__forecast.weather_for_day(self.__request.request_date)
@@ -159,14 +161,22 @@ class WeatherReport:
             else:
                 response_type = "no_rain"
         elif self.__request.requested in self.__locale.warm_items:
-            day_weather = self.__forecast.weather_during_daytime(self.__request)
-            if day_weather.is_clear:
-                if weather.max_temperature >= self.__locale.temperature_warm_from:
-                    response_type = "warm_and_sunny"
-                else:
-                    response_type = "not_warm_and_sunny"
+            if weather.max_temperature >= self.__locale.temperature_warm_from:
+                response_type = "warm_"
             else:
-                response_type = "not_sunny"
+                response_type = "not_warm"
+        elif self.__request.requested in self.__locale.sun_items:
+            day_weather = self.__forecast.weather_during_daytime(self.__request)
+            if day_weather is not None:
+                if day_weather.is_clear:
+                    if weather.max_temperature >= self.__locale.temperature_warm_from:
+                        response_type = "warm_and_sunny"
+                    else:
+                        response_type = "not_warm_and_sunny"
+                else:
+                    response_type = "not_sunny"
+            else:
+                response_type = "nighttime"
         elif self.__request.requested in self.__locale.cold_items:
             if weather.max_temperature < self.__locale.temperature_cold_to:
                 response_type = "cold"

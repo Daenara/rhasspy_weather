@@ -140,7 +140,7 @@ def parse_intent_message(intent_message):
         else:
             requested = ConditionType.UNKNOWN
     elif intent == ForecastType.ITEM and slot_item_name in slots:
-        items = config.locale.rain_items + config.locale.cold_items + config.locale.warm_items
+        items = config.locale.rain_items + config.locale.cold_items + config.locale.warm_items + config.locale.sun_items
         items_lowercase = [x.lower() for x in items]
         if slots[slot_item_name].lower() in items_lowercase:
             requested = items[items_lowercase.index(slots[slot_item_name].lower())]

@@ -55,6 +55,9 @@ class WeatherForecast:
         from rhasspy_weather.globals import config
         self.__timezone = config.timezone
 
+    def __str__(self):
+        return self.forecast
+
     # calculates the time for sunrise and sunset
     def calculate_sunrise_and_sunset(self, lat, lon):
         log.debug("Calculating Sunrise and Sunset - error: {0}".format(self.status.is_error))
@@ -70,6 +73,7 @@ class WeatherForecast:
         log.debug("getting weather for daylight time - error: {0}".format(self.status.is_error))
 
         weather = self.__get_forecast_for_date(request.request_date)
+        log.debug("Weather: %s", weather)
         if request.start_time is not None:
             if self.sunrise <= request.start_time <= self.sunset:
                 if request.end_time is not None:
@@ -191,6 +195,7 @@ class WeatherForecast:
 
     def __get_forecast_for_date(self, date):
         log.debug("getting the complete forecast for a date - error: {0}".format(self.status.is_error))
+
         if self.status.is_error:
             return self.status
         for x in self.forecast:
@@ -222,6 +227,9 @@ class WeatherForecast:
             for x in self.weather:
                 str_weather = str_weather + str(x) + "\n"
             return self.string_date + ":\n" + str_weather
+
+        def __repr__(self):
+            return self.__str__()
 
         # saves the weather into a new WeatherAtTime Object and adds it to the
         # list
