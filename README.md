@@ -193,16 +193,45 @@ Multiple requests at the same time is not something I know how to implement with
 On the other side there are a few items that can be queried for with rhasspy that the logic has not learned yet, so both sides aren't perfect.
  
  ## TODO
- * ~~add location support~~
- * ~~add config file~~
- * make daily times in rhasspy_weather.py fit those in the weather logic (and use the logic already there to output the weather)
- * ~~move custom data like weekdays, time definitions for midday, etc.~~ and all language stuff to one file for easy access and easy translation
- * ~~fix the localized weekday problem again, this time using my custom array instead of a system locale that might not be installed~~
- * ~~move the weather api(s) into a subfolder and only import and use the one that is specified in the config~~
- * ~~rework error handling so errors are handed through everything, not only parts of it (errors while parsing the intent for example)~~
- * ~~figure out the data type of the errors owm gives back, one was an int and one was a string, or just make sure to cast them so they don't break the code~~ (hopefully)
- * move remaining slots from the sentences.ini to the slots
- * clean up and add to the sentences
- * add in new items to the logic
- * clean up code
- * ~~add/fix custom answers for weather conditions~~
+* [ ] **Rework the item system for requests**
+    * [ ] add custom item class saving name, grammar information and condition type
+        * [ ] properly format item for output
+        * [ ] output conditions it can be useful in
+    * [ ] write wrapper class to hold those items
+        * [ ] find if item is in list
+        * [ ] (maybe) list items by condition
+        * [ ] export items to rhasspy slot program
+    * [ ] while at it, add in new item types (there are types in my rhasspy slot the logic does not now and parts in the logic that rhasspy does not know)
+* [ ] **(maybe) add a dict full of aliases for weather conditions to language files and import everything in it as rhasspy slot program as well as map those aliases to conditions (similar to named_days and named_times aliases)**
+* [ ] **(maybe) export named_days, named_times and their aliases as slot program**
+* [ ] **rewrite the logic for a detailed weather report (and remove the last hardcoded language stuff with that)**
+* [ ] **add in logic for ConditionType.WIND**
+    * [ ] add wind as an extra WeatherCondition
+        * [ ] figure out a wind speed to severity conversion
+        * [ ] figure out how to write a custom description for wind (owm does not do that for me) and translate that
+        * [ ] add filter functionality to only add certain conditions to answers (I do not want to hear about a mild wind in my daily weather report)
+    * [ ] define and use items that are useful for wind
+    * [ ] make it possible to ask about wind condition
+* [ ] **add output system to define how this script outputs**
+    * [ ] rhasspy hass.io json (current way)
+    * [ ] extended json (add in an output part to json containing the answer to the question as well as some information)
+    * [ ] mqtt
+    * [ ] rhasspy web api tts
+* [ ] **clean up code**
+    * [ ] remove all comments to do with snips
+    * [ ] replace comments documenting functions with pydoc strings
+    * [ ] add documentation for everything that has none
+    * [ ] figure out a way to have the config globally accessible without having to import it inside functions because it is not initialized otherwise
+    * [ ] cleaning up imports in general
+    * [ ] move definition for warm and cold from language files to config file
+    * [ ] find every not implemented feature that could be implemented (StatusCode.NOT_IMPLEMENTED_ERROR)
+* [ ] **clean up on the rhasspy side of things**
+     * [ ] clean up sentences for rhasspy and add some
+     * [ ] offer an english translation for rhasspy sentences
+* [ ] **add to this documentation**
+    * [ ] table of content
+    * [ ] file structure graph
+    * [ ] rewrite most of the text
+        * [ ] add better explanation for setup
+        * [ ] add explanation of config
+        * [ ] rewrite functionality part
