@@ -140,7 +140,10 @@ def parse_intent_message(intent_message):
         else:
             requested = ConditionType.UNKNOWN
     elif intent == ForecastType.ITEM and slot_item_name in slots:
-        requested = slots[slot_item_name].capitalize()
+        items = config.locale.rain_items + config.locale.cold_items + config.locale.warm_items
+        items_lowercase = [x.lower() for x in items]
+        if slots[slot_item_name].lower() in items_lowercase:
+            requested = items[items_lowercase.index(slots[slot_item_name].lower())]
     elif intent == ForecastType.TEMPERATURE and slot_temperature_name in slots:
         if slots[slot_temperature_name] in config.locale.requested_temperature:
             requested = config.locale.requested_temperature[slots[slot_temperature_name]]
