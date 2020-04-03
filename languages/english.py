@@ -28,11 +28,11 @@ requested_condition = {
     "rain": ConditionType.RAIN,
     "snow": ConditionType.SNOW,
     "mist": ConditionType.MIST,
-    "fog": ConditionType.MIST, # TODO: what about haze, hazy, misty, foggy?
-    "clouds": ConditionType.CLOUDS, # TODO: cloudy?
+    "fog": ConditionType.MIST, # haze, hazy, misty, foggy will be handled in grammar if necessary
+    "clouds": ConditionType.CLOUDS, # rainy and cloudy handled in grammar
     "thunderstorm": ConditionType.THUNDERSTORM,
     "sun": ConditionType.CLEAR,
-    "wind": ConditionType.WIND # TODO: windy, stormy
+    "wind": ConditionType.WIND # windyand stormy handled in grammar
 }
 requested_temperature = {
     "warm": "warm",
@@ -111,7 +111,7 @@ temperature_answers = {
 
 def format_temperature_output(min_temperature, max_temperature):
     if min_temperature == max_temperature:
-        return str(min_temperature) + " degrees"  # TODO: add Celsius/centigrade?
+        return str(min_temperature) + " degrees"  #  Centigrade/Fahrenheit is handled through setting in config.ini
     else:
         return "between " + str(min_temperature) + " and " + str(max_temperature) + " degrees"
 
