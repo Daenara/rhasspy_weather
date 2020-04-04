@@ -4,8 +4,6 @@ from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
-temperature_warm_from = 20
-temperature_cold_to = 5
 language_code = "de"
 
 # used in parsers

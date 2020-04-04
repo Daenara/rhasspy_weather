@@ -34,12 +34,12 @@ class WeatherReport:
         """
         log.debug("weather report initialized")
 
-        config = get_config()
+        self.__config = get_config()
 
         self.__forecast = forecast
         self.__request = request
-        self.__timezone = config.timezone
-        self.__locale = config.locale
+        self.__timezone = self.__config.timezone
+        self.__locale = self.__config.locale
         self.status = Status()
 
     def generate_report(self):
@@ -163,7 +163,7 @@ class WeatherReport:
             else:
                 response_type = "no_rain"
         elif self.__request.requested in self.__locale.warm_items:
-            if weather.max_temperature >= self.__locale.temperature_warm_from:
+            if weather.max_temperature >= self.__config.temperature_warm_from:
                 response_type = "warm_"
             else:
                 response_type = "not_warm"
@@ -171,7 +171,7 @@ class WeatherReport:
             day_weather = self.__forecast.weather_during_daytime(self.__request)
             if day_weather is not None:
                 if day_weather.is_clear:
-                    if weather.max_temperature >= self.__locale.temperature_warm_from:
+                    if weather.max_temperature >= self.__config.temperature_warm_from:
                         response_type = "warm_and_sunny"
                     else:
                         response_type = "not_warm_and_sunny"
@@ -180,7 +180,7 @@ class WeatherReport:
             else:
                 response_type = "nighttime"
         elif self.__request.requested in self.__locale.cold_items:
-            if weather.max_temperature < self.__locale.temperature_cold_to:
+            if weather.max_temperature < self.__config.temperature_cold_to:
                 response_type = "cold"
             else:
                 response_type = "not_cold"
@@ -272,12 +272,12 @@ class WeatherReport:
         max_temp = int(max_temp)
 
         if self.__request.requested == "cold":
-            if min_temp <= self.__locale.temperature_cold_to:
+            if min_temp <= self.__config.temperature_cold_to:
                 response_type = "cold_true"
             else:
                 response_type = "cold_false"
         elif self.__request.requested == "warm":
-            if min_temp >= self.__locale.temperature_warm_from:
+            if min_temp >= self.__config.temperature_warm_from:
                 response_type = "warm_true"
             else:
                 response_type = "warm_false"

@@ -5,6 +5,8 @@ units=metric
 level_of_detail=False
 timezone=Europe/Berlin
 locale=german
+warm_temp=20 # the lowest temperature you consider warm
+cold_temp=5  # the highest temperature you consider cold
 
 [Location]
 city=Berlin

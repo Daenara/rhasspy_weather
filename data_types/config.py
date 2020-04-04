@@ -54,6 +54,8 @@ class WeatherConfig:
                 log.error("There is no module in the locale folder that matches the locale name in your config.")
                 return None
             self.__timezone = pytz.timezone(self.__get_required_option(section_general, "timezone", "Europe/Berlin"))
+            self.__temp_warm_from = self.__get_required_option(section_general, "temp_warm", 20, "int")
+            self.__temp_cold_to = self.__get_required_option(section_general, "temp_cold", 5, "int")
         else:
             log.error("Section [{0}] is missing from config. Please refer to 'config.default' for an example config.".format(section_name_general))
             return None
@@ -109,6 +111,14 @@ class WeatherConfig:
     @property
     def parser(self):
         return self.__parser
+
+    @property
+    def temperature_warm_from(self):
+        return self.__temp_warm_from
+
+    @property
+    def temperature_cold_to(self):
+        return self.__temp_cold_to
 
     @property
     def timezone(self):

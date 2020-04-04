@@ -218,16 +218,16 @@ On the other side there are a few items that can be queried for with rhasspy tha
     * [ ] mqtt
     * [ ] rhasspy web api tts
 * [ ] **clean up code**
-    * [ ] remove all comments to do with snips
+    * [ ] remove all comments referencing snips
     * [ ] replace comments documenting functions with pydoc strings
     * [ ] add documentation for everything that has none
     * [X] figure out a way to have the config globally accessible without having to import it inside functions because it is not initialized otherwise
     * [ ] cleaning up imports in general
-    * [ ] move definition for warm and cold from language files to config file
+    * [X] move definition for warm and cold from language files to config file
     * [ ] find every not implemented feature that could be implemented (StatusCode.NOT_IMPLEMENTED_ERROR)
 * [ ] **clean up on the rhasspy side of things**
      * [ ] clean up sentences for rhasspy and add some
-     * [ ] offer an english translation for rhasspy sentences
+     * [ ] offer an English translation for rhasspy sentences
 * [ ] **add to this documentation**
     * [ ] table of content
     * [ ] file structure graph
