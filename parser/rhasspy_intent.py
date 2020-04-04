@@ -5,6 +5,7 @@ from rhasspy_weather import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.location import Location
 from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
+from rhasspy_weather.data_types.config import get_config
 
 log = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ log = logging.getLogger(__name__)
 def parse_intent_message(intent_message):
     intent = None
 
-    from rhasspy_weather.globals import config
+    config = get_config()
 
     # if you changed the slot names in rhasspy, change them here, too
     slot_day_name = "when_day"

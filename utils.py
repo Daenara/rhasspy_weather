@@ -1,6 +1,7 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
+from .data_types.config import get_config
 
 
 def get_date_with_year(day, month, can_be_past_date=False):
@@ -17,8 +18,7 @@ def get_date_with_year(day, month, can_be_past_date=False):
     Wrong dates (like the 31.06.) will not throw an error but instead give a valid day the next month based
     on the number of days it differs from today (so the 31.02. turns into 01.07).
     """
-    from rhasspy_weather.globals import config
-    today = datetime.datetime.now(config.timezone).date()
+    today = datetime.datetime.now(get_config().timezone).date()
     delta_days = day - today.day
     delta_month = month - today.month
     delta_year = 0

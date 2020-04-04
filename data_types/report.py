@@ -2,6 +2,7 @@ import datetime
 import logging
 import random
 
+from .config import get_config
 from .request import DateType, ForecastType, Grain
 from .status import Status, StatusCode
 
@@ -33,9 +34,10 @@ class WeatherReport:
         """
         log.debug("weather report initialized")
 
+        config = get_config()
+
         self.__forecast = forecast
         self.__request = request
-        from rhasspy_weather.globals import config
         self.__timezone = config.timezone
         self.__locale = config.locale
         self.status = Status()

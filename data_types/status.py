@@ -2,6 +2,8 @@ import logging
 import random
 from enum import Enum
 
+from .config import get_config
+
 log = logging.getLogger(__name__)
 
 
@@ -49,8 +51,7 @@ class Status:
         self.__log_status()
 
     def status_response(self):
-        from rhasspy_weather.globals import config
-        locale = config.locale
+        locale = get_config().locale
 
         if self.status_code in locale.status_response:
             response = random.choice(locale.status_response[self.status_code])

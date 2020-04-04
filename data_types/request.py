@@ -2,6 +2,7 @@ import datetime
 import logging
 from enum import Enum
 
+from .config import get_config
 from .status import Status, StatusCode
 
 log = logging.getLogger(__name__)
@@ -52,7 +53,8 @@ class WeatherRequest:
         forecast_type : ForecastType
         """
 
-        from rhasspy_weather.globals import config
+        config = get_config()
+
         self.__location = config.location
         self.date_type = date_type
         self.grain = grain

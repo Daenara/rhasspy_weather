@@ -3,6 +3,7 @@ import logging
 
 import requests
 
+from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
 from rhasspy_weather.data_types.forecast import WeatherForecast
 from rhasspy_weather.data_types.status import StatusCode
@@ -20,7 +21,7 @@ def get_weather(location):
         
     """
     log.debug("parsing weather from openweathermap")
-    from rhasspy_weather.globals import config
+    config = get_config()
     weather_forecast = WeatherForecast()
 
     if hasattr(location, "lat") and hasattr(location, "lon"):

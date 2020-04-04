@@ -3,6 +3,7 @@ import logging
 
 import suntime
 
+from .config import get_config
 from .interval import WeatherInterval
 from .status import Status
 
@@ -52,8 +53,7 @@ class WeatherForecast:
 
         self.status = Status()
         self.forecast = []
-        from rhasspy_weather.globals import config
-        self.__timezone = config.timezone
+        self.__timezone = get_config().timezone
 
     def __str__(self):
         return self.forecast
