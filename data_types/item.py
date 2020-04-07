@@ -1,10 +1,23 @@
 class WeatherItem:
 
-    def __init__(self, name, prefix, suffix, condition_type_list):
+    def __init__(self, name, prefix="", suffix="", condition_type_list=[]):
         self.__name = name
         self.__prefix = prefix
         self.__suffix = suffix
         self.__condition_list = condition_type_list
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__name == other.name
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __str__(self):
+        return "{%s, %s, %s, %s}" % (self.__name, self.__prefix, self.__suffix, self.__condition_list)
+
+    __repr__ = __str__
 
     @property
     def name(self):
