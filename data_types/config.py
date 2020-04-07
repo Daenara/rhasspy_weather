@@ -2,7 +2,7 @@ import configparser
 import logging
 import os
 import shutil
-import sys
+from pathlib import Path
 
 import pytz
 
@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 class WeatherConfig:
     def __init__(self):
         log.info("Loading config")
-        base_path = os.path.join(os.path.dirname(sys.modules['__main__'].__file__), "rhasspy_weather")
+        base_path = str(Path(__file__).parent.parent)
         config_path = os.path.join(base_path, 'config.ini')
         default_config_path = os.path.join(base_path, 'config.default')
         config_parser = configparser.ConfigParser(allow_no_value=True)
