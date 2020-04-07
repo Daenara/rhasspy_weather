@@ -90,7 +90,7 @@ wie (ist|wird) das wetter [<day> {when_day}] [<time> {when_time}] [in <location>
 wie (ist|wird) [<day> {when_day}] [<time> {when_time}] das wetter [in <location> {location}]
 
 [GetWeatherForecastItem]
-brauche ich [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] [(eine|einen|ein) {article}] $weather_items {item}
+brauche ich [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] [(eine|einen|ein)] $rhasspy_weather_slots/items {item}
 
 [GetWeatherForecastCondition]
 gibt es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] $weather_condition {condition}
@@ -126,37 +126,6 @@ was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherFore
         "abend",
         "mittag"
     ],
-    "weather_items": [
-        "regenmantel",
-        "hut",
-        "kaputze",
-        "paar gummistiefel",
-        "sonnenhut",
-        "sonnenschirm",
-        "mütze",
-        "sonnencreme",
-        "regenschirm",
-        "schirm",
-        "paar lange unterhosen",
-        "stiefel",
-        "paar handschuhe",
-        "lange unterhosen",
-        "handschuhe",
-        "mantel",
-        "lange unterhose",
-        "halbschuhe",
-        "paar halbschuhe",
-        "gummistiefel",
-        "schal",
-        "paar stiefel",
-        "winterstiefel",
-        "sonnenbrille",
-        "winterjacke",
-        "paar sandalen",
-        "kappe",
-        "paar winterstiefel",
-        "sandalen"
-    ],
     "weather_condition": [
         "regen",
         "schnee",
@@ -174,6 +143,14 @@ was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherFore
     
 </p>
 </details>
+
+There also is a slot program that dynamically generates the items. To set this up you need to create a folder "slot_programs" in your profile folder, navigate into the folder on a linux console and then create a symlink to the slot_programs folder that comes with this script.
+
+```
+ln -s ../custom_command/rhasspy_weather/slot_programs rhasspy_weather_slots
+```
+
+You can also manually copy the files in this folder into a subfolder! of slot_programs. The subfolder is important because the script loads modules from the main part of the script and navigates up to the profile folder from there. If anyone knows a way to get the path of the rhasspy profile without this crap, please let me know.
 
 ## Usage
 If everything is set up you can query the weather from rhasspy with sentences like
@@ -193,15 +170,15 @@ Multiple requests at the same time is not something I know how to implement with
 On the other side there are a few items that can be queried for with rhasspy that the logic has not learned yet, so both sides aren't perfect.
  
  ## TODO
-* [ ] **Rework the item system for requests**
+* [X] **Rework the item system for requests**
     * [X] add custom item class saving name, grammar information and condition type
         * [X] properly format item for output
         * [X] output conditions it can be useful in
-    * [ ] write wrapper class to hold those items
+    * [X] write wrapper class to hold those items
         * [X] find if item is in list
         * [X] (maybe) list items by condition
-        * [ ] export items to rhasspy slot program
-    * [ ] while at it, add in new item types (there are types in my rhasspy slot the logic does not now and parts in the logic that rhasspy does not know)
+        * [X] export items to rhasspy slot program
+    * [X] while at it, add in new item types (there are types in my rhasspy slot the logic does not now and parts in the logic that rhasspy does not know)
 * [ ] **(maybe) add a dict full of aliases for weather conditions to language files and import everything in it as rhasspy slot program as well as map those aliases to conditions (similar to named_days and named_times aliases)**
 * [ ] **(maybe) export named_days, named_times and their aliases as slot program**
 * [ ] **rewrite the logic for a detailed weather report (and remove the last hardcoded language stuff with that)**
