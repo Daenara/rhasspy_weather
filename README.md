@@ -194,12 +194,12 @@ On the other side there are a few items that can be queried for with rhasspy tha
  
  ## TODO
 * [ ] **Rework the item system for requests**
-    * [ ] add custom item class saving name, grammar information and condition type
-        * [ ] properly format item for output
-        * [ ] output conditions it can be useful in
+    * [X] add custom item class saving name, grammar information and condition type
+        * [X] properly format item for output
+        * [X] output conditions it can be useful in
     * [ ] write wrapper class to hold those items
-        * [ ] find if item is in list
-        * [ ] (maybe) list items by condition
+        * [X] find if item is in list
+        * [X] (maybe) list items by condition
         * [ ] export items to rhasspy slot program
     * [ ] while at it, add in new item types (there are types in my rhasspy slot the logic does not now and parts in the logic that rhasspy does not know)
 * [ ] **(maybe) add a dict full of aliases for weather conditions to language files and import everything in it as rhasspy slot program as well as map those aliases to conditions (similar to named_days and named_times aliases)**
