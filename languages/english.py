@@ -1,6 +1,7 @@
 import datetime
 
 from rhasspy_weather.data_types.condition import ConditionType
+from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
@@ -26,11 +27,11 @@ requested_condition = {
     "rain": ConditionType.RAIN,
     "snow": ConditionType.SNOW,
     "mist": ConditionType.MIST,
-    "fog": ConditionType.MIST, # haze, hazy, misty, foggy will be handled in grammar if necessary
-    "clouds": ConditionType.CLOUDS, # rainy and cloudy handled in grammar
+    "fog": ConditionType.MIST,  # haze, hazy, misty, foggy will be handled in grammar if necessary
+    "clouds": ConditionType.CLOUDS,  # rainy and cloudy handled in grammar
     "thunderstorm": ConditionType.THUNDERSTORM,
     "sun": ConditionType.CLEAR,
-    "wind": ConditionType.WIND # windyand stormy handled in grammar
+    "wind": ConditionType.WIND  # windyand stormy handled in grammar
 }
 requested_temperature = {
     "warm": "warm",
@@ -44,23 +45,23 @@ def format_userdefined_date(date):
 
 def format_userdefined_time(hour, minutes=""):
     if minutes == "":
-        return "at {} o'clock {}m".format(hour%12, "a" if hour < 12 else "p")
+        return "at {} o'clock {}m".format(hour % 12, "a" if hour < 12 else "p")
     return "at {} {:02d}".format(hour, minutes)
 
 
 # used in status.py to output status messages
 status_response = {
     StatusCode.NORMAL: ["Everything seems to be okay."],
-    StatusCode.NO_NETWORK_ERROR: ["I don't have network.", 
-        "I seem not be connected to the internet."],
-    StatusCode.API_ERROR: ["There is a problem with the API Key.", 
-        "the API key is invalid."],
+    StatusCode.NO_NETWORK_ERROR: ["I don't have network.",
+                                  "I seem not be connected to the internet."],
+    StatusCode.API_ERROR: ["There is a problem with the API Key.",
+                           "the API key is invalid."],
     StatusCode.FUTURE_WEATHER_ERROR: ["I don't know the weather this far ahead.",
-        "There is not prediction data for your requested date yet."],
+                                      "There is not prediction data for your requested date yet."],
     StatusCode.NOT_IMPLEMENTED_ERROR: ["This function is not implemented."],
     StatusCode.LOCATION_ERROR: ["I can't find the location."],
     StatusCode.PAST_WEATHER_ERROR: ["I don't know the weather of the past.",
-    "I am a forecasting service not a historian."],
+                                    "I am a forecasting service not a historian."],
     StatusCode.NO_WEATHER_FOR_DAY_ERROR: ["There seems to be no weather for today."],
     StatusCode.DATE_ERROR: ["Something is wrong with the date."],
     StatusCode.API_TIMEOUT_ERROR: ["API Key was used to often, try again later."],
@@ -109,7 +110,7 @@ temperature_answers = {
 
 def format_temperature_output(min_temperature, max_temperature):
     if min_temperature == max_temperature:
-        return str(min_temperature) + " degrees"  #  Centigrade/Fahrenheit is handled through setting in config.ini
+        return str(min_temperature) + " degrees"  # Centigrade/Fahrenheit is handled through setting in config.ini
     else:
         return "between " + str(min_temperature) + " and " + str(max_temperature) + " degrees"
 
@@ -149,10 +150,22 @@ def combine_conditions(conditions):
 
 
 # items
-rain_items = ["umbrella", "raincoat", "rubber boots"]
-warm_items = ["sandals"]
-sun_items = ["sunglasses", "sunscreen"]
-cold_items = ["boots", "scarf", "gloves"]
+
+items = WeatherItemList()
+items.add_item("umbrella", "an", "", ["rain", "snow"])
+items.add_item("raincoat", "a", "", ["rain", "wind"])
+items.add_item("rubber boots", "", "", ["rain"])
+items.add_item("sandals", "", "", ["warm", "sun"])
+items.add_item("sunglasses", "", "", ["sun"])
+items.add_item("sunscreen", "", "", ["sun"])
+items.add_item("boots", "", "", ["cold", "wind"])
+items.add_item("scarf", "a", "", ["cold"])
+items.add_item("gloves", "", "", ["cold"])
+
+rain_items = items.get_item_names_for_condition("rain")
+warm_items = items.get_item_names_for_condition("warm")
+cold_items = items.get_item_names_for_condition("cold")
+sun_items = items.get_item_names_for_condition("sun")
 
 item_answers = {
     "rain": ["It could be rainy {when} {where}. Taking {item} might be a good idea.", "Yes, taking {item} {when} {where} makes sense."],
@@ -169,14 +182,8 @@ item_answers = {
 }
 
 
-def format_item_for_output(item):
-    if item in ["umbrella"]:
-        return "an " + item
-    elif item in ["boots", "sunglasses"]:
-        return item
-    elif item in ["scarf", "raincoat"]:
-        return "a " + item
-    elif item in ["sunscreen"]:
-        return item
+def format_item_for_output(item_name):
+    if items.is_in_list(item_name):
+        return items.get_item(item_name).format_for_output()
     else:
-        return item
+        return item_name

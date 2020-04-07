@@ -1,6 +1,7 @@
 import datetime
 
 from rhasspy_weather.data_types.condition import ConditionType
+from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
@@ -166,10 +167,38 @@ def combine_conditions(conditions):
 
 
 # items
-rain_items = ["Regenmantel", "Schirm", "Gummistiefel", "Halbschuhe", "Kaputze", "Hut", "Regenschirm"]
-warm_items = ["T-Shirt", "Sandalen", "kurze Hosen", "leichte Kleidung"]
-cold_items = ["Winterstiefel", "Mantel", "Schal", "Handschuhe", "Mütze", "dicke Kleidung", "Stiefel", "lange Hosen", "lange Unterhosen", "Fleece"]
-sun_items = ["Sonnenhut", "Sonnenschirm", "Kappe", "Sonnenbrille", "Sonnencreme"]
+items = WeatherItemList()
+items.add_item("Regenmantel", "ein", "ist", ["rain", "wind"])
+items.add_item("Schirm", "ein", "ist", ["rain", "snow"])
+items.add_item("Gummistiefel", "", "sind", ["rain"])
+items.add_item("Halbschuhe", "", "sind", ["rain", "wind"])
+items.add_item("Kaputze", "eine", "ist", ["rain"])
+items.add_item("Hut", "ein", "ist", ["rain", "sun", "snow"])
+items.add_item("Regenschirm", "ein", "ist", ["rain", "snow"])
+items.add_item("T-Shirt", "ein", "ist", ["warm", "sun"])
+items.add_item("Sandalen", "", "sind", ["warm", "sun"])
+items.add_item("kurze Hosen", "", "sind", ["warm", "sun"])
+items.add_item("leichte Kleidung", "", "ist", ["warm", "sun"])
+items.add_item("Winterstiefel", "", "sind", ["cold", "snow"])
+items.add_item("Mantel", "ein", "ist", ["cold", "rain", "snow", "wind"])
+items.add_item("Schal", "ein", "ist", ["cold", "snow"])
+items.add_item("Handschuhe", "", "sind", ["cold", "snow"])
+items.add_item("Mütze", "eine", "ist", ["cold", "snow"])
+items.add_item("dicke Kleidung", "", "ist", ["cold"])
+items.add_item("Stiefel", "", "sind", ["rain", "cold", "snow", "wind"])
+items.add_item("lange Hosen", "", "sind", ["wind", "cold", "snow"])
+items.add_item("lange Unterhosen", "", "sind", ["cold", "snow"])
+items.add_item("Fleece", "ein", "ist", ["cold", "wind"])
+items.add_item("Sonnenhut", "ein", "ist", ["sun"])
+items.add_item("Sonnenschirm", "ein", "ist", ["sun"])
+items.add_item("Kappe", "eine", "ist", ["sun"])
+items.add_item("Sonnenbrille", "eine", "ist", ["sun"])
+items.add_item("Sonnencreme", "", "ist", ["sun"])
+
+rain_items = items.get_item_names_for_condition("rain")
+warm_items = items.get_item_names_for_condition("warm")
+cold_items = items.get_item_names_for_condition("cold")
+sun_items = items.get_item_names_for_condition("sun")
 
 item_answers = {
     "rain": ["Es könnte {when} {where} regnen, {item} keine schlechte Idee.", "Es könnte {when} {where} Regen geben. {item} keine schlechte Idee."],
@@ -186,14 +215,8 @@ item_answers = {
 }
 
 
-def format_item_for_output(item):
-    if item in ["Regenmantel", "Schirm", "Hut", "Sonnenhut", "Mantel", "Schal", "Sonnenschirm", "Regenschirm", "T-Shirt", "Fleece"]:
-        return "ein " + item + " ist"
-    elif item in ["Kaputze", "Kappe", "Mütze", "Sonnenbrille"]:
-        return "eine " + item + " ist"
-    elif item in ["Gummistiefel", "Halbschuhe", "Sandalen", "Handschuhe", "Winterstiefel", "Stiefel", "kurze Hosen", "lange Hosen", "lange Unterhosen"]:
-        return item + " sind"
-    elif item in ["Sonnencreme", "dicke Kleidung", "leichte Kleidung"]:
-        return item + " ist"
+def format_item_for_output(item_name):
+    if items.is_in_list(item_name):
+        return items.get_item(item_name).format_for_output()
     else:
-        return item
+        return item_name
