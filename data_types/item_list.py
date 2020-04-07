@@ -30,6 +30,13 @@ class WeatherItemList:
                 output.append(item)
         return output
 
+    def get_item_names_for_condition(self, condition):
+        output = []
+        for item in self.__items:
+            if item.is_for_condition_type(condition):
+                output.append(item.name)
+        return output
+
     def is_in_list(self, item_name):
         item = WeatherItem(item_name)
         return item in self.__items
