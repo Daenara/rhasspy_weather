@@ -170,7 +170,7 @@ Multiple requests at the same time is not something I know how to implement with
 On the other side there are a few items that can be queried for with rhasspy that the logic has not learned yet, so both sides aren't perfect.
  
  ## TODO
-* [X] **Rework the item system for requests**
+* [ ] **Rework the item system for requests**
     * [X] add custom item class saving name, grammar information and condition type
         * [X] properly format item for output
         * [X] output conditions it can be useful in
@@ -179,6 +179,11 @@ On the other side there are a few items that can be queried for with rhasspy tha
         * [X] (maybe) list items by condition
         * [X] export items to rhasspy slot program
     * [X] while at it, add in new item types (there are types in my rhasspy slot the logic does not now and parts in the logic that rhasspy does not know)
+    * [ ] actually use the new item system
+        * [ ] replace function from language files
+        * [ ] add in new condition types
+        * [ ] actually use ContiditonType for conditions
+        * [ ] rework answers to (optionally) use a generalized answer that has a slot for the condition
 * [ ] **(maybe) add a dict full of aliases for weather conditions to language files and import everything in it as rhasspy slot program as well as map those aliases to conditions (similar to named_days and named_times aliases)**
 * [ ] **(maybe) export named_days, named_times and their aliases as slot program**
 * [ ] **rewrite the logic for a detailed weather report (and remove the last hardcoded language stuff with that)**
