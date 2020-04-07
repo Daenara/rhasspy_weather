@@ -164,7 +164,7 @@ class WeatherReport:
                 response_type = "no_rain"
         elif self.__request.requested in self.__locale.warm_items:
             if weather.max_temperature >= self.__config.temperature_warm_from:
-                response_type = "warm_"
+                response_type = "warm"
             else:
                 response_type = "not_warm"
         elif self.__request.requested in self.__locale.sun_items:
