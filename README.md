@@ -182,7 +182,7 @@ On the other side there are a few items that can be queried for with rhasspy tha
     * [ ] actually use the new item system
         * [ ] replace function from language files
         * [ ] add in new condition types
-        * [ ] actually use ContiditonType for conditions
+        * [ ] actually use ConditionType for conditions
         * [ ] rework answers to (optionally) use a generalized answer that has a slot for the condition
 * [ ] **(maybe) add a dict full of aliases for weather conditions to language files and import everything in it as rhasspy slot program as well as map those aliases to conditions (similar to named_days and named_times aliases)**
 * [ ] **(maybe) export named_days, named_times and their aliases as slot program**
