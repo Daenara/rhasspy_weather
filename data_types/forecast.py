@@ -1,7 +1,14 @@
 import datetime
 import logging
+import subprocess
+import sys
 
-import suntime
+try:
+    import suntime
+except ImportError:
+    subprocess.call([sys.executable, "-m", "pip", "install", 'suntime'])
+finally:
+    import suntime
 
 from .config import get_config
 from .interval import WeatherInterval
