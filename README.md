@@ -11,6 +11,7 @@ Just open an issue and supply me with the sentence that produced the bug.
 * [rhasspy](https://rhasspy.readthedocs.io/en/latest/) (Tested with 2.4.19 but should work with any version that can run custom commands)
 * [pytz](https://pypi.org/project/pytz/) (seems to be included in rhasspy docker)
 * [suntime](https://pypi.org/project/suntime/)
+* [dateutil](https://pypi.org/project/python-dateutil/)
 * [open weather map api key](https://home.openweathermap.org/api_keys)
 
 ## Setup

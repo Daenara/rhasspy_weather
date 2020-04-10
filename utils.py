@@ -1,6 +1,19 @@
 import datetime
+import logging
 
-from dateutil.relativedelta import relativedelta
+log = logging.getLogger(__name__)
+
+try:
+    from dateutil.relativedelta import relativedelta
+except ImportError:
+    import subprocess
+    import sys
+    log.error("Requirement dateutil not installed, will be installed now")
+    subprocess.run([sys.executable, "-m", "pip", "install", 'python-dateutil'])
+finally:
+    from dateutil.relativedelta import relativedelta
+
+
 from .data_types.config import get_config
 
 
