@@ -1,12 +1,12 @@
 import datetime
 import logging
-import subprocess
-import sys
 
 try:
     import suntime
 except ImportError:
-    subprocess.call([sys.executable, "-m", "pip", "install", 'suntime'])
+    import subprocess
+    import sys
+    subprocess.run([sys.executable, "-m", "pip", "install", 'suntime'])
 finally:
     import suntime
 
