@@ -66,7 +66,7 @@ class WeatherForecast:
             import subprocess
             import sys
             log.error("Requirement suntime not installed, will be installed now")
-            subprocess.run([sys.executable, "-m", "pip", "install", 'suntime'])
+            subprocess.run([sys.executable, "-m", "pip", "install", 'suntime'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         finally:
             import suntime
 

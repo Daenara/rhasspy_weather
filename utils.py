@@ -9,7 +9,7 @@ except ImportError:
     import subprocess
     import sys
     log.error("Requirement dateutil not installed, will be installed now")
-    subprocess.run([sys.executable, "-m", "pip", "install", 'python-dateutil'])
+    subprocess.run([sys.executable, "-m", "pip", "install", 'python-dateutil'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 finally:
     from dateutil.relativedelta import relativedelta
 
