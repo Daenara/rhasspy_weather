@@ -23,7 +23,7 @@ named_times = {
 named_times_synonyms = {
     "früh": "Morgen"
 }
-requested_condition = {
+conditions = {
     "regen": ConditionType.RAIN,
     "schnee": ConditionType.SNOW,
     "nebel": ConditionType.MIST,
@@ -31,6 +31,29 @@ requested_condition = {
     "gewitter": ConditionType.THUNDERSTORM,
     "sonne": ConditionType.CLEAR,
     "wind": ConditionType.WIND
+}
+condition_synonyms = {
+    "regnet": "regen",
+    "schneit": "schnee",
+    "nebelt": "nebel",
+    "wolkig": "wolken",
+    "bewölkt": "wolken",
+    "gewittert": "gewitter",
+    "sonnig": "sonne",
+    "windig": "wind",
+    "windet": "wind",
+    "nieselt": "regen",
+    "niesel": "regen",
+    "schüttet": "regen",
+    "schneien": "schnee",
+    "regnen": "regen",
+    "gewittern": "gewitter",
+    "donnern": "gewitter",
+    "donnert": "gewitter",
+    "blitzt": "gewitter",
+    "blitzen": "gewitter",
+    "donner": "gewitter",
+    "blite": "gewitter"
 }
 requested_temperature = {
     "warm": "warm",

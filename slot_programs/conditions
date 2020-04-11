@@ -22,7 +22,7 @@ logging.Formatter.converter = custom_time
 
 config = get_config()
 
-conditions = list(config.locale.requested_condition.keys())
+conditions = list(config.locale.conditions.keys()) + list(config.locale.condition_synonyms.keys())
 
 for s in conditions:
     print(s)

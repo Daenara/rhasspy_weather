@@ -147,22 +147,29 @@ was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherFore
 ```
 [GetWeatherForecast]
 day = ($rhasspy_weather_slots/named_days|[on:] ($rhasspy/days|((0..31) $rhasspy/months))|in (0..7) days)
-time = ([at:] $rhasspy_weather_slots|[at:] (0..24) [(0..59)] [o'clock:]|in (one hour|(2..100) hours))
+time = ($rhasspy_weather_slots/named_times|[at:] (0..24) [Uhr:] [(0..59)]|in (one hour|(2..100) hours))
 location = [(Frankfurt|Berlin|Regensburg|London)]
-how is the weather [<day> {when_day}] [<time> {when_time}] [in <location> {location}]
+
+(how|what|whats) (is|will) [the] weather [(be|going to be)] [<day> {when_day}] [<time> {when_time}] [(in|at) <location> {location}]
+(how|what|whats) (is|will) [the] weather [(in|at) <location> {location}] [(be|going to be)] [<day> {when_day}] [<time> {when_time}]
+(how|what|whats) (is|will) [<day> {when_day}] [<time> {when_time}] [the] weather [(be|going to be)] [(in|at) <location> {location}]
+
 
 [GetWeatherForecastItem]
-do I need [(a|an)] $rhasspy_weather_slots/items {item} [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
+do (I|we|you) (need|have to take|have to bring|need to wear|need to take) [(a|an|some|any|one|the)] $rhasspy_weather_slots/items {item} [(in|at) <GetWeatherForecast.location> {location}] [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}]
+do (I|we|you) (need|have to take|have to bring|need to wear|need to take) [(a|an|some|any|one|the)] $rhasspy_weather_slots/items {item} [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [(in|at) <GetWeatherForecast.location> {location}]
 
 [GetWeatherForecastCondition]
-will it $rhasspy_weather_slots/conditions {condition} [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] 
+(does it|is it|will it|will it be|will there be|is it going to|is there going to be) [(a|the)] $rhasspy_weather_slots/conditions {condition} [(in|at) <GetWeatherForecast.location> {location}] [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}]
+
 
 [GetWeatherForecastTemperature]
-(is it|will it be) $rhasspy_weather_slots/temperatures {temperature} {temperature} [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
-how $rhasspy_weather_slots/temperatures {temperature} {temperature} (is it|will it be) [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
-what is the temperature [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
+(will it be|is it going to be) $rhasspy_weather_slots/temperatures {temperature} [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [(in|at) <GetWeatherForecast.location> {location}] 
+how $rhasspy_weather_slots/temperatures {temperature} (is it|will it be|is it going to be) [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [(in|at) <GetWeatherForecast.location> {location}]
+what is the temperature [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [(in|at) <GetWeatherForecast.location> {location}]
 ```
 
+Thanks to [ulno](https://github.com/ulno/cli_weather) for his English sentences which are way better than mine were.
 </p>
 </details>
 

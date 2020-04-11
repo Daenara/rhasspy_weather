@@ -18,24 +18,49 @@ named_times = {
     "afternoon": (datetime.time(12, 0), datetime.time(18, 0)),
     "evening": (datetime.time(18, 0), datetime.time(22, 0)),
     "night": (datetime.time(22, 0), datetime.time(6, 0)),
-    "midnight": datetime.time(23, 59)
+    "midnight": datetime.time(23, 59),
+    "now": datetime.datetime.now().time(),  # somehow put timezone in here without producing a loop with the config
 }
 named_times_synonyms = {
     "noon": "midday",
+    "tonight": "night",
+    "currently": "now",
+    "right now": "now",
+    "at the moment": "now",
+    "early morning": "morning"
 }
-requested_condition = {
+conditions = {
     "rain": ConditionType.RAIN,
     "snow": ConditionType.SNOW,
     "mist": ConditionType.MIST,
-    "fog": ConditionType.MIST,  # haze, hazy, misty, foggy will be handled in grammar if necessary
-    "clouds": ConditionType.CLOUDS,  # rainy and cloudy handled in grammar
+    "fog": ConditionType.MIST,
+    "clouds": ConditionType.CLOUDS,
     "thunderstorm": ConditionType.THUNDERSTORM,
     "sun": ConditionType.CLEAR,
-    "wind": ConditionType.WIND  # windyand stormy handled in grammar
+    "wind": ConditionType.WIND
+}
+condition_synonyms = {
+    "rainy": "rain",
+    "raining": "rain",
+    "snowy": "snow",
+    "snowing": "snow",
+    "foggy": "fog",
+    "misty": "mist",
+    "cloudy": "clouds",
+    "thunderstorms": "thunderstorm",
+    "thunder": "thunderstorm",
+    "lightning": "thunderstorm",
+    "sun shine": "sun",
+    "sunny": "sun",
+    "windy": "wind",
+    "storming": "wind",
+    "stormy": "wind"
 }
 requested_temperature = {
     "warm": "warm",
-    "cold": "cold"
+    "cold": "cold",
+    "hot": "warm",
+    "cool": "cold"
 }
 
 
@@ -154,13 +179,31 @@ def combine_conditions(conditions):
 items = WeatherItemList()
 items.add_item("umbrella", "an", "", ["rain", "snow"])
 items.add_item("raincoat", "a", "", ["rain", "wind"])
+items.add_item("rain coat", "a", "", ["rain", "wind"])
 items.add_item("rubber boots", "", "", ["rain"])
+items.add_item("pair of rubber boots", "a", "", ["rain"])
 items.add_item("sandals", "", "", ["warm", "sun"])
 items.add_item("sunglasses", "", "", ["sun"])
 items.add_item("sunscreen", "", "", ["sun"])
 items.add_item("boots", "", "", ["cold", "wind"])
 items.add_item("scarf", "a", "", ["cold"])
 items.add_item("gloves", "", "", ["cold"])
+items.add_item("hat", "a", "", ["cold"])
+items.add_item("wool hat", "a", "", ["cold"])
+items.add_item("hoodie", "a", "", ["cold"])
+items.add_item("sun hat", "a", "", ["sun"])
+items.add_item("cap", "a", "", ["sun"])
+items.add_item("parasol", "a", "", ["sun"])
+items.add_item("boots", "", "", ["rain", "cold", "wind"])
+items.add_item("pair of boots", "a", "", ["rain", "cold", "wind"])
+items.add_item("sun screen", "", "", ["sun"])
+items.add_item("pair of gloves", "a", "", ["cold"])
+items.add_item("sneakers", "", "", ["cold", "wind"])
+items.add_item("winter boots", "", "", ["cold", "snow"])
+items.add_item("pair of winter boots", "a", "", ["cold", "snow"])
+items.add_item("winter coat", "a", "", ["cold", "snow"])
+items.add_item("sandals", "", "", ["warm", "sun"])
+items.add_item("pair of sandals", "a", "", ["warm", "sun"])
 
 rain_items = items.get_item_names_for_condition("rain")
 warm_items = items.get_item_names_for_condition("warm")
