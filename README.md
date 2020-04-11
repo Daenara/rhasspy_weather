@@ -99,7 +99,7 @@ For now the result needs to be forwarded to hass (even if you don't use it) beca
         "system": "command",
         "forward_to_hass": true
     },
-    # the rest of your profile.json here
+    ...
 }
 ```
 
