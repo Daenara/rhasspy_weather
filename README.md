@@ -1,21 +1,27 @@
 # rhasspy Weather
 
-## General
 A python script that can make rhasspy voice assistant tell the weather. The output of the script is in German and so far it only works with the German rhasspy profile.
 
 ## Found a bug?
 Just open an issue and supply me with the sentence that produced the bug. 
 
-## Requirements
+## Table of Contents
+* [Setup](#setup)
+
+## Setup
+### Requirements
 * python3
 * [rhasspy](https://rhasspy.readthedocs.io/en/latest/) (Tested with 2.4.19 but should work with any version that can run custom commands)
 * [pytz](https://pypi.org/project/pytz/) (seems to be included in rhasspy docker)
-* [suntime](https://pypi.org/project/suntime/)
-* [dateutil](https://pypi.org/project/python-dateutil/)
+* [suntime](https://pypi.org/project/suntime/) (will be installed when missing)
+* [dateutil](https://pypi.org/project/python-dateutil/) (will be installed when missing)
 * [open weather map api key](https://home.openweathermap.org/api_keys)
 
-## Setup
-I personally have created a folder called "custom_commands" in my rhasspy profile folder, put a custom_commands.py in there and made a subfolder there holding the contents of this repository. The setup for a custom command in rhasspy 2.4 is described [here](https://rhasspy.readthedocs.io/en/latest/intent-handling/#command). It is important to note that rhasspy will only answer if forward_to_hass is true. If you don't use homeassistant then you need to figure out another way to read the answer. For rhasspy 2.4 you can call the /api/text-to-speech in the speech(text) function instead of adding to the dictionary. If you have rhasspy 2.5 running you can also use mqtt instead of the api to read out the answer.
+### Creating rhasspy custom_command script (rhasspy 2.4)
+1. If you have not already set up a custom_command script for something else you need to set this up. Create a folder 
+called *custom_command* in your rhasspy profile folder.
+
+1. In this folder create a file called *custom_commands.py* and paste the content found below in there.
 
 <details>
 <summary>custom_commands.py (click to expand)</summary>
@@ -71,21 +77,34 @@ print(json.dumps(o))
 </p>
 </details>
 
-You need a config file for the scripts to do anything. Either run the command script once after you added it or manually rename the "config.default" file to "config.ini" and edit it to your liking. 
+1. Now you need to make rhasspy call that file to handle intents. To do so edit your profile.json so it contains the following.
+```
+{
+    "handle": {
+         "command": {
+             "program": "$RHASSPY_PROFILE_DIR/custom_command/custom_commands.py"
+         },
+         "system": "command"
+    },
+    # the rest of your profile.json here
+}
+```
 
-Be sure to add your api key for OpenWeatherMap in, otherwise you will only get an error as output.
-If "LevelOfDetail" is set to True and you query the weather, temperature and so on for a full day it will read a much more detailed weather report that splits the day into morning, midday, noon and so on.
+### Setting up sentences.ini and slots
 
-Other than the scripts and the config you will need the intents. Here are mine (changes might break the scripts so please only change things if you know what you are doing):
+Now we need to get rhasspy to actually recognize our intents. For that we will need to add the sentences to sentences.ini and also add the slots used in those.
+
+1. Copy the sentences below to your sentences.ini via the web gui. You can add to those or edit them but make sure the slots in the curly brackets {} stay the same.
+You need to expand/edit the locations in the line *location = [(Frankfurt|Berlin|Regensburg|London)]* to something useful for you.
 
 <details>
-<summary>sentences.ini (click to expand)</summary>
+<summary>German Sentences (click to expand)</summary>
 <p>
 
 ```
 [GetWeatherForecast]
-day = ($named_days|[am:] ($rhasspy/days|((0..31) $rhasspy/months))|in (0..7) Tagen)
-time = ($named_times|[um:] (0..24) [Uhr:] [(0..59)]|in (einer Stunde|(2..100) Stunden))
+day = ($rhasspy_weather_slots/named_days|[am:] ($rhasspy/days|((0..31) $rhasspy/months))|in (0..7) Tagen)
+time = ($rhasspy_weather_slots/named_times|[um:] (0..24) [Uhr:] [(0..59)]|in (einer Stunde|(2..100) Stunden))
 location = [(Frankfurt|Berlin|Regensburg|London)]
 wie (ist|wird) das wetter [<day> {when_day}] [<time> {when_time}] [in <location> {location}]
 wie (ist|wird) [<day> {when_day}] [<time> {when_time}] das wetter [in <location> {location}]
@@ -94,13 +113,13 @@ wie (ist|wird) [<day> {when_day}] [<time> {when_time}] das wetter [in <location>
 brauche ich [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] [(eine|einen|ein)] $rhasspy_weather_slots/items {item}
 
 [GetWeatherForecastCondition]
-gibt es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] $weather_condition {condition}
-scheint [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] die $weather_condition {condition}
-$weather_condition {condition} es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
+gibt es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] $rhasspy_weather_slots/conditions {condition}
+scheint [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] die $rhasspy_weather_slots/conditions {condition}
+$rhasspy_weather_slots/conditions {condition} es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
 
 [GetWeatherForecastTemperature]
-(ist|wird) es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] (warm|kalt) {temperature}
-wie (warm|kalt) {temperature} (ist|wird) es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
+(ist|wird) es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] $rhasspy_weather_slots/temperatures {temperature}
+wie $rhasspy_weather_slots/temperatures {temperature} (ist|wird) es [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
 was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
 ```
 
@@ -108,44 +127,34 @@ was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherFore
 </details>
 
 <details>
-<summary>Slots (click to expand)</summary>
+<summary>English Sentences (click to expand)</summary>
 <p>
-    
+
 ```
-{
-    "named_days": [
-        "übermorgen",
-        "morgen",
-        "heute"
-    ],
-    "named_times": [
-        "nacht",
-        "nachmittag",
-        "vormittag",
-        "früh",
-        "morgen",
-        "abend",
-        "mittag"
-    ],
-    "weather_condition": [
-        "regen",
-        "schnee",
-        "nebel",
-        "wolken",
-        "gewitter",
-        "sonne",
-        "wind",
-        "stürmt:wind",
-        "regnet:regen",
-        "schneit:schnee"
-    ]
-}
+[GetWeatherForecast]
+day = ($rhasspy_weather_slots/named_days|[on:] ($rhasspy/days|((0..31) $rhasspy/months))|in (0..7) days)
+time = ($rhasspy_weather_slots|[at:] (0..24) [(0..59)] [o'clock:]|in (one hour|(2..100) hours))
+location = [(Frankfurt|Berlin|Regensburg|London)]
+how is the weather [<day> {when_day}] [<time> {when_time}] [in <location> {location}]
+
+[GetWeatherForecastItem]
+do I need [(a|an)] $rhasspy_weather_slots/items {item} [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
+
+[GetWeatherForecastCondition]
+will it $rhasspy_weather_slots/conditions {condition} [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}] 
+
+[GetWeatherForecastTemperature]
+(is it|will it be) $rhasspy_weather_slots/temperatures {temperature} {temperature} [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
+how $rhasspy_weather_slots/temperatures {temperature} {temperature} (is it|will it be) [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
+what is the temperature [<GetWeatherForecast.day> {when_day}] [<GetWeatherForecast.time> {when_time}] [in <GetWeatherForecast.location> {location}]
 ```
-    
+
 </p>
 </details>
 
-There also is a slot program that dynamically generates the items. To set this up you need to create a folder "slot_programs" in your profile folder, navigate into the folder on a linux console and then create a symlink to the slot_programs folder that comes with this script.
+1. Setting up the slots
+
+The slots are dynamically generated via rhasspy slot_programs. To set this up you need to create a folder *"slot_programs"* in your profile folder, navigate into the folder on a linux console and then create a symlink to the slot_programs folder that comes with this script.
 
 ```
 ln -s ../custom_command/rhasspy_weather/slot_programs rhasspy_weather_slots
@@ -153,22 +162,26 @@ ln -s ../custom_command/rhasspy_weather/slot_programs rhasspy_weather_slots
 
 You can also manually copy the files in this folder into a subfolder! of slot_programs. The subfolder is important because the script loads modules from the main part of the script and navigates up to the profile folder from there. If anyone knows a way to get the path of the rhasspy profile without this crap, please let me know.
 
+### Config file
+You need a config file for the scripts to do anything. Either run the command script once after you added it or manually rename the "config.default" file to "config.ini" and edit it to your liking. 
+
+Be sure to add your api key for OpenWeatherMap in, otherwise you will only get an error as output.
+If "LevelOfDetail" is set to True and you query the weather, temperature and so on for a full day it will read a much more detailed weather report that splits the day into morning, midday, noon and so on.
+
+
 ## Usage
-If everything is set up you can query the weather from rhasspy with sentences like
- * Wie wird das Wetter morgen abend?
- * Brauche ich heute einen Regenschirm?
- * Wird es am 31. März kalt?
- * Wie ist das Wetter heute?
- * Regnet es morgen in Berlin?
- 
-## Functionality
-The weather logic is quite powerful and can answer questions about the weather condition or temperature, the complete weather report and the necessary of some items. Date and time can be specified and so can the location. The logic itself can even handle multiple queries at once if they are passed in the right format, it will then read everything in a row.
-
-When using the weather logic with rhasspy it is less powerful because the sentences written for rhasspy and the parser just don't have that functionality (yet).
-
-Multiple requests at the same time is not something I know how to implement with the rhasspy grammar and I do not see much need in it so it is not on my todo list even thought the logic could do it. 
-
-On the other side there are a few items that can be queried for with rhasspy that the logic has not learned yet, so both sides aren't perfect.
+If everything is set up you can query the weather:
+* German:
+    * Wie wird das Wetter morgen abend?
+    * Brauche ich heute einen Regenschirm?
+    * Wird es am 31. März kalt?
+    * Wie ist das Wetter heute?
+    * Regnet es morgen in Berlin?
+* English:
+    * How is the weather tomorrow in London?
+    * Do I need an umbrella?
+    * How cold is it tomorrow evening in London?
+    * Will it be warm on 31. March?
  
  ## TODO
 * [ ] **Rework the item system for requests**
@@ -186,7 +199,7 @@ On the other side there are a few items that can be queried for with rhasspy tha
         * [ ] actually use ConditionType for conditions
         * [ ] rework answers to (optionally) use a generalized answer that has a slot for the condition
 * [ ] **(maybe) add a dict full of aliases for weather conditions to language files and import everything in it as rhasspy slot program as well as map those aliases to conditions (similar to named_days and named_times aliases)**
-* [ ] **(maybe) export named_days, named_times and their aliases as slot program**
+* [X] **(maybe) export named_days, named_times and their aliases as slot program**
 * [ ] **rewrite the logic for a detailed weather report (and remove the last hardcoded language stuff with that)**
 * [ ] **add in logic for ConditionType.WIND**
     * [ ] add wind as an extra WeatherCondition
@@ -210,11 +223,11 @@ On the other side there are a few items that can be queried for with rhasspy tha
     * [ ] find every not implemented feature that could be implemented (StatusCode.NOT_IMPLEMENTED_ERROR)
 * [ ] **clean up on the rhasspy side of things**
      * [ ] clean up sentences for rhasspy and add some
-     * [ ] offer an English translation for rhasspy sentences
+     * [X] offer an English translation for rhasspy sentences
 * [ ] **add to this documentation**
-    * [ ] table of content
+    * [X] table of contents
     * [ ] file structure graph
     * [ ] rewrite most of the text
-        * [ ] add better explanation for setup
+        * [X] add better explanation for setup
         * [ ] add explanation of config
         * [ ] rewrite functionality part
