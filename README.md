@@ -8,7 +8,7 @@ Just open an issue and supply me with the sentence that produced the bug.
 ## Table of Contents
 * [Setup](#setup)
     * [custom_command script](#custom_command-script)
-    * [sentences and slots](#Setting-up-sentences.ini-and-slots)
+    * [sentences and slots](#setting-up-sentences-and-slots)
     * [config file](#config-file)
 * [Usage](#usage)
 * [Development](#development)
@@ -103,7 +103,7 @@ For now the result needs to be forwarded to hass (even if you don't use it) beca
 }
 ```
 
-### Setting up sentences.ini and slots
+### Setting up sentences and slots
 Now we need to get rhasspy to actually recognize our intents. For that we will need to add the sentences to sentences.ini and also add the slots used in those.
 
 #### Sentences
