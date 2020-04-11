@@ -90,7 +90,7 @@ print(json.dumps(o))
 Now you need to make rhasspy call that file to handle intents. To do so edit your profile.json so it contains the following.
 
 For now the result needs to be forwarded to hass (even if you don't use it) because otherwise the answer will not be read by the TTS engine.
-```json
+```
 {
     "handle": {
         "command": {
@@ -99,7 +99,7 @@ For now the result needs to be forwarded to hass (even if you don't use it) beca
         "system": "command",
         "forward_to_hass": true
     },
-    ...
+    ... # the rest of your profile.json (make sure to not include this line)
 }
 ```
 
