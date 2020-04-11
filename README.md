@@ -1,27 +1,37 @@
 # rhasspy Weather
 
-A python script that can make rhasspy voice assistant tell the weather. The output of the script is in German and so far it only works with the German rhasspy profile.
+A python script that can make rhasspy voice assistant tell the weather.
 
 ## Found a bug?
 Just open an issue and supply me with the sentence that produced the bug. 
 
 ## Table of Contents
 * [Setup](#setup)
+    * [custom_command script](#custom_command-script)
+    * [sentences and slots](#Setting-up-sentences.ini-and-slots)
+    * [config file](#config-file)
+* [Usage](#usage)
+* [Development](#development)
+    * [Project Structure](#project-structure)
+    * [What not to do](#what-not-to-do)
+* [TODO](#todo)
 
 ## Setup
+The whole setup procedure described was only tested on rhasspy 2.4. If you want to set it up on rhasspy 2.5 this might not work anymore.
+
 ### Requirements
 * python3
-* [rhasspy](https://rhasspy.readthedocs.io/en/latest/) (Tested with 2.4.19 but should work with any version that can run custom commands)
+* [rhasspy](https://rhasspy.readthedocs.io/en/latest/) (Tested with 2.4.19, should work with any version that can run custom commands)
 * [pytz](https://pypi.org/project/pytz/) (seems to be included in rhasspy docker)
 * [suntime](https://pypi.org/project/suntime/) (will be installed when missing)
 * [dateutil](https://pypi.org/project/python-dateutil/) (will be installed when missing)
 * [open weather map api key](https://home.openweathermap.org/api_keys)
 
-### Creating rhasspy custom_command script (rhasspy 2.4)
-1. If you have not already set up a custom_command script for something else you need to set this up. Create a folder 
-called *custom_command* in your rhasspy profile folder.
+### custom_command script
+If you have not already set up a custom_command script for something else you need to set this up. Create a folder 
+called *"custom_command"* in your rhasspy profile folder.
 
-1. In this folder create a file called *custom_commands.py* and paste the content found below in there.
+In this folder create a file called *"custom_commands.py"* and paste the code from below in there.
 
 <details>
 <summary>custom_commands.py (click to expand)</summary>
@@ -77,25 +87,29 @@ print(json.dumps(o))
 </p>
 </details>
 
-1. Now you need to make rhasspy call that file to handle intents. To do so edit your profile.json so it contains the following.
-```
+Now you need to make rhasspy call that file to handle intents. To do so edit your profile.json so it contains the following.
+
+For now the result needs to be forwarded to hass (even if you don't use it) because otherwise the answer will not be read by the TTS engine.
+```json
 {
     "handle": {
-         "command": {
-             "program": "$RHASSPY_PROFILE_DIR/custom_command/custom_commands.py"
-         },
-         "system": "command"
+        "command": {
+            "program": "$RHASSPY_PROFILE_DIR/custom_command/custom_commands.py"
+        },
+        "system": "command",
+        "forward_to_hass": true
     },
     # the rest of your profile.json here
 }
 ```
 
 ### Setting up sentences.ini and slots
-
 Now we need to get rhasspy to actually recognize our intents. For that we will need to add the sentences to sentences.ini and also add the slots used in those.
 
-1. Copy the sentences below to your sentences.ini via the web gui. You can add to those or edit them but make sure the slots in the curly brackets {} stay the same.
-You need to expand/edit the locations in the line *location = [(Frankfurt|Berlin|Regensburg|London)]* to something useful for you.
+#### Sentences
+Copy the sentences below to your sentences.ini via the web gui. You can add to those or edit them but make sure the slots in the curly brackets {} stay the same.
+
+You need to expand/edit the locations in the line *"location = [(Frankfurt|Berlin|Regensburg|London)]"* to something useful for you.
 
 <details>
 <summary>German Sentences (click to expand)</summary>
@@ -133,7 +147,7 @@ was ist die temperatur [am <GetWeatherForecast.day> {when_day}] [<GetWeatherFore
 ```
 [GetWeatherForecast]
 day = ($rhasspy_weather_slots/named_days|[on:] ($rhasspy/days|((0..31) $rhasspy/months))|in (0..7) days)
-time = ($rhasspy_weather_slots|[at:] (0..24) [(0..59)] [o'clock:]|in (one hour|(2..100) hours))
+time = ([at:] $rhasspy_weather_slots|[at:] (0..24) [(0..59)] [o'clock:]|in (one hour|(2..100) hours))
 location = [(Frankfurt|Berlin|Regensburg|London)]
 how is the weather [<day> {when_day}] [<time> {when_time}] [in <location> {location}]
 
@@ -152,8 +166,7 @@ what is the temperature [<GetWeatherForecast.day> {when_day}] [<GetWeatherForeca
 </p>
 </details>
 
-1. Setting up the slots
-
+#### Slots
 The slots are dynamically generated via rhasspy slot_programs. To set this up you need to create a folder *"slot_programs"* in your profile folder, navigate into the folder on a linux console and then create a symlink to the slot_programs folder that comes with this script.
 
 ```
@@ -163,27 +176,113 @@ ln -s ../custom_command/rhasspy_weather/slot_programs rhasspy_weather_slots
 You can also manually copy the files in this folder into a subfolder! of slot_programs. The subfolder is important because the script loads modules from the main part of the script and navigates up to the profile folder from there. If anyone knows a way to get the path of the rhasspy profile without this crap, please let me know.
 
 ### Config file
-You need a config file for the scripts to do anything. Either run the command script once after you added it or manually rename the "config.default" file to "config.ini" and edit it to your liking. 
+The config file will be created once the script is run for the first time so no need to create it yourself.
 
-Be sure to add your api key for OpenWeatherMap in, otherwise you will only get an error as output.
-If "LevelOfDetail" is set to True and you query the weather, temperature and so on for a full day it will read a much more detailed weather report that splits the day into morning, midday, noon and so on.
+```
+[General]
+api=openweathermap
+parser=rhasspy_intent
+units=metric
+level_of_detail=False
+timezone=Europe/Berlin
+locale=german
+temp_warm=20
+temp_cold=5
+
+[Location]
+city=Berlin
+zipcode=
+country_code=
+lat=
+lon=
+
+[OpenWeatherMap]
+api_key=
+```
+
+* Valid values for api, parser and locale are the names of python files in the respective subfolder
+* units can be either metric or imperial
+* level_of_detail governs how detailed the answer is (true is hardcoded to german, pending rewrite)
+* timezone values can be found [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+* temp_warm is the minimum temperature that is considered warm, temp_cold the maximum temperature to be considered cold
+* zipcode and country_code will only be used if both are set, country_code refers to the two letter code of your country (e.g de)
+* lat and lon will only be used if both are set
+* be sure to input your owm api key, otherwise the script will not work
 
 
 ## Usage
 If everything is set up you can query the weather:
-* German:
-    * Wie wird das Wetter morgen abend?
-    * Brauche ich heute einen Regenschirm?
-    * Wird es am 31. März kalt?
-    * Wie ist das Wetter heute?
-    * Regnet es morgen in Berlin?
-* English:
-    * How is the weather tomorrow in London?
-    * Do I need an umbrella?
-    * How cold is it tomorrow evening in London?
-    * Will it be warm on 31. March?
+### German:
+* Wie wird das Wetter morgen abend?
+* Brauche ich heute einen Regenschirm?
+* Wird es am 31. März kalt?
+* Wie ist das Wetter heute?
+* Regnet es morgen in Berlin?
+### English:
+* How is the weather tomorrow in London?
+* Do I need an umbrella?
+* How cold is it tomorrow evening in London?
+* Will it be warm on 31. March?
  
- ## TODO
+## Development
+Some helpful things needed to know for development.
+
+### Project Structure
+```
+custom_command
+|--- rhasspy_weather                # this is actually in the github project
+     |--- api                       # all weather api's go here
+          |--- openweathermap.py    # default api
+     |--- data_types                # basically tons of custom classes saving data
+          |--- condition.py         
+          |--- config.py            # config file is parsed here
+          |--- forecast.py
+          |--- interval.py
+          |--- item.py
+          |--- item_list.py
+          |--- location.py
+          |--- report.py
+          |--- request.py           # this is what a parser outputs
+          |--- status.py            # status and error handling
+     |--- languages                 # language files go here
+          |--- german.py
+          |--- english.py
+     |--- parser                    # parsers go here
+          |--- rhasspy_intent.py
+     |--- slot_programs             # slot program generating rhasspy slots from language files
+          |--- conditions
+          |--- items
+          |--- named_days
+          |--- named_times
+          |--- output.log           # output from slot_programs ends up here
+          |--- temperatures
+     |--- config.default
+     |--- rhasspy_weather.py        # basically the main of the script (do only call from outside)
+     |--- utils.py                  # misc functions that are used by more than one data_type
+|--- custom_commands.py # the script rhasspy calls that uses this project
+|--- output.log         # the file all logs land in (if my example custom_commands.py is used
+```
+
+### What not to do
+#### call rhasspy_weather.py from inside the rhasspy_weather folder
+Python3 imports are weird. If you call rhasspy_weather.py from inside the rhasspy_weather folder python will 
+complain about the module rhasspy_weather not existing. Every fix I tried so far resulted in some kind of error. This
+at least works if called from outside. Just make sure to always call from the folder the rhasspy_weather folder is in. I 
+have not tried what happens if you go another folder up, probably import errors.
+
+If you have/find a solution that works both from outside the folder (for custom_commands.py) as well as from inside 
+the folder I am open for it.
+
+#### call slot_programs from the slot_programs folder (slot_programs )
+I used a bit of a hacky workaround to be able to import parts of the script from the slot_programs folder which results in
+this quirky behaviour. Just always call from the folder that slot_programs (or the symlink to this) is in and it will work.
+
+This is my hacky stuff. If someone has an idea how to get the folder of the current rhasspy profile in a better way, please tell me.
+```
+sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), '..'), '..'), "custom_command")))
+```
+
+## TODO
 * [ ] **Rework the item system for requests**
     * [X] add custom item class saving name, grammar information and condition type
         * [X] properly format item for output
@@ -224,10 +323,11 @@ If everything is set up you can query the weather:
 * [ ] **clean up on the rhasspy side of things**
      * [ ] clean up sentences for rhasspy and add some
      * [X] offer an English translation for rhasspy sentences
-* [ ] **add to this documentation**
+* [ ] **add to this readme**
     * [X] table of contents
-    * [ ] file structure graph
+    * [X] file structure graph
     * [ ] rewrite most of the text
+        * [ ] add better introduction
         * [X] add better explanation for setup
-        * [ ] add explanation of config
-        * [ ] rewrite functionality part
+        * [X] add explanation of config
+        * [X] rewrite functionality part (removed it instead)
