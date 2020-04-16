@@ -62,7 +62,7 @@ requested_temperature = {
 
 
 def format_userdefined_date(date):
-    return "am" + date
+    return "am " + date
 
 
 def format_userdefined_time(hour, minutes=""):
