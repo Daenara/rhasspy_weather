@@ -1,12 +1,15 @@
 [General]
 api=openweathermap
 parser=rhasspy_intent
+output=hass_json
 units=metric
-level_of_detail=False
 timezone=Europe/Berlin
 locale=german
+
+[Weather]
 temp_warm=20
 temp_cold=5
+level_of_detail=False
 
 [Location]
 city=Berlin
@@ -17,3 +20,10 @@ lon=
 
 [OpenWeatherMap]
 api_key=
+
+[mqtt]
+address=
+port=
+user=
+password=
+topic=rhasspy_weather/response

@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 def get_weather_forecast(intent_message):
     config = get_config()
 
-    if config is None:
+    if config is None or config.error:
         return "Configuration could not be read. Please make sure everything is set up correctly"
 
     log.info("Parsing rhasspy intent")
@@ -26,5 +26,8 @@ def get_weather_forecast(intent_message):
 
     log.info("Formulating answer")
     response = WeatherReport(request, forecast).generate_report()
+
+    log.info("Answering question")
+    config.output.output_response(response, intent_message)
 
     return response

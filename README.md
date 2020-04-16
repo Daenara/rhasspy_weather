@@ -23,6 +23,7 @@ The whole setup procedure described was only tested on rhasspy 2.4. If you want 
 * python3
 * [rhasspy](https://rhasspy.readthedocs.io/en/latest/) (Tested with 2.4.19, should work with any version that can run custom commands)
 * [pytz](https://pypi.org/project/pytz/) (seems to be included in rhasspy docker)
+* [paho-mqtt](https://pypi.org/project/paho-mqtt/) (seems to be included in rhasspy docker, only needed for mqtt answer)
 * [suntime](https://pypi.org/project/suntime/) (will be installed when missing)
 * [dateutil](https://pypi.org/project/python-dateutil/) (will be installed when missing)
 * [open weather map api key](https://home.openweathermap.org/api_keys)
@@ -78,7 +79,7 @@ intent = o["intent"]["name"]
 if intent.startswith("GetWeatherForecast"):
     log.info("Detected Weather Intent")
     forecast = weather.get_weather_forecast(o)
-    speech(forecast)
+    o["rhasspy_weather"] = forecast
 
 # convert dict to json and print to stdout
 print(json.dumps(o))
@@ -89,7 +90,7 @@ print(json.dumps(o))
 
 Now you need to make rhasspy call that file to handle intents. To do so edit your profile.json so it contains the following.
 
-For now the result needs to be forwarded to hass (even if you don't use it) because otherwise the answer will not be read by the TTS engine.
+The forward_to_hass setting has to be true, even if you don't use it because otherwise the custom command script I provide will not work.
 ```
 {
     "handle": {
@@ -189,12 +190,15 @@ The config file will be created once the script is run for the first time so no 
 [General]
 api=openweathermap
 parser=rhasspy_intent
+output=hass_json
 units=metric
-level_of_detail=False
 timezone=Europe/Berlin
 locale=german
+
+[Weather]
 temp_warm=20
 temp_cold=5
+level_of_detail=False
 
 [Location]
 city=Berlin
@@ -205,9 +209,16 @@ lon=
 
 [OpenWeatherMap]
 api_key=
+
+[mqtt]
+address=
+port=
+user=
+password=
+topic=rhasspy_weather/response
 ```
 
-* Valid values for api, parser and locale are the names of python files in the respective subfolder
+* Valid values for api, parser, output and locale are the names of python files in the respective subfolder
 * units can be either metric or imperial
 * level_of_detail governs how detailed the answer is (true is hardcoded to german, pending rewrite)
 * timezone values can be found [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
@@ -215,6 +226,7 @@ api_key=
 * zipcode and country_code will only be used if both are set, country_code refers to the two letter code of your country (e.g de)
 * lat and lon will only be used if both are set
 * be sure to input your owm api key, otherwise the script will not work
+* the mqtt section will only be used when output is set to mqtt and can be removed if that is not the case
 
 
 ## Usage
@@ -254,6 +266,9 @@ custom_command
      |--- languages                 # language files go here
           |--- german.py
           |--- english.py
+     |--- output
+          |--- hass_json.py         # adds a speech part to the input json to be read by rhasspy
+          |--- mqtt.py              # sends the answer per mqtt
      |--- parser                    # parsers go here
           |--- rhasspy_intent.py
      |--- slot_programs             # slot program generating rhasspy slots from language files
@@ -315,9 +330,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
     * [ ] define and use items that are useful for wind
     * [ ] make it possible to ask about wind condition
 * [ ] **add output system to define how this script outputs**
-    * [ ] rhasspy hass.io json (current way)
+    * [X] rhasspy hass.io json (current way)
     * [ ] extended json (add in an output part to json containing the answer to the question as well as some information)
-    * [ ] mqtt
+    * [X] mqtt
     * [ ] rhasspy web api tts
 * [ ] **clean up code**
     * [ ] remove all comments referencing snips
