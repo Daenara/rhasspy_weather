@@ -1,5 +1,6 @@
 import datetime
 import logging
+import math
 
 log = logging.getLogger(__name__)
 
@@ -40,3 +41,9 @@ def get_date_with_year(day, month, can_be_past_date=False):
             delta_year = 1
     then = today + relativedelta(years=delta_year, months=delta_month, days=delta_days)
     return then
+
+
+def normal_round(n):
+    if n - math.floor(n) < 0.5:
+        return math.floor(n)
+    return math.ceil(n)
