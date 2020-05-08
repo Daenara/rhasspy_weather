@@ -53,7 +53,7 @@ condition_synonyms = {
     "blitzt": "gewitter",
     "blitzen": "gewitter",
     "donner": "gewitter",
-    "blite": "gewitter"
+    "blitze": "gewitter"
 }
 requested_temperature = {
     "warm": "warm",
