@@ -105,7 +105,6 @@ class WeatherConfig:
                         self.__error = True
                     else:
                         self.__api_key = api_key
-                        has_error = True
                 else:
                     self.__error = True
                     has_error = True
