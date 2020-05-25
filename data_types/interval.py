@@ -32,9 +32,9 @@ class WeatherInterval:
             self.max_temperature = weather_at_time.temperature
         if weather_at_time.temperature < self.min_temperature:
             self.min_temperature = weather_at_time.temperature
-        if weather_at_time.weather_condition_obj not in self.weather_condition_list:
-            self.weather_condition_list.append(weather_at_time.weather_condition_obj)
-        self.__increase_counter(weather_at_time.weather_condition_obj.condition_type)
+        if weather_at_time.main_condition not in self.weather_condition_list:
+            self.weather_condition_list.append(weather_at_time.main_condition)
+        self.__increase_counter(weather_at_time.main_condition.condition_type)
 
     # counts how many occurrences of a certain weather type there are
     def __increase_counter(self, condition_type):
@@ -115,9 +115,9 @@ class WeatherInterval:
         if len(condition_list) == 0:
             condition_list.append(element)
         else:
-            if element.condition in [x.condition for x in condition_list]:
+            if element.condition_type in [x.condition_type for x in condition_list]:
                 for x in condition_list[:]:
-                    if x.condition == element.condition:
+                    if x.condition_type == element.condition_type:
                         if element.severity > x.severity:
                             condition_list.remove(x)
                             condition_list.append(element)

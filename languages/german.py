@@ -23,7 +23,7 @@ named_times = {
 named_times_synonyms = {
     "früh": "Morgen"
 }
-conditions = {
+condition_types = {
     "regen": ConditionType.RAIN,
     "schnee": ConditionType.SNOW,
     "nebel": ConditionType.MIST,
@@ -70,6 +70,16 @@ def format_userdefined_time(hour, minutes=""):
         return "um " + str(hour) + " Uhr"
     return "um " + str(hour) + " Uhr " + str(minutes)
 
+
+# weather conditions
+
+conditions = {
+    ConditionType.WIND: {0: "Windstille", 1: "Windstille", 2: "leichte Briese", 3: "schwacher Wind", 4: "mäßiger Wind", 5: "frischer Wind", 6: "starker Wind", 7: "starker Wind", 8: "Sturm",
+                         9: "Sturm", 10: "schwerer Sturm", 11: "orkanartiger Sturm", 12: "Orkan"},
+    ConditionType.CLOUDS: {0: "Klarer Himmel", 1: "Ein paar Wolken", 2: "Leicht bewölkt", 3: "Bewölkt", 4: "Stark bewölkt"},
+    ConditionType.RAIN: {0: "leichter Regen", 1: "mäßiger Regen", 2: "starker Regen", 3: "sehr starker Regen", 4: "extremer Regen"},
+    ConditionType.SNOW: {0: "leichter Schneefall", 1: "Schneefall", 2: "starker Schneefall"},
+    ConditionType.THUNDERSTORM: {0: "leichtes Gewitter", 1: "Gewitter", 2: "starkes Gewitter"}}
 
 # used in status.py to output status messages
 status_response = {

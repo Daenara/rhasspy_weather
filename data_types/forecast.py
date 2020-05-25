@@ -1,9 +1,11 @@
 import datetime
 import logging
 
+from .condition import WeatherCondition, ConditionType
 from .config import get_config
 from .interval import WeatherInterval
 from .status import Status
+from ..utils import normal_round
 
 log = logging.getLogger(__name__)
 
@@ -244,7 +246,7 @@ class WeatherForecast:
         # list
         def parse_weather(self, time, temperature, weather_condition_list, pressure, humidity, wind_speed, wind_direction):
             for x in range(len(time)):
-                self.weather.append(WeatherForecast.WeatherAtDate.WeatherAtTime(time[x], temperature[x], weather_condition_list[x], pressure[x], humidity[x], wind_speed[x], wind_direction[x], self.interval))
+                self.weather.append(self.WeatherAtTime(time[x], temperature[x], weather_condition_list[x], pressure[x], humidity[x], wind_speed[x], wind_direction[x], self.interval))
 
         # returns the weather during the specified interval
         def get_weather_for_interval(self, from_time, to_time, weather_for_interval=None):
@@ -271,15 +273,17 @@ class WeatherForecast:
 
         # saves the weather data at a specific time
         class WeatherAtTime:
-            def __init__(self, time, temperature, weather_condition_obj, pressure, humidity, wind_speed, wind_direction, interval):
+            def __init__(self, time, temperature, main_condition, pressure, humidity, wind_speed, wind_direction, interval):
                 self.interval = interval
                 self.time = time
                 self.temperature = temperature
-                self.weather_condition_obj = weather_condition_obj
+                self.main_condition = main_condition
                 self.pressure = pressure
                 self.humidity = humidity
                 self.wind_speed = wind_speed
                 self.wind_direction = wind_direction
+                self.wind_condition = self.__get_wind_condition()
+                #log.debug(self)
 
             def __str__(self):
                 return "[" + str(self.string_time) + ", " + str(self.temperature) + ", " + str(self.weather_condition) + \
@@ -288,17 +292,29 @@ class WeatherForecast:
             def __repr__(self):
                 return self.weather_condition
 
+            def __get_wind_condition(self):
+                units = get_config().units
+                if units == "imperial":
+                    self.wind_speed = self.wind_speed / 2.237
+                severity = normal_round((self.wind_speed / 0.836) * (2 / 3))
+                #log.debug(severity)
+
+                compass_index = int((self.wind_direction/45)+0.5) % 8
+                compass_directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+
+                return WeatherCondition(severity, "", ConditionType.WIND)
+
             @property
             def weather_condition(self):
-                return self.weather_condition_obj.condition
+                return self.main_condition.condition_type
 
             @property
             def weather_severity(self):
-                return self.weather_condition_obj.severity
+                return self.main_condition.severity
 
             @property
             def weather_description(self):
-                return self.weather_condition_obj.description
+                return self.main_condition.description
 
             @property
             def time(self):

@@ -2,20 +2,19 @@ from enum import Enum
 
 
 class WeatherCondition:
-    def __init__(self, severity, description, condition, condition_type):
+    def __init__(self, severity, description, condition_type):
         self.severity = severity
         self.description = description
-        self.condition = condition
         self.condition_type = condition_type
 
     def __eq__(self, other):
         return self.description == other.description
 
     def __str__(self):
-        return "[" + str(self.condition) + ", " + str(self.severity) + ", " + str(self.description) + "]"
+        return "[" + str(self.condition_type) + ", " + str(self.severity) + ", " + str(self.description) + "]"
 
     def __repr__(self):
-        return "[" + str(self.condition) + ", " + str(self.severity) + ", " + str(self.description) + "]"
+        return "[" + str(self.condition_type) + ", " + str(self.severity) + ", " + str(self.description) + "]"
 
 
 class ConditionType(Enum):

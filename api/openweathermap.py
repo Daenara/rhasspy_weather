@@ -49,7 +49,7 @@ def get_weather(location):
         if not (hasattr(location, "lat") and hasattr(location, "lon")):
             location.set_lat_and_lon(response["city"]["coord"]["lat"], response["city"]["coord"]["lon"])
         weather_forecast.calculate_sunrise_and_sunset(location.lat, location.lon)
-        forecasts = { }
+        forecasts = {}
         for x in response["list"]:
             if str(datetime.date.fromtimestamp(x["dt"])) not in forecasts:
                 forecasts[str(datetime.date.fromtimestamp(x["dt"]))] = \
@@ -61,7 +61,7 @@ def get_weather(location):
             weather_description = [x["weather"][0]["description"] for x in forecast]
             weather_id = [x["weather"][0]["id"] for x in forecast]
             for x in range(len(weather_condition)):
-                temp_condition = WeatherCondition(__get_severity_from_open_weather_map_id(weather_id[x]), weather_description[x], weather_condition[x], __get_condition_type(weather_id[x]))
+                temp_condition = WeatherCondition(__get_severity_from_open_weather_map_id(weather_id[x]), weather_description[x], __get_condition_type(weather_id[x]))
                 condition_list.append(temp_condition)
             tmp = WeatherForecast.WeatherAtDate(datetime.datetime.strptime(key, "%Y-%m-%d").date())
             tmp.parse_weather(
@@ -123,10 +123,11 @@ def __get_severity_from_open_weather_map_id(owm_id):
     if owm_id == 602: return 2  # heavy snow
     if owm_id == 622: return 2  # heavy shower snow
 
-    if owm_id == 801: return 0  # few clouds: 11-25%
-    if owm_id == 802: return 1  # scattered clouds: 25-50%
-    if owm_id == 803: return 2  # broken clouds: 51-84%
-    if owm_id == 804: return 3  # overcast clouds: 85-100%
+    if owm_id == 800: return 0  # clear sky
+    if owm_id == 801: return 1  # few clouds: 11-25%
+    if owm_id == 802: return 2  # scattered clouds: 25-50%
+    if owm_id == 803: return 3  # broken clouds: 51-84%
+    if owm_id == 804: return 4  # overcast clouds: 85-100%
 
     return 0
 

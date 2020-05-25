@@ -29,7 +29,7 @@ named_times_synonyms = {
     "at the moment": "now",
     "early morning": "morning"
 }
-conditions = {
+condition_types = {
     "rain": ConditionType.RAIN,
     "snow": ConditionType.SNOW,
     "mist": ConditionType.MIST,
@@ -72,6 +72,16 @@ def format_userdefined_time(hour, minutes=""):
     if minutes == "":
         return "at {} o'clock {}m".format(hour % 12, "a" if hour < 12 else "p")
     return "at {} {:02d}".format(hour, minutes)
+
+# weather conditions
+
+conditions = {
+    ConditionType.WIND: {0: "calm", 1: "Light air", 2: "Light breeze", 3: "Gentle breeze", 4: "Moderate breeze", 5: "Fresh breeze", 6: "Strong breeze", 7: "High wind", 8: "Gale",
+                         9: "Strong gale", 10: "storm", 11: "Violent storm", 12: "Hurricane force"},
+    ConditionType.CLOUDS: {0: "clear sky", 1: "a few clouds", 2: "scattered clouds", 3: "broken clouds", 4: "overcast clouds"},
+    ConditionType.RAIN: {0: "light rain", 1: "moderate rain", 2: "heavy rain", 3: "very heavy rain", 4: "extreme rain"},
+    ConditionType.SNOW: {0: "light snow", 1: "snow", 2: "heavy snow"},
+    ConditionType.THUNDERSTORM: {0: "light thunderstorm", 1: "thunderstorm", 2: "strong thunderstorm"}}
 
 
 # used in status.py to output status messages
