@@ -62,15 +62,7 @@ class WeatherForecast:
     def calculate_sunrise_and_sunset(self, lat, lon):
         log.debug("Calculating Sunrise and Sunset - error: {0}".format(self.status.is_error))
 
-        try:
-            import suntime
-        except ImportError:
-            import subprocess
-            import sys
-            log.error("Requirement suntime not installed, will be installed now")
-            subprocess.run([sys.executable, "-m", "pip", "install", 'suntime'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        finally:
-            import suntime
+        import suntime
 
         sun = suntime.Sun(lat, lon)
         self.sunrise = sun.get_local_sunrise_time().time()

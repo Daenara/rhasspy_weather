@@ -2,20 +2,10 @@ import datetime
 import logging
 import math
 
-log = logging.getLogger(__name__)
-
-try:
-    from dateutil.relativedelta import relativedelta
-except ImportError:
-    import subprocess
-    import sys
-    log.error("Requirement dateutil not installed, will be installed now")
-    subprocess.run([sys.executable, "-m", "pip", "install", 'python-dateutil'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-finally:
-    from dateutil.relativedelta import relativedelta
-
-
+from dateutil.relativedelta import relativedelta
 from .data_types.config import get_config
+
+log = logging.getLogger(__name__)
 
 
 def get_date_with_year(day, month, can_be_past_date=False):

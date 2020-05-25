@@ -1,17 +1,9 @@
 import logging
 from rhasspy_weather.data_types.config import get_config
 
-log = logging.getLogger(__name__)
+import paho.mqtt.client as mqtt
 
-try:
-    import paho.mqtt.client as mqtt
-except ImportError:
-    import subprocess
-    import sys
-    log.error("Requirement paho mqtt not installed, will be installed now")
-    subprocess.run([sys.executable, "-m", "pip", "install", 'paho-mqtt'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-finally:
-    import paho.mqtt.client as mqtt
+log = logging.getLogger(__name__)
 
 
 def output_response(response, dummy):
