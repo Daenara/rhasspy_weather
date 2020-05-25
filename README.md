@@ -324,8 +324,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
 * [ ] **rewrite the logic for a detailed weather report (and remove the last hardcoded language stuff with that)**
 * [ ] **add in logic for ConditionType.WIND**
     * [ ] add wind as an extra WeatherCondition
-        * [ ] figure out a wind speed to severity conversion
-        * [ ] figure out how to write a custom description for wind (owm does not do that for me) and translate that
+        * [X] figure out a wind speed to severity conversion
+        * [X] figure out how to write a custom description for wind (owm does not do that for me) and translate that
         * [ ] add filter functionality to only add certain conditions to answers (I do not want to hear about a mild wind in my daily weather report)
     * [ ] define and use items that are useful for wind
     * [ ] make it possible to ask about wind condition
