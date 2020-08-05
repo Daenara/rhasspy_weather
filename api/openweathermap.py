@@ -79,6 +79,60 @@ def get_weather(location):
 
 # parses the weather condition into my own format (WeatherCondition)
 def __get_severity_from_open_weather_map_id(owm_id):
+    switcher = {
+        # owm_id -> intensity
+        210: 0,  # light thunderstorm
+        211: 1,  # thunderstorm
+        230: 3,  # thunderstorm with light drizzle
+        231: 4,  # thunderstorm with drizzle
+        232: 5,  # thunderstorm with heavy drizzle
+        200: 6,  # thunderstorm with light rain
+        201: 7,  # thunderstorm with rain
+        202: 8,  # thunderstorm with heavy rain
+        212: 9,  # heavy thunderstorm
+        221: 10, # ragged thunderstorm
+
+        300: 0,  # light drizzle
+        301: 1,  # drizzle
+        321: 1,  # shower drizzle
+        302: 2,  # heavy intensity drizzle
+        310: 3,  # light intensity drizzle rain
+        311: 4,  # drizzle rain
+        312: 5,  # heavy intensity drizzle rain
+        313: 6,  # shower rain and drizzle
+        314: 7,  # heavy shower rain and drizzle
+
+        500: 0,  # light rain
+        520: 0,  # light intensity shower rain
+        501: 1,  # moderate rain
+        521: 1,  # shower rain
+        511: 1,  # freezing rain
+        502: 2,  # heavy intensity rain
+        522: 2,  # heavy intensity shower rain
+        503: 3,  # very heavy rain
+        531: 3,  # ragged shower rain
+        504: 4,  # extreme rain
+
+        600: 0,  # light snow
+        620: 0,  # light shower snow
+        612: 0,  # light shower sleet
+        615: 1,  # light rain and snow
+        601: 1,  # snow
+        621: 1,  # shower snow
+        611: 1,  # sleet
+        613: 1,  # shower sleet
+        616: 2,  # rain and snow
+        602: 2,  # heavy snow
+        622: 2,  # heavy shower snow
+
+        800: 0,  # clear sky
+        801: 1,  # few clouds: 11-25%
+        802: 2,  # scattered clouds: 25-50%
+        803: 3,  # broken clouds: 51-84%
+        804: 4   # overcast clouds: 85-100%
+    }
+    
+    return switcher.get(owm_id, 0)
     if owm_id == 210: return 0  # light thunderstorm
     if owm_id == 211: return 1  # thunderstorm
     if owm_id == 230: return 3  # thunderstorm with light drizzle
@@ -140,11 +194,11 @@ def __get_condition_type(owm_id):
         return ConditionType.RAIN
     elif first_digit == 6:
         return ConditionType.SNOW
-    elif owm_id == 800:
+    el800:
         return ConditionType.CLEAR
     elif first_digit == 8:
         return ConditionType.CLOUDS
-    elif owm_id == 701 or owm_id == 741:
+    el701 or owm_id == 741:
         return ConditionType.MIST
     else:
         return ConditionType.MISC
