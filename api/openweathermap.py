@@ -194,11 +194,11 @@ def __get_condition_type(owm_id):
         return ConditionType.RAIN
     elif first_digit == 6:
         return ConditionType.SNOW
-    el800:
+    elif owm_id == 800:
         return ConditionType.CLEAR
     elif first_digit == 8:
         return ConditionType.CLOUDS
-    el701 or owm_id == 741:
+    elif owm_id == 701 or owm_id == 741:
         return ConditionType.MIST
     else:
         return ConditionType.MISC
