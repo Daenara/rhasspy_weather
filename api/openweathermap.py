@@ -133,57 +133,6 @@ def __get_severity_from_open_weather_map_id(owm_id):
     }
     
     return switcher.get(owm_id, 0)
-    if owm_id == 210: return 0  # light thunderstorm
-    if owm_id == 211: return 1  # thunderstorm
-    if owm_id == 230: return 3  # thunderstorm with light drizzle
-    if owm_id == 231: return 4  # thunderstorm with drizzle
-    if owm_id == 232: return 5  # thunderstorm with heavy drizzle
-    if owm_id == 200: return 6  # thunderstorm with light rain
-    if owm_id == 201: return 7  # thunderstorm with rain
-    if owm_id == 202: return 8  # thunderstorm with heavy rain
-    if owm_id == 212: return 9  # heavy thunderstorm
-    if owm_id == 221: return 10  # ragged thunderstorm
-
-    if owm_id == 300: return 0  # light drizzle
-    if owm_id == 301: return 1  # drizzle
-    if owm_id == 321: return 1  # shower drizzle
-    if owm_id == 302: return 2  # heavy intensity drizzle
-    if owm_id == 310: return 3  # light intensity drizzle rain
-    if owm_id == 311: return 4  # drizzle rain
-    if owm_id == 312: return 5  # heavy intensity drizzle rain
-    if owm_id == 313: return 6  # shower rain and drizzle
-    if owm_id == 314: return 7  # heavy shower rain and drizzle
-
-    if owm_id == 500: return 0  # light rain
-    if owm_id == 520: return 0  # light intensity shower rain
-    if owm_id == 501: return 1  # moderate rain
-    if owm_id == 521: return 1  # shower rain
-    if owm_id == 511: return 1  # freezing rain
-    if owm_id == 502: return 2  # heavy intensity rain
-    if owm_id == 522: return 2  # heavy intensity shower rain
-    if owm_id == 503: return 3  # very heavy rain
-    if owm_id == 531: return 3  # ragged shower rain
-    if owm_id == 504: return 4  # extreme rain
-
-    if owm_id == 600: return 0  # light snow
-    if owm_id == 620: return 0  # light shower snow
-    if owm_id == 612: return 0  # light shower sleet
-    if owm_id == 615: return 1  # light rain and snow
-    if owm_id == 601: return 1  # snow
-    if owm_id == 621: return 1  # shower snow
-    if owm_id == 611: return 1  # sleet
-    if owm_id == 613: return 1  # shower sleet
-    if owm_id == 616: return 2  # rain and snow
-    if owm_id == 602: return 2  # heavy snow
-    if owm_id == 622: return 2  # heavy shower snow
-
-    if owm_id == 800: return 0  # clear sky
-    if owm_id == 801: return 1  # few clouds: 11-25%
-    if owm_id == 802: return 2  # scattered clouds: 25-50%
-    if owm_id == 803: return 3  # broken clouds: 51-84%
-    if owm_id == 804: return 4  # overcast clouds: 85-100%
-
-    return 0
 
 
 def __get_condition_type(owm_id):
