@@ -333,7 +333,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
     * [X] rhasspy hass.io json (current way)
     * [ ] extended json (add in an output part to json containing the answer to the question as well as some information)
     * [X] mqtt
+    * [ ] rhasspy_hermes-app
     * [ ] rhasspy web api tts
+* [ ] **add parsers for more than rhasspy local command script**
+    * [ ] rhasspy_hermes-app
+    * [ ] cli (integrate [ulnos cli parser](https://github.com/ulno/cli_weather))
 * [ ] **clean up code**
     * [ ] remove all comments referencing snips
     * [ ] replace comments documenting functions with pydoc strings
@@ -353,3 +357,4 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
         * [X] add better explanation for setup
         * [X] add explanation of config
         * [X] rewrite functionality part (removed it instead)
+        * [ ] split setup explanation into 2.4 and 2.5
