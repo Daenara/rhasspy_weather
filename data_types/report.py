@@ -5,6 +5,7 @@ import random
 from .config import get_config
 from .request import DateType, ForecastType, Grain
 from .status import Status, StatusCode
+from .condition import ConditionType
 
 log = logging.getLogger(__name__)
 
@@ -170,7 +171,7 @@ class WeatherReport:
         elif self.__request.requested in self.__locale.sun_items:
             day_weather = self.__forecast.weather_during_daytime(self.__request)
             if day_weather is not None:
-                if day_weather.is_clear:
+                if day_weather.is_weather_chance(ConditionType.CLEAR):
                     if weather.max_temperature >= self.__config.temperature_warm_from:
                         response_type = "warm_and_sunny"
                     else:
@@ -289,48 +290,27 @@ class WeatherReport:
     # returns a string with the weather condition and placeholders for location and time
     def __answer_condition(self, weather_obj):
         log.debug("generating response for condition - error: {0}".format(self.status.is_error))
-
+        log.debug(ConditionType.RAIN.value)
         response_type = "general_weather"
         output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
         if self.__request.forecast_type == ForecastType.CONDITION:
-            from .condition import ConditionType
-            if self.__request.requested == ConditionType.RAIN:
-                if weather_obj.is_rain_chance:
-                    response_type = "rain_true"
-                else:
-                    response_type = "rain_false"
-            elif self.__request.requested == ConditionType.SNOW:
-                if weather_obj.is_snow_chance:
-                    response_type = "snow_true"
-                else:
-                    response_type = "snow_false"
-            elif self.__request.requested == ConditionType.CLEAR:
+            if self.__request.requested == ConditionType.CLEAR:
                 day_weather = self.__forecast.weather_during_daytime(self.__request)
-                if day_weather is not None and day_weather.is_clear:
+                if day_weather is not None and day_weather.is_weather_chance(ConditionType.CLEAR):
                     response_type = "sun_true"
                 else:
                     response_type = "sun_false"
-            elif self.__request.requested == ConditionType.THUNDERSTORM:
-                if weather_obj.is_thunderstorm_chance:
-                    response_type = "thunderstorm_true"
-                else:
-                    response_type = "thunderstorm_false"
-            elif self.__request.requested == ConditionType.MIST:
-                if weather_obj.is_misty:
-                    response_type = "mist_true"
-                else:
-                    response_type = "mist_false"
-            elif self.__request.requested == ConditionType.CLOUDS:
-                if weather_obj.is_cloudy:
-                    response_type = "clouds_true"
-                else:
-                    response_type = "clouds_false"
             elif self.__request.requested == ConditionType.WIND:
                 log.error("condition wind not implemented yet")
                 self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
                 return self.status.status_response()
             elif self.__request.requested == ConditionType.UNKNOWN:
                 response_type = "unknown_condition"
+            else:
+                if weather_obj.is_weather_chance(self.__request.requested):
+                    response_type = self.__request.requested.value + "_true"
+                else:
+                    response_type = self.__request.requested.value + "_false"
 
         return random.choice(self.__locale.condition_answers[response_type]).format(weather=output_conditions, when="{when}", where="{where}")
 

@@ -36,14 +36,14 @@ class WeatherConfig:
             try:
                 name = "rhasspy_weather.api." + api
                 self.__api = __import__(name, fromlist=[''])
-            except:
+            except ImportError:
                 log.error("There is no module in the api folder that matches the api name in your config.")
                 self.__error = True
             parser = self.__get_required_option(section_general, "parser", "rhasspy_intent")
             try:
                 name = "rhasspy_weather.parser." + parser
                 self.__parser = __import__(name, fromlist=[''])
-            except:
+            except ImportError:
                 log.error("There is no module in the parser folder that matches the parser name in your config.")
                 self.__error = True
 
@@ -51,7 +51,7 @@ class WeatherConfig:
             try:
                 name = "rhasspy_weather.output." + output
                 self.__output = __import__(name, fromlist=[''])
-            except:
+            except ImportError:
                 log.error("There is no module in the output folder that matches the output name in your config.")
                 self.__error = True
 
@@ -59,7 +59,7 @@ class WeatherConfig:
             try:
                 name = "rhasspy_weather.languages." + locale
                 self.__locale = __import__(name, fromlist=[''])
-            except:
+            except ImportError:
                 log.error("There is no module in the locale folder that matches the locale name in your config.")
                 self.__error = True
             self.__timezone = pytz.timezone(self.__get_required_option(section_general, "timezone", "Europe/Berlin"))

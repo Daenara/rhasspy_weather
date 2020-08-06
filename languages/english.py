@@ -68,8 +68,8 @@ def format_userdefined_date(date):
     return "on " + date
 
 
-def format_userdefined_time(hour, minutes=""):
-    if minutes == "":
+def format_userdefined_time(hour, minutes=-1):
+    if minutes == -1:
         return "at {} o'clock {}m".format(hour % 12, "a" if hour < 12 else "p")
     return "at {} {:02d}".format(hour, minutes)
 

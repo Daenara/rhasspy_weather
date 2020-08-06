@@ -17,13 +17,8 @@ class WeatherInterval:
         self.humidity = 0
         self.wind_speed = 0
         self.wind_direction = 0
-        self.__rain = 0
-        self.__thunderstorm = 0
-        self.__mist = 0
-        self.__snow = 0
-        self.__clouds = 0
-        self.__clear = 0
         self.__change_count = 0
+        self.__condition_counts = {}
 
     # puts information into itself
     def add_information(self, weather_at_time):
@@ -38,46 +33,16 @@ class WeatherInterval:
 
     # counts how many occurrences of a certain weather type there are
     def __increase_counter(self, condition_type):
-        if condition_type == ConditionType.RAIN:
-            self.__rain = self.__rain + 1
-        elif condition_type == ConditionType.THUNDERSTORM:
-            self.__thunderstorm = self.__thunderstorm + 1
-        elif condition_type == ConditionType.SNOW:
-            self.__snow = self.__snow + 1
-        elif condition_type == ConditionType.CLOUDS:
-            self.__clouds = self.__clouds + 1
-        elif condition_type == ConditionType.CLEAR:
-            self.__clear = self.__clear + 1
-        elif condition_type == ConditionType.MIST:
-            self.__mist = self.__mist + 1
-
-    @property
-    def is_rain_chance(self):
-        return self.__rain > 0
-
-    @property
-    def is_thunderstorm_chance(self):
-        return self.__thunderstorm > 0
-
-    @property
-    def is_snow_chance(self):
-        return self.__snow > 0
-
-    @property
-    def is_cloudy(self):
-        return self.__clouds > 0
-
-    @property
-    def is_misty(self):
-        return self.__mist > 0
-
-    @property
-    def is_clear(self):
-        return self.__clear > 0
+        if condition_type not in self.__condition_counts:
+            self.__condition_counts[condition_type] = 0
+        self.__condition_counts[condition_type] = self.__condition_counts[condition_type] + 1
 
     @property
     def contains_information(self):
         return self.__change_count > 0
+
+    def is_weather_chance(self, condition_type):
+        return self.__condition_counts.get(condition_type, 0) > 0
 
     # creates a list of condition descriptions to be used in output
     def get_output_condition_list(self, clouds_and_clear_exclusive=False):

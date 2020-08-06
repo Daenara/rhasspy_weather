@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 log = logging.getLogger(__name__)
 
 
-def output_response(response, dummy):
+def output_response(response, _):
     config = get_config()
     client = mqtt.Client()
     if not (config.mqtt_user == "" or config.mqtt_password == ""):

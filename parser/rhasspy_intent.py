@@ -136,10 +136,10 @@ def parse_intent_message(intent_message):
     # requested
     requested = None
     if intent == ForecastType.CONDITION and slot_condition_name in slots:
-        if slots[slot_condition_name] in config.locale.conditions:
-            requested = config.locale.conditions[slots[slot_condition_name]]
+        if slots[slot_condition_name] in config.locale.condition_types:
+            requested = config.locale.condition_types[slots[slot_condition_name]]
         elif slots[slot_condition_name] in config.locale.condition_synonyms:
-            requested = config.locale.conditions[config.locale.condition_synonyms[slots[slot_condition_name]]]
+            requested = config.locale.condition_types[config.locale.condition_synonyms[slots[slot_condition_name]]]
         else:
             requested = ConditionType.UNKNOWN
     elif intent == ForecastType.ITEM and slot_item_name in slots:

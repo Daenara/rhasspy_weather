@@ -275,7 +275,7 @@ class WeatherForecast:
                 self.wind_speed = wind_speed
                 self.wind_direction = wind_direction
                 self.wind_condition = self.__get_wind_condition()
-                #log.debug(self)
+                # log.debug(self)
 
             def __str__(self):
                 return "[" + str(self.string_time) + ", " + str(self.temperature) + ", " + str(self.weather_condition) + \
@@ -289,7 +289,7 @@ class WeatherForecast:
                 if units == "imperial":
                     self.wind_speed = self.wind_speed / 2.237
                 severity = normal_round((self.wind_speed / 0.836) * (2 / 3))
-                #log.debug(severity)
+                # log.debug(severity)
 
                 compass_index = int((self.wind_direction/45)+0.5) % 8
                 compass_directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]

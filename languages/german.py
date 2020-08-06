@@ -65,8 +65,8 @@ def format_userdefined_date(date):
     return "am " + date
 
 
-def format_userdefined_time(hour, minutes=""):
-    if minutes == "":
+def format_userdefined_time(hour, minutes=-1):
+    if minutes == -1:
         return "um " + str(hour) + " Uhr"
     return "um " + str(hour) + " Uhr " + str(minutes)
 
