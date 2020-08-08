@@ -1,16 +1,11 @@
 import datetime
-import inspect
-import json
 import logging
 from enum import Enum
-from json.encoder import JSONEncoder
 from string import Template
 
-import pytz
 
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.location import Location
-from rhasspy_weather.data_types.request import Grain
 from rhasspy_weather.data_types.status import Status
 
 log = logging.getLogger(__name__)
@@ -52,8 +47,6 @@ def weather_report_to_template_values(report):
 
 def weather_request_to_template_values(request):
     template_values = {}
-    log.debug(request)
-    log.debug(request.__dict__)
     for key, value in request.__dict__.items():
         new_key = "request_" + key.replace("_WeatherRequest__", "")
         if isinstance(value, str) and not value == "":
@@ -70,26 +63,5 @@ def weather_request_to_template_values(request):
                 template_values[new_l_key] = l_value
         elif isinstance(value, Status):
             template_values[new_key] = str(value.status_code)
-    log.debug(template_values)
     return template_values
 
-
-class CustomJSONEncoder(JSONEncoder):
-    def default(self, o):
-        if isinstance(o, Grain):
-            return str(o)
-        if isinstance(o, Enum):
-            return o.value
-        if isinstance(o, datetime.date):
-            return str(o)
-        if isinstance(o, datetime.time):
-            return str(o)
-        if isinstance(o, Status) or isinstance(o, Location):
-            return o.__dict__
-        if "pytz.tzfile" in str(type(o)):
-            return str(o)
-        if "languages" in o.__name__:
-            return o.__name__
-        # log.debug(o)
-        # log.debug(type(o))
-        return o.__dict__
