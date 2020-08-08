@@ -159,7 +159,7 @@ class WeatherReport:
             weather = self.__forecast.weather_for_interval(self.__request.request_date, self.__request.start_time, self.__request.end_time)
 
         if self.__request.requested in self.__locale.rain_items:
-            if weather.is_rain_chance:
+            if weather.is_weather_chance(ConditionType.RAIN):
                 response_type = "rain"
             else:
                 response_type = "no_rain"
