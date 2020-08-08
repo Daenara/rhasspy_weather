@@ -290,7 +290,6 @@ class WeatherReport:
     # returns a string with the weather condition and placeholders for location and time
     def __answer_condition(self, weather_obj):
         log.debug("generating response for condition - error: {0}".format(self.status.is_error))
-        log.debug(ConditionType.RAIN.value)
         response_type = "general_weather"
         output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
         if self.__request.forecast_type == ForecastType.CONDITION:

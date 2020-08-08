@@ -124,7 +124,6 @@ class WeatherConfig:
                 self.__error = True
 
         if "mqtt" in output:
-            log.debug("mqtt_config")
             section_name_mqtt = "mqtt"
             if config_parser.has_section(section_name_mqtt):
                 section_mqtt = config_parser[section_name_mqtt]

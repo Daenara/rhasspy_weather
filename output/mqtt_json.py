@@ -8,6 +8,7 @@ log = logging.getLogger(__name__)
 
 
 def output_response(output):
+    log.debug("Selected output: mqtt_json")
     config = get_config()
     client = mqtt.Client()
     if not (config.mqtt_user == "" or config.mqtt_password == ""):
