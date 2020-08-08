@@ -346,3 +346,7 @@ class WeatherReport:
         response = response.replace(" :", ":")
         response = response[0].capitalize() + response[1:]
         return response
+
+    @property
+    def request(self):
+        return self.__request
