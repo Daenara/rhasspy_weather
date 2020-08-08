@@ -13,12 +13,10 @@ log = logging.getLogger(__name__)
 
 def fill_template(intent_message, report):
     config = get_config()
-    log.debug(type(config.parser))
-    log.debug(config.parser.__name__)
     template = Template(config.output_template)
     rhasspy_intent_values = {}
     weather_report_values = weather_report_to_template_values(report)
-    weather_request_values = weather_request_to_template_values(report.request)
+    weather_request_values = weather_object_to_template_values(report.request, "request")
     if "rhasspy_intent" in config.parser.__name__:
         rhasspy_intent_values = intent_to_template_values(intent_message)
     template_values = {**rhasspy_intent_values, **weather_report_values, **weather_request_values}
@@ -45,10 +43,10 @@ def weather_report_to_template_values(report):
     return template_values
 
 
-def weather_request_to_template_values(request):
+def weather_object_to_template_values(weather_object, name):
     template_values = {}
-    for key, value in request.__dict__.items():
-        new_key = "request_" + key.replace("_WeatherRequest__", "")
+    for key, value in weather_object.__dict__.items():
+        new_key = name + "_" + key.replace("_"+ type(weather_object).__name__+ "__", "")
         if isinstance(value, str) and not value == "":
             template_values[new_key] = value
         elif isinstance(value, bool):
