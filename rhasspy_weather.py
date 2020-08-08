@@ -36,5 +36,3 @@ def get_weather_forecast(intent_message):
 
     log.info("Answering question")
     config.output.output_response(output)
-
-    return report.generate_report()
