@@ -1,7 +1,8 @@
 [General]
 api=openweathermap
 parser=rhasspy_intent
-output=hass_json
+output=console_json
+output_template=rhasspy_json
 units=metric
 timezone=Europe/Berlin
 locale=german

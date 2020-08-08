@@ -1,0 +1,17 @@
+{
+    "intent": {
+        "name": "$intent_name",
+        "confidence": $intent_confidence
+    },
+    "entities": $intent_entities,
+    "slots": $intent_slots,
+    "text": "$intent_text",
+    "raw_text": "$intent_raw_text",
+    "tokens": $intent_tokens,
+    "raw_tokens": $intent_raw_tokens,
+    "wakeword_id": $intent_wakeword_id,
+    "site_id": "$intent_site_id",
+    "speech": {
+        "text": "$weather_text"
+    }
+}

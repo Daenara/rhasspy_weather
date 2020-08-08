@@ -47,12 +47,20 @@ class WeatherConfig:
                 log.error("There is no module in the parser folder that matches the parser name in your config.")
                 self.__error = True
 
-            output = self.__get_required_option(section_general, "output", "hass_json")
+            output = self.__get_required_option(section_general, "output", "console_json")
             try:
                 name = "rhasspy_weather.output." + output
                 self.__output = __import__(name, fromlist=[''])
             except ImportError:
                 log.error("There is no module in the output folder that matches the output name in your config.")
+                self.__error = True
+
+            output_template = self.__get_required_option(section_general, "output_template", "rhasspy.json")
+            try:
+                path = os.path.join(base_path, "output_templates", output_template)
+                self.__output_template = open(path, 'r').read()
+            except OSError:
+                log.error("There is no template that matches the name of your config.")
                 self.__error = True
 
             locale = self.__get_required_option(section_general, "locale", "german")
@@ -115,7 +123,8 @@ class WeatherConfig:
                 log.error("API is set to OpenWeatherMap yet no config section for that is found. Please refer to 'config.default' for an example config.")
                 self.__error = True
 
-        if output == "mqtt":
+        if "mqtt" in output:
+            log.debug("mqtt_config")
             section_name_mqtt = "mqtt"
             if config_parser.has_section(section_name_mqtt):
                 section_mqtt = config_parser[section_name_mqtt]
@@ -125,6 +134,7 @@ class WeatherConfig:
                     log.error("You need to specify address and port for the mqtt output to work.")
                     self.__error = True
                 self.__mqtt_user = section_mqtt.get("user")
+                log.debug(section_mqtt.get("user"))
                 self.__mqtt_password = section_mqtt.get("password")
                 self.__mqtt_topic = self.__get_required_option(section_mqtt, "topic", "rhasspy_weather/response")
 
@@ -148,6 +158,10 @@ class WeatherConfig:
     @property
     def output(self):
         return self.__output
+
+    @property
+    def output_template(self):
+        return self.__output_template
 
     @property
     def temperature_warm_from(self):

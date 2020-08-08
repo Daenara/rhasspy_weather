@@ -37,3 +37,21 @@ def normal_round(n):
     if n - math.floor(n) < 0.5:
         return math.floor(n)
     return math.ceil(n)
+
+
+def intent_to_template_values(intent_message):
+    template_values = {}
+    for key, value in intent_message.items():
+        if key == "intent":
+            for i_key, i_value in value.items():
+                template_values["intent_"+i_key] = i_value
+        else:
+            template_values["intent_" + key] = value
+    return template_values
+
+
+def weather_report_to_template_values(report):
+    template_values = {
+        "weather_text": report.generate_report()
+    }
+    return template_values

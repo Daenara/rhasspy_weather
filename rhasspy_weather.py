@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 import logging
+from string import Template
 
 from .data_types.report import WeatherReport
 from .data_types.config import get_config
+from .utils import intent_to_template_values, weather_report_to_template_values
 
 log = logging.getLogger(__name__)
 
@@ -25,9 +27,14 @@ def get_weather_forecast(intent_message):
         return forecast.status.status_response()
 
     log.info("Formulating answer")
-    response = WeatherReport(request, forecast).generate_report()
+    report = WeatherReport(request, forecast)
+    config = get_config()
+    template = Template(config.output_template)
+    template_values = {**intent_to_template_values(intent_message), **weather_report_to_template_values(report)}
+    output = template.safe_substitute(template_values)
+    output = output.replace("None", "null").replace("'", "\"")
 
     log.info("Answering question")
-    config.output.output_response(response, intent_message)
+    config.output.output_response(output)
 
-    return response
+    return report.generate_report()
