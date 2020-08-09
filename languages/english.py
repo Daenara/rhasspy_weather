@@ -9,7 +9,8 @@ language_code = "en"
 
 # used in parsers
 weekday_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+               "November", "December"]
 named_days = {"today": 0, "tomorrow": 1, "the day after tomorrow": 2}
 named_days_synonyms = {}
 named_times = {
@@ -73,16 +74,18 @@ def format_userdefined_time(hour, minutes=-1):
         return "at {} o'clock {}m".format(hour % 12, "a" if hour < 12 else "p")
     return "at {} {:02d}".format(hour, minutes)
 
+
 # weather conditions
 
 conditions = {
-    ConditionType.WIND: {0: "calm", 1: "Light air", 2: "Light breeze", 3: "Gentle breeze", 4: "Moderate breeze", 5: "Fresh breeze", 6: "Strong breeze", 7: "High wind", 8: "Gale",
+    ConditionType.WIND: {0: "calm", 1: "Light air", 2: "Light breeze", 3: "Gentle breeze", 4: "Moderate breeze",
+                         5: "Fresh breeze", 6: "Strong breeze", 7: "High wind", 8: "Gale",
                          9: "Strong gale", 10: "storm", 11: "Violent storm", 12: "Hurricane force"},
-    ConditionType.CLOUDS: {0: "clear sky", 1: "a few clouds", 2: "scattered clouds", 3: "broken clouds", 4: "overcast clouds"},
+    ConditionType.CLOUDS: {0: "clear sky", 1: "a few clouds", 2: "scattered clouds", 3: "broken clouds",
+                           4: "overcast clouds"},
     ConditionType.RAIN: {0: "light rain", 1: "moderate rain", 2: "heavy rain", 3: "very heavy rain", 4: "extreme rain"},
     ConditionType.SNOW: {0: "light snow", 1: "snow", 2: "heavy snow"},
     ConditionType.THUNDERSTORM: {0: "light thunderstorm", 1: "thunderstorm", 2: "strong thunderstorm"}}
-
 
 # used in status.py to output status messages
 status_response = {
@@ -133,7 +136,6 @@ def format_output_time(request):
 
 
 # temperature report
-
 temperature_answers = {
     "cold_true": ["Yes, it will be cold {where} {when}. The temperature will be {temperature}."],
     "cold_false": ["No, {when} {where} will not be cold. The temperature will be {temperature}."],
@@ -151,7 +153,6 @@ def format_temperature_output(min_temperature, max_temperature):
 
 
 # condition report
-
 condition_answers = {
     "general_weather": ["The weather {when} {where}: {weather}."],
     "rain_true": ["Yes, {when} could be rainy {where}."],
@@ -170,17 +171,17 @@ condition_answers = {
 }
 
 
-def combine_conditions(conditions):
-    if isinstance(conditions, list):
-        if len(conditions) == 0:
+def combine_conditions(condition_list):
+    if isinstance(condition_list, list):
+        if len(condition_list) == 0:
             return ""
-        elif len(conditions) == 1:
-            return conditions[0]
+        elif len(condition_list) == 1:
+            return condition_list[0]
         else:
-            combined = conditions[0]
-            for x in conditions[1:-1]:
+            combined = condition_list[0]
+            for x in condition_list[1:-1]:
                 combined += ", " + x
-            combined += " and " + conditions[-1]
+            combined += " and " + condition_list[-1]
             return combined
 
 
@@ -221,11 +222,16 @@ cold_items = items.get_item_names_for_condition("cold")
 sun_items = items.get_item_names_for_condition("sun")
 
 item_answers = {
-    "rain": ["It could be rainy {when} {where}. Taking {item} might be a good idea.", "Yes, taking {item} {when} {where} makes sense."],
-    "no_rain": ["There should be no rain {when} {where}. {item} is probably not necessary.", "No, you will most likely not need {item}. No rain is expected {when} {where}."],
-    "warm_and_sunny": ["It will be warm {when} {where} and the sun might come out during the day. {item} might be a good idea."],
-    "not_warm_and_sunny": ["It will not exactly be warm {when} {where} but it might still be sunny. {item} could still be useful."],
-    "not_sunny": ["It will not be sunny {when} {where}. {item} might not be necessary.", "There is not going to be a lot of sunshine {when} {where}. Therefore, you might not need {item}."],
+    "rain": ["It could be rainy {when} {where}. Taking {item} might be a good idea.",
+             "Yes, taking {item} {when} {where} makes sense."],
+    "no_rain": ["There should be no rain {when} {where}. {item} is probably not necessary.",
+                "No, you will most likely not need {item}. No rain is expected {when} {where}."],
+    "warm_and_sunny": [
+        "It will be warm {when} {where} and the sun might come out during the day. {item} might be a good idea."],
+    "not_warm_and_sunny": [
+        "It will not exactly be warm {when} {where} but it might still be sunny. {item} could still be useful."],
+    "not_sunny": ["It will not be sunny {when} {where}. {item} might not be necessary.",
+                  "There is not going to be a lot of sunshine {when} {where}. Therefore, you might not need {item}."],
     "nighttime": ["It is dark {when} {where} so you won't need {item}."],
     "warm": ["It will be warm {when} {where}. {item} might be a good idea."],
     "not_warm": ["It will not be warm {when} {where}, so {item} might not help."],

@@ -133,7 +133,6 @@ def format_output_time(request):
 
 
 # temperature report
-
 temperature_answers = {
     "cold_true": ["Ja, {when} {where} wird es kalt. Die Temperatur ist {temperature}."],
     "cold_false": ["Nein, {when} {where} wird es nicht kalt. Die Temperatur ist {temperature}."],
@@ -154,7 +153,6 @@ def format_temperature_output(min_temperature, max_temperature):
 
 
 # condition report
-
 condition_answers = {
     "general_weather": ["Das Wetter {when} {where}: {weather}.",
                         "{when} {where} ist das Wetter: {weather}.",
@@ -185,17 +183,17 @@ condition_answers = {
 }
 
 
-def combine_conditions(conditions):
-    if isinstance(conditions, list):
-        if len(conditions) == 0:
+def combine_conditions(condition_list):
+    if isinstance(condition_list, list):
+        if len(condition_list) == 0:
             return ""
-        elif len(conditions) == 1:
-            return conditions[0]
+        elif len(condition_list) == 1:
+            return condition_list[0]
         else:
-            combined = conditions[0]
-            for x in conditions[1:-1]:
+            combined = condition_list[0]
+            for x in condition_list[1:-1]:
                 combined += ", " + x
-            combined += " und " + conditions[-1]
+            combined += " und " + condition_list[-1]
             return combined
 
 

@@ -6,6 +6,7 @@ from .config import get_config
 from .request import DateType, ForecastType, Grain
 from .status import Status, StatusCode
 from .condition import ConditionType
+from ..utils import format_string
 
 log = logging.getLogger(__name__)
 
@@ -90,7 +91,7 @@ class WeatherReport:
         elif self.__request.forecast_type == ForecastType.ITEM:
             response = self.__generate_item_report()
 
-        return self.__format_response(response)
+        return format_string(response)
 
     # returns the answer to a question about the weather
     # called by generate_report()
