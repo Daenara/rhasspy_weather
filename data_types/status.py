@@ -27,6 +27,7 @@ class Status:
     def __init__(self, status_code=StatusCode.NORMAL):
         self.status_code = status_code
         self.__last_change = ""
+        self.error_codes = []
 
     @property
     def status_code(self):
@@ -35,12 +36,16 @@ class Status:
     @status_code.setter
     def status_code(self, val):
         self.__status_code = val
+        if val is not StatusCode.NORMAL and val not in self.error_codes:
+            self.error_codes.append(val)
+
+    @property
+    def error_code_list(self):
+        return self.error_codes
 
     @property
     def is_error(self):
-        if self.status_code == StatusCode.NORMAL:
-            return False
-        return True
+        return len(self.error_codes) > 0
 
     @property
     def last_change_message(self):
@@ -51,12 +56,7 @@ class Status:
         self.__log_status()
 
     def status_response(self):
-        locale = get_config().locale
-
-        if self.status_code in locale.status_response:
-            response = random.choice(locale.status_response[self.status_code])
-        else:
-            response = random.choice(locale.status_response[StatusCode.GENERAL_ERROR])
+        response = self.get_error_message(self.__status_code)
 
         if self.is_error:
             log.error("Status: {0} - {1}".format(StatusCode(self.status_code), response))
@@ -74,3 +74,10 @@ class Status:
             log.error(self.__last_change)
         else:
             log.info(self.__last_change)
+
+    @staticmethod
+    def get_error_message(status_code):
+        locale = get_config().locale
+        if status_code in locale.status_response:
+            return random.choice(locale.status_response[status_code])
+        return random.choice(locale.status_response[StatusCode.GENERAL_ERROR])
