@@ -318,10 +318,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
         * [ ] replace function from language files
         * [ ] add in new condition types
         * [ ] actually use ConditionType for conditions
+        * [ ] add ConditionType.SUN and ConditionType.STARS to make asking after sun and sunny items easier
         * [ ] rework answers to (optionally) use a generalized answer that has a slot for the condition
 * [ ] **(maybe) add a dict full of aliases for weather conditions to language files and import everything in it as rhasspy slot program as well as map those aliases to conditions (similar to named_days and named_times aliases)**
 * [X] **(maybe) export named_days, named_times and their aliases as slot program**
-* [ ] **rewrite the logic for a detailed weather report (and remove the last hardcoded language stuff with that)**
+* [X] **rewrite the logic for a detailed weather report (and remove the last hardcoded language stuff with that)**
 * [ ] **add in logic for ConditionType.WIND**
     * [ ] add wind as an extra WeatherCondition
         * [X] figure out a wind speed to severity conversion
@@ -331,7 +332,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
     * [ ] make it possible to ask about wind condition
 * [ ] **add output system to define how this script outputs**
     * [X] rhasspy hass.io json (current way)
-    * [ ] extended json (add in an output part to json containing the answer to the question as well as some information)
+    * [x] extended json (add in an output part to json containing the answer to the question as well as some information) (can be done with the new template system)
     * [X] mqtt
     * [ ] rhasspy_hermes-app
     * [ ] rhasspy web api tts
@@ -346,8 +347,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
     * [ ] cleaning up imports in general
     * [X] move definition for warm and cold from language files to config file
     * [ ] find every not implemented feature that could be implemented (StatusCode.NOT_IMPLEMENTED_ERROR)
+    * [ ] fix asking for sun at night error
 * [ ] **clean up on the rhasspy side of things**
      * [ ] clean up sentences for rhasspy and add some
+     * [ ] make asking about stars possible
+     * [ ] find some way to ask about a clear sky
      * [X] offer an English translation for rhasspy sentences
 * [ ] **add to this readme**
     * [X] table of contents
