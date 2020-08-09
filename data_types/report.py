@@ -65,9 +65,11 @@ class WeatherReport:
                     log.debug("only weather for one day was requested, we don't have weather for that day so return with error message")
                     self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
                     return self.status.status_response()
-                elif self.__request.request_date == DateType.INTERVAL:
-                    log.debug("handle intervals that span over night here")
-                    self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
+                # overnight request and no weather for the other day, also
+                elif self.__request.request_date == DateType.INTERVAL and self.__request.grain == Grain.HOUR \
+                        and self.__request.end_time < self.__request.start_time \
+                        and not self.__forecast.has_weather_for_date(self.__request.request_date + datetime.timedelta(days=1)):
+                    self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
                     return self.status.status_response()
                 if self.__forecast.has_weather_for_date(self.__request.request_date + datetime.timedelta(days=1)):
                     log.debug("weather for tomorrow was requested as well so we are good to continue")

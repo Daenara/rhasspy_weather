@@ -69,6 +69,12 @@ class WeatherRequest:
         self.__timezone = config.timezone
         self.__locale = config.locale
 
+        # weather apis don't have weather for the past, so no no need checking
+        if self.request_date < datetime.datetime.now(self.__timezone).date() \
+                or self.grain == Grain.HOUR and self.__request.request_date == datetime.datetime.now(self.__timezone).date() \
+                and self.__request.start_time < datetime.datetime.now(self.__timezone).time():
+            self.status.set_status(StatusCode.PAST_WEATHER_ERROR)
+
     def __str__(self):
         return "(" + str(self.forecast_type) + ", " + str(self.date_type) + ", " + \
                str(self.grain) + ", " + self.string_date + ", " + str(self.start_time) + \
