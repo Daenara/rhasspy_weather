@@ -338,15 +338,6 @@ class WeatherReport:
         log.debug("generating location for response - error: {0}".format(self.status.is_error))
         return self.__locale.format_output_location(self.__request.location.name) if self.__request.location_specified else ""
 
-    @staticmethod
-    def __format_response(response):
-        response = response.replace(" .", ".")
-        response = response.replace("   ", " ")
-        response = response.replace("  ", " ")
-        response = response.replace(" :", ":")
-        response = response[0].capitalize() + response[1:]
-        return response
-
     @property
     def request(self):
         return self.__request
