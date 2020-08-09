@@ -54,6 +54,8 @@ class WeatherForecast:
         self.status = Status()
         self.forecast = []
         self.__timezone = get_config().timezone
+        self.sunset = None
+        self.sunrise = None
 
     def __str__(self):
         return self.forecast
@@ -73,23 +75,34 @@ class WeatherForecast:
         Parameters:
         request : WeatherRequest
         """
-        log.debug("getting weather for daylight time - error: {0}".format(self.status.is_error))
+        log.debug("getting weather for daytime - error: {0}".format(self.status.is_error))
 
-        weather = self.__get_forecast_for_date(request.request_date)
-        log.debug("Weather: %s", weather)
-        if request.start_time is not None:
-            if self.sunrise <= request.start_time <= self.sunset:
-                if request.end_time is not None:
-                    if self.sunrise <= request.end_time <= self.sunset:
-                        return weather.get_weather_for_interval(request.start_time, request.end_time)
-                    return weather.get_weather_for_interval(request.start_time, self.sunset)
-                return weather.get_weather_for_interval(request.start_time, request.start_time)
-            else:
-                if request.end_time is not None:
-                    if self.sunrise <= request.end_time <= self.sunset:
-                        return weather.get_weather_for_interval(self.sunrise, request.end_time)
-        else:
-            return weather.get_weather_for_interval(self.sunrise, self.sunset)
+        start_time = self.sunrise
+        end_time = self.sunset
+
+        if request.start_time is not None and self.sunrise <= request.start_time <= self.sunset:
+            start_time = request.start_time
+        if request.end_time is not None and self.sunrise <= request.end_time <= self.sunset:
+            end_time = request.end_time
+
+        return self.weather_for_interval(request.request_date, start_time, end_time)
+
+    def weather_during_nighttime(self, request):
+        """returns WeatherInterval for a request only during nighttime hours
+        Parameters:
+        request : WeatherRequest
+        """
+        log.debug("getting weather for nighttime - error: {0}".format(self.status.is_error))
+
+        start_time = self.sunset
+        end_time = self.sunrise
+
+        if request.start_time is not None and self.sunset <= request.start_time <= datetime.time.max:
+            start_time = request.start_time
+        if request.end_time is not None and datetime.time.min <= request.end_time <= self.sunrise:
+            end_time = request.end_time
+
+        return self.weather_for_interval(request.request_date, start_time, end_time)
 
     def weather_for_day(self, date):
         """returns the weather for a whole day
@@ -98,8 +111,7 @@ class WeatherForecast:
         """
         log.debug("getting weather for the whole day - error: {0}".format(self.status.is_error))
 
-        weather = self.__get_forecast_for_date(date)
-        return weather.get_weather_for_interval(datetime.time.min, datetime.time.max)
+        return self.weather_for_interval(date, datetime.time.min, datetime.time.max)
 
     def weather_at_time(self, date, time):
         """returns the weather at a specific time
@@ -109,8 +121,7 @@ class WeatherForecast:
         """
         log.debug("getting weather at a certain time - error: {0}".format(self.status.is_error))
 
-        weather = self.__get_forecast_for_date(date)
-        return weather.get_weather_for_interval(time, time)
+        return self.weather_for_interval(date, time, time)
 
     def weather_for_interval(self, date, start, end):
         """returns the weather for a time interval
@@ -122,6 +133,16 @@ class WeatherForecast:
         log.debug("getting weather for an interval - error: {0}".format(self.status.is_error))
 
         weather = self.__get_forecast_for_date(date)
+
+        if end < start:
+            if weather is not None:
+                weather_interval = weather.get_weather_for_interval(start, datetime.time.max)
+                weather = self.__get_forecast_for_date(date + datetime.timedelta(days=1))
+                weather_interval = weather.get_weather_for_interval(datetime.time.min, end, weather_interval)
+            else:
+                weather = self.__get_forecast_for_date(date + datetime.timedelta(days=1))
+                weather_interval = weather.get_weather_for_interval(datetime.time.min, end)
+            return weather_interval
         return weather.get_weather_for_interval(start, end)
 
     def weather_morning(self, date):
