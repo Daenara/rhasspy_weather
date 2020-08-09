@@ -3,6 +3,7 @@ import logging
 import random
 
 from .config import get_config
+from .fixed_times import FixedTimes
 from .request import DateType, ForecastType, Grain
 from .status import Status, StatusCode
 from .condition import ConditionType
@@ -53,12 +54,8 @@ class WeatherReport:
 
         response = ""
 
-        if self.__request.request_date < datetime.datetime.now(self.__timezone).date() \
-                or self.__request.grain == Grain.HOUR and self.__request.request_date == datetime.datetime.now(self.__timezone).date() \
-                and self.__request.start_time < datetime.datetime.now(self.__timezone).time():
-            log.debug("Can't get past weather, return with error message")
-            self.status.set_status(StatusCode.PAST_WEATHER_ERROR)
-            return self.status.status_response()
+        if StatusCode.PAST_WEATHER_ERROR in self.__request.status.error_codes:
+            return Status.get_error_message(StatusCode.PAST_WEATHER_ERROR)
         elif not self.__forecast.has_weather_for_date(self.__request.request_date):
             log.debug("No weather for today")
             if self.__request.request_date == datetime.datetime.now(self.__timezone).date():
@@ -72,8 +69,6 @@ class WeatherReport:
                         and not self.__forecast.has_weather_for_date(self.__request.request_date + datetime.timedelta(days=1)):
                     self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
                     return self.status.status_response()
-                if self.__forecast.has_weather_for_date(self.__request.request_date + datetime.timedelta(days=1)):
-                    log.debug("weather for tomorrow was requested as well so we are good to continue")
             else:
                 self.status.set_status(StatusCode.FUTURE_WEATHER_ERROR)
                 return self.status.status_response()
@@ -197,23 +192,13 @@ class WeatherReport:
     def __generate_full_report_day(self):
         log.debug("generating full day report - error: {0}".format(self.status.is_error))
         if self.__request.detail:
-            response = "Der Wetter-Bericht {when} {where}: ".format(when=self.__output_date_and_time, where=self.__output_location)
-            morning = self.__forecast.weather_morning(self.__request.request_date)
-            if morning is not None:
-                response = response + self.__answer_condition(morning).format(when="Morgens", where="")
-                response = response + " " + self.__answer_temperature(morning.min_temperature, morning.max_temperature).format(when="", where="") + " "
-            noon = self.__forecast.weather_noon(self.__request.request_date)
-            if noon is not None:
-                response = response + self.__answer_condition(noon).format(when="Mittags", where="")
-                response = response + " " + self.__answer_temperature(noon.min_temperature, noon.max_temperature).format(when="", where="") + " "
-            evening = self.__forecast.weather_evening(self.__request.request_date)
-            if evening is not None:
-                response = response + self.__answer_condition(evening).format(when="Abends", where="")
-                response = response + " " + self.__answer_temperature(evening.min_temperature, evening.max_temperature).format(when="", where="") + " "
-            night = self.__forecast.weather_night(self.__request.request_date)
-            if night is not None:
-                response = response + self.__answer_condition(night).format(when="Nachts", where="")
-                response = response + " " + self.__answer_temperature(night.min_temperature, night.max_temperature).format(when="", where="")
+            response = random.choice(self.__locale.condition_answers["general_weather_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
+            for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
+                response = response + " "
+                weather = self.__forecast.weather_for_interval(self.__request.request_date, fixed_time.value[0], fixed_time.value[1])
+                if weather is not None:
+                    response = response + " " + self.__answer_condition(weather).format(when=self.__locale.fixed_times[fixed_time], where="")
+                    response = response + " " + self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when="", where="")
         else:
             weather_for_day = self.__forecast.weather_for_day(self.__request.request_date)
             response = self.__answer_condition(weather_for_day).format(when=self.__output_date_and_time, where=self.__output_location)
@@ -225,19 +210,12 @@ class WeatherReport:
     def __generate_temperature_report_day(self):
         log.debug("generating temperature day report - error: {0}".format(self.status.is_error))
         if self.__request.detail:
-            response = "Die Temperatur {when} {where}. ".format(when=self.__output_date_and_time, where=self.__output_location)
-            morning = self.__forecast.weather_morning(self.__request.request_date)
-            if morning is not None:
-                response = response + " " + self.__answer_temperature(morning.min_temperature, morning.max_temperature).format(when="Morgens", where="") + " "
-            noon = self.__forecast.weather_noon(self.__request.request_date)
-            if noon is not None:
-                response = response + " " + self.__answer_temperature(noon.min_temperature, noon.max_temperature).format(when="Mittags", where="") + " "
-            evening = self.__forecast.weather_evening(self.__request.request_date)
-            if evening is not None:
-                response = response + " " + self.__answer_temperature(evening.min_temperature, evening.max_temperature).format(when="Abends", where="") + " "
-            night = self.__forecast.weather_night(self.__request.request_date)
-            if night is not None:
-                response = response + " " + self.__answer_temperature(night.min_temperature, night.max_temperature).format(when="Nachts", where="")
+            response = random.choice(self.__locale.condition_answers["general_temperature_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
+            for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
+                response = response + " "
+                weather = self.__forecast.weather_for_interval(self.__request.request_date, fixed_time.value[0], fixed_time.value[1])
+                if weather is not None:
+                    response = response + " " + self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when=self.__locale.fixed_times[fixed_time], where="")
         else:
             weather = self.__forecast.weather_for_day(self.__request.request_date)
             response = self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when=self.__output_date_and_time, where=self.__output_location)
@@ -248,19 +226,12 @@ class WeatherReport:
     def __generate_condition_report_day(self):
         log.debug("generating condition day report - error: {0}".format(self.status.is_error))
         if self.__request.detail:
-            response = "Das Wetter {when} {where}. ".format(when=self.__output_date_and_time, where=self.__output_location)
-            morning = self.__forecast.weather_morning(self.__request.request_date)
-            if morning is not None:
-                response = response + self.__answer_condition(morning).format(when="Morgens", where="") + " "
-            noon = self.__forecast.weather_noon(self.__request.request_date)
-            if noon is not None:
-                response = response + self.__answer_condition(noon).format(when="Mittags", where="") + " "
-            evening = self.__forecast.weather_evening(self.__request.request_date)
-            if evening is not None:
-                response = response + self.__answer_condition(evening).format(when="Abends", where="") + " "
-            night = self.__forecast.weather_night(self.__request.request_date)
-            if night is not None:
-                response = response + self.__answer_condition(night).format(when="Nachts", where="")
+            response = random.choice(self.__locale.condition_answers["general_weather_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
+            for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
+                response = response + " "
+                weather = self.__forecast.weather_for_interval(self.__request.request_date, fixed_time.value[0], fixed_time.value[1])
+                if weather is not None:
+                    response = response + " " + self.__answer_condition(weather).format(when=self.__locale.fixed_times[fixed_time], where="")
         else:
             weather = self.__forecast.weather_for_day(self.__request.request_date)
             response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)

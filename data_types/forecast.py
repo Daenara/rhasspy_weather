@@ -145,78 +145,7 @@ class WeatherForecast:
             return weather_interval
         return weather.get_weather_for_interval(start, end)
 
-    def weather_morning(self, date):
-        """returns the weather during the morning of date
-        Parameters:
-        date : datetime.date
-        """
-        log.debug("getting weather for the morning - error: {0}".format(self.status.is_error))
-
-        start = datetime.time(6, 0)
-        end = datetime.time(11, 59)
-        if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
-            return None
-        weather = self.__get_forecast_for_date(date)
-        weather_for_interval = weather.get_weather_for_interval(start, end)
-        weather_for_interval.switch = True
-        return weather_for_interval
-
-    def weather_noon(self, date):
-        """returns the weather during the noon of date
-        Parameters:
-        date : datetime.date
-        """
-        log.debug("getting weather for noon - error: {0}".format(self.status.is_error))
-
-        start = datetime.time(12, 0)
-        end = datetime.time(16, 59)
-        if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
-            return None
-        weather = self.__get_forecast_for_date(date)
-        weather_for_interval = weather.get_weather_for_interval(start, end)
-        weather_for_interval.switch = True
-        return weather_for_interval
-
-    def weather_evening(self, date):
-        """returns the weather during the evening of date
-        Parameters:
-        date : datetime.date
-        """
-        log.debug("getting weather for the evening - error: {0}".format(self.status.is_error))
-
-        start = datetime.time(17, 0)
-        end = datetime.time(20, 59)
-        if date == datetime.datetime.now(self.__timezone.timezone).date() and end < datetime.datetime.now(self.__timezone.timezone).time():
-            return None
-        weather = self.__get_forecast_for_date(date)
-        weather_for_interval = weather.get_weather_for_interval(start, end)
-        weather_for_interval.switch = True
-        return weather_for_interval
-
-    def weather_night(self, date):
-        """returns the weather during the night of date and date+1
-        Parameters:
-        date : datetime.date
-        """
-        log.debug("getting weather for the night - error: {0}".format(self.status.is_error))
-
-        start = datetime.time(21, 0)
-        end = datetime.time(5, 59)
-        if self.has_weather_for_date(date):
-            part_one = self.__get_forecast_for_date(date).get_weather_for_interval(start, datetime.time.max)
-            if self.has_weather_for_date(date + datetime.timedelta(days=1)):
-                part_two = self.__get_forecast_for_date(date + datetime.timedelta(days=1)).get_weather_for_interval(datetime.time.min, end, part_one)
-                part_two.switch = True
-                return part_two
-            part_one.switch = True
-            return part_one
-        elif self.has_weather_for_date(date + datetime.timedelta(days=1)):
-            part_two = self.__get_forecast_for_date(date + datetime.timedelta(days=1)).get_weather_for_interval(datetime.time.min, end)
-            part_two.switch = True
-            return part_two
-
-            # returns the forecast at the specified date
-
+    # returns the forecast at the specified date
     def __get_forecast_for_date(self, date):
         log.debug("getting the complete forecast for a date - error: {0}".format(self.status.is_error))
 

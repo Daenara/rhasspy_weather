@@ -5,6 +5,8 @@ from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
+from rhasspy_weather.data_types.fixed_times import FixedTimes
+
 language_code = "en"
 
 # used in parsers
@@ -135,12 +137,20 @@ def format_output_time(request):
     return "at " + request.readable_start_time + " o'clock"
 
 
+# used for detailed report of the day
+fixed_times = {
+    FixedTimes.MORNING: "Morning",
+    FixedTimes.AFTERNOON: "Afternoon",
+    FixedTimes.EVENING: "Evening"
+}
+
 # temperature report
 temperature_answers = {
     "cold_true": ["Yes, it will be cold {where} {when}. The temperature will be {temperature}."],
     "cold_false": ["No, {when} {where} will not be cold. The temperature will be {temperature}."],
     "warm_true": ["Yes, it will be warm {where} {when}. The temperature will be {temperature}."],
     "warm_false": ["No, {when} {where} will not be warm. The temperature will be {temperature}."],
+    "general_temperature_full": ["The temperature {when} {where}: "],
     "general_temperature": ["The temperature {when} {where} is {temperature}."]
 }
 
@@ -154,6 +164,7 @@ def format_temperature_output(min_temperature, max_temperature):
 
 # condition report
 condition_answers = {
+    "general_weather_full": ["The weather {when} {where}: ", "Weather for {when} {where}: "],
     "general_weather": ["The weather {when} {where}: {weather}."],
     "rain_true": ["Yes, {when} could be rainy {where}."],
     "rain_false": ["No, it will not rain {when} {where}. The weather will be: {weather}."],

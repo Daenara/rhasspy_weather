@@ -5,6 +5,8 @@ from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
+from rhasspy_weather.data_types.fixed_times import FixedTimes
+
 language_code = "de"
 
 # used in parsers
@@ -132,12 +134,20 @@ def format_output_time(request):
     return "um " + request.readable_start_time + " Uhr"
 
 
+# used for detailed report of the day
+fixed_times = {
+    FixedTimes.MORNING: "Morgens",
+    FixedTimes.AFTERNOON: "Mittags",
+    FixedTimes.EVENING: "Abends"
+}
+
 # temperature report
 temperature_answers = {
     "cold_true": ["Ja, {when} {where} wird es kalt. Die Temperatur ist {temperature}."],
     "cold_false": ["Nein, {when} {where} wird es nicht kalt. Die Temperatur ist {temperature}."],
     "warm_true": ["Ja, {when} {where} wird es warm. Die Temperatur ist {temperature}."],
     "warm_false": ["Nein, {when} {where} wird es nicht warm. Die Temperatur ist {temperature}."],
+    "general_temperature_full": ["Der Temperatur {when} {where}: ", "Temperatur für {when} {where}: "],
     "general_temperature": ["Die Temperatur {when} {where} ist {temperature}.",
                             "Es hat {where} {temperature} {when}.",
                             "Es hat {where} {when} {temperature}.",
@@ -154,6 +164,7 @@ def format_temperature_output(min_temperature, max_temperature):
 
 # condition report
 condition_answers = {
+    "general_weather_full": ["Der Wetterbericht {when} {where}: ", "Wetterbericht für {when} {where}: "],
     "general_weather": ["Das Wetter {when} {where}: {weather}.",
                         "{when} {where} ist das Wetter: {weather}.",
                         "Wetter {when} {where}: {weather}."],
