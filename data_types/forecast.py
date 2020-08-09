@@ -79,14 +79,19 @@ class WeatherForecast:
 
         start_time = self.sunrise
         end_time = self.sunset
+        date = request.request_date
+
+        if request.end_time < request.start_time:
+            date = date + datetime.timedelta(days=1)
 
         if request.start_time is not None and self.sunrise <= request.start_time <= self.sunset:
             start_time = request.start_time
         if request.end_time is not None and self.sunrise <= request.end_time <= self.sunset:
             end_time = request.end_time
 
-        return self.weather_for_interval(request.request_date, start_time, end_time)
+        return self.weather_for_interval(date, start_time, end_time)
 
+    # TODO: use this
     def weather_during_nighttime(self, request):
         """returns WeatherInterval for a request only during nighttime hours
         Parameters:

@@ -267,12 +267,27 @@ class WeatherReport:
         response_type = "general_weather"
         output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
         if self.__request.forecast_type == ForecastType.CONDITION:
-            if self.__request.requested == ConditionType.CLEAR:
-                day_weather = self.__forecast.weather_during_daytime(self.__request)
-                if day_weather is not None and day_weather.is_weather_chance(ConditionType.CLEAR):
-                    response_type = "sun_true"
+            if self.__request.requested == ConditionType.SUN:
+                if self.__request.start_time > self.__forecast.sunset:
+                    # start time after sunset
+                    if self.__request.end_time < self.__forecast.sunrise:
+                        # end time before sunrise
+                        response_type = "sun_false"
+                    else:
+                        # end time after sunrise
+                        # todo: figure out the difference between end_time and sunrise and only output sunny if it is the majority of time
+
+                        day_weather = self.__forecast.weather_during_daytime(self.__request)
+                        if day_weather is not None and day_weather.is_weather_chance(ConditionType.CLEAR):
+                            response_type = "sun_true"
+                        else:
+                            response_type = "sun_false"
                 else:
-                    response_type = "sun_false"
+                    day_weather = self.__forecast.weather_during_daytime(self.__request)
+                    if day_weather is not None and day_weather.is_weather_chance(ConditionType.CLEAR):
+                        response_type = "sun_true"
+                    else:
+                        response_type = "sun_false"
             elif self.__request.requested == ConditionType.WIND:
                 log.error("condition wind not implemented yet")
                 self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)

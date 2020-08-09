@@ -31,7 +31,9 @@ condition_types = {
     "nebel": ConditionType.MIST,
     "wolken": ConditionType.CLOUDS,
     "gewitter": ConditionType.THUNDERSTORM,
-    "sonne": ConditionType.CLEAR,
+    "sonne": ConditionType.SUN,
+    "sterne": ConditionType.STARS,
+    "klar": ConditionType.CLEAR,
     "wind": ConditionType.WIND
 }
 condition_synonyms = {
@@ -55,7 +57,8 @@ condition_synonyms = {
     "blitzt": "gewitter",
     "blitzen": "gewitter",
     "donner": "gewitter",
-    "blitze": "gewitter"
+    "blitze": "gewitter",
+    "klarer himmel": "klar"
 }
 requested_temperature = {
     "warm": "warm",
@@ -188,6 +191,10 @@ condition_answers = {
     "clouds_false": ["Nein, {when} {where} ist es nicht bewölkt. Das Wetter ist: {weather}."],
     "sun_true": ["Ja, {when} {where} scheint die Sonne."],
     "sun_false": ["Nein, {when} {where} scheint keine Sonne. Das Wetter ist: {weather}."],
+    "stars_true": ["Ja, man kann {when} {where} die Sterne sehen."],
+    "stars_false": ["Keine Sterne zu sehen {when} {where}, stattdessen gibt es: {weather}."],
+    "clear_true": ["Der Himmel ist klar {when} {where}."],
+    "clear_false": ["Kein klarer Himmel {when} {where}, stattdessen {weather}."],
     "mist_true": ["Ja, {when} {where} ist es neblig."],
     "mist_false": ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."],
     "unknown_condition": ["Ich weiß nicht, was genau du wissen willst. Hier das allgemeine Wetter: {weather}"]

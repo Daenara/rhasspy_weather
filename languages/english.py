@@ -39,7 +39,9 @@ condition_types = {
     "fog": ConditionType.MIST,
     "clouds": ConditionType.CLOUDS,
     "thunderstorm": ConditionType.THUNDERSTORM,
-    "sun": ConditionType.CLEAR,
+    "sun": ConditionType.SUN,
+    "stars": ConditionType.STARS,
+    "clear": ConditionType.CLEAR,
     "wind": ConditionType.WIND
 }
 condition_synonyms = {
@@ -57,7 +59,8 @@ condition_synonyms = {
     "sunny": "sun",
     "windy": "wind",
     "storming": "wind",
-    "stormy": "wind"
+    "stormy": "wind",
+    "clear sky": "clear"
 }
 requested_temperature = {
     "warm": "warm",
@@ -175,7 +178,11 @@ condition_answers = {
     "clouds_true": ["Yes, {when} {where} could be cloudy."],
     "clouds_false": ["No, {when} {where} will not be cloudy. The weather will be: {weather}."],
     "sun_true": ["Yes, {when} {where} will be sunny."],
-    "sun_false": ["No, {when} {where} won't have a clear sky. The weather will be: {weather}."],
+    "sun_false": ["No, {when} {where} won't be sunny. The weather will be: {weather}."],
+    "stars_true": ["Yes, you can see the stars {when} {where}."],
+    "stars_false": ["No stars {when} {where}, instead it will be: {weather}."],
+    "clear_true": ["The sky will be clear {when} {where}."],
+    "clear_false": ["No clear skies {when} {where}, {weather} instead."],
     "mist_true": ["Yes, {when} {where} might be foggy."],
     "mist_false": ["No, {when} {where} will have no fog. The weather will be: {weather}."],
     "unknown_condition": ["I don't know what you want to know. Here the general weather: {weather}"]
