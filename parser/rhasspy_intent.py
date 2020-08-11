@@ -148,8 +148,10 @@ def parse_intent_message(intent_message):
         if slots[slot_item_name].lower() in items_lowercase:
             requested = items[items_lowercase.index(slots[slot_item_name].lower())]
     elif intent == ForecastType.TEMPERATURE and slot_temperature_name in slots:
-        if slots[slot_temperature_name] in config.locale.requested_temperature:
-            requested = config.locale.requested_temperature[slots[slot_temperature_name]]
+        if slots[slot_temperature_name] in config.locale.temperature_types:
+            requested = config.locale.temperature_types[slots[slot_temperature_name]]
+        elif slots[slot_temperature_name] in config.locale.temperature_synonyms:
+            requested = config.locale.temperature_types[config.locale.temperature_synonyms[slots[slot_temperature_name]]]
     if requested is not None:
         log.debug("there was a special request made")
         new_request.requested = requested

@@ -6,6 +6,7 @@ from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
 from rhasspy_weather.data_types.fixed_times import FixedTimes
+from rhasspy_weather.data_types.temperature import TemperatureType
 
 language_code = "en"
 
@@ -62,9 +63,12 @@ condition_synonyms = {
     "stormy": "wind",
     "clear sky": "clear"
 }
-requested_temperature = {
-    "warm": "warm",
-    "cold": "cold",
+temperature_types = {
+    "warm": TemperatureType.WARM,
+    "cold": TemperatureType.COLD,
+}
+temperature_synonyms = {
+    "freezing": "cold",
     "hot": "warm",
     "cool": "cold"
 }
@@ -149,12 +153,18 @@ fixed_times = {
 
 # temperature report
 temperature_answers = {
-    "cold_true": ["Yes, it will be cold {where} {when}. The temperature will be {temperature}."],
-    "cold_false": ["No, {when} {where} will not be cold. The temperature will be {temperature}."],
-    "warm_true": ["Yes, it will be warm {where} {when}. The temperature will be {temperature}."],
-    "warm_false": ["No, {when} {where} will not be warm. The temperature will be {temperature}."],
     "general_temperature_full": ["The temperature {when} {where}: "],
-    "general_temperature": ["The temperature {when} {where} is {temperature}."]
+    TemperatureType.GENERAL: {
+        "": ["The temperature {when} {where} is {temperature}."]
+    },
+    TemperatureType.COLD: {
+        "true": ["Yes, it will be cold {where} {when}. The temperature will be {temperature}."],
+        "false": ["No, {when} {where} will not be cold. The temperature will be {temperature}."]
+    },
+    TemperatureType.WARM: {
+        "true": ["Yes, it will be warm {where} {when}. The temperature will be {temperature}."],
+        "false": ["No, {when} {where} will not be warm. The temperature will be {temperature}."]
+    }
 }
 
 

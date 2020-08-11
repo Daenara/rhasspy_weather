@@ -7,6 +7,7 @@ from .fixed_times import FixedTimes
 from .request import DateType, ForecastType, Grain
 from .status import Status, StatusCode
 from .condition import ConditionType
+from .temperature import TemperatureType
 from ..utils import format_string
 
 log = logging.getLogger(__name__)
@@ -246,20 +247,19 @@ class WeatherReport:
         min_temp = int(min_temp)
         max_temp = int(max_temp)
 
-        if self.__request.requested == "cold":
-            if min_temp <= self.__config.temperature_cold_to:
-                response_type = "cold_true"
-            else:
-                response_type = "cold_false"
-        elif self.__request.requested == "warm":
-            if min_temp >= self.__config.temperature_warm_from:
-                response_type = "warm_true"
-            else:
-                response_type = "warm_false"
-        else:
-            response_type = "general_temperature"
+        response_type = ""
+        temperature_type = TemperatureType.GENERAL
+        if self.__request.forecast_type == ForecastType.TEMPERATURE and type(self.__request.requested) == TemperatureType:
+            temperature_type = self.__request.requested
+            response_type = "false"
+            if temperature_type == TemperatureType.COLD:
+                if min_temp <= self.__config.temperature_cold_to:
+                    response_type = "true"
+            elif temperature_type == TemperatureType.WARM:
+                if min_temp >= self.__config.temperature_warm_from:
+                    response_type = "true"
 
-        return random.choice(self.__locale.temperature_answers[response_type]).format(temperature=self.__locale.format_temperature_output(min_temp, max_temp), when="{when}", where="{where}")
+        return random.choice(self.__locale.temperature_answers[temperature_type][response_type]).format(temperature=self.__locale.format_temperature_output(min_temp, max_temp), when="{when}", where="{where}")
 
     # returns a string with the weather condition and placeholders for location and time
     def __answer_condition(self, weather_obj):
@@ -294,8 +294,6 @@ class WeatherReport:
                 log.error("condition wind not implemented yet")
                 self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
                 return self.status.status_response()
-            elif self.__request.requested == ConditionType.UNKNOWN:
-                response_type = ""
             else:
                 if weather_obj.is_weather_chance(self.__request.requested):
                     response_type = "true"

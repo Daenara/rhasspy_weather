@@ -6,6 +6,7 @@ from rhasspy_weather.data_types.status import StatusCode
 
 # general stuff
 from rhasspy_weather.data_types.fixed_times import FixedTimes
+from rhasspy_weather.data_types.temperature import TemperatureType
 
 language_code = "de"
 
@@ -61,9 +62,12 @@ condition_synonyms = {
     "blitze": "gewitter",
     "klarer himmel": "klar"
 }
-requested_temperature = {
-    "warm": "warm",
-    "kalt": "cold"
+temperature_types = {
+    "warm": TemperatureType.WARM,
+    "kalt": TemperatureType.COLD
+}
+temperature_synonyms = {
+    "heiß": "warm"
 }
 
 
@@ -153,15 +157,20 @@ fixed_times = {
 
 # temperature report
 temperature_answers = {
-    "cold_true": ["Ja, {when} {where} wird es kalt. Die Temperatur ist {temperature}."],
-    "cold_false": ["Nein, {when} {where} wird es nicht kalt. Die Temperatur ist {temperature}."],
-    "warm_true": ["Ja, {when} {where} wird es warm. Die Temperatur ist {temperature}."],
-    "warm_false": ["Nein, {when} {where} wird es nicht warm. Die Temperatur ist {temperature}."],
     "general_temperature_full": ["Der Temperatur {when} {where}: ", "Temperatur für {when} {where}: "],
-    "general_temperature": ["Die Temperatur {when} {where} ist {temperature}.",
-                            "Es hat {where} {temperature} {when}.",
-                            "Es hat {where} {when} {temperature}.",
-                            "Es hat {when} {temperature} {where}."]
+    TemperatureType.GENERAL: {
+        "": ["Die Temperatur {when} {where} ist {temperature}.",
+             "Es hat {where} {temperature} {when}.",
+             "Es hat {where} {when} {temperature}.",
+             "Es hat {when} {temperature} {where}."]
+    },
+    TemperatureType.COLD: {
+        "true": ["Ja, {when} {where} wird es kalt. Die Temperatur ist {temperature}."],
+        "false": ["Nein, {when} {where} wird es nicht kalt. Die Temperatur ist {temperature}."]},
+    TemperatureType.WARM: {
+        "true": ["Ja, {when} {where} wird es warm. Die Temperatur ist {temperature}."],
+        "false": ["Nein, {when} {where} wird es nicht warm. Die Temperatur ist {temperature}."]
+    }
 }
 
 

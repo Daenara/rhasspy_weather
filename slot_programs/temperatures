@@ -22,7 +22,7 @@ logging.Formatter.converter = custom_time
 
 config = get_config()
 
-temperatures = list(config.locale.requested_temperature.keys())
+temperatures = list(config.locale.temperature_types.keys())
 
 for s in temperatures:
     print(s)
