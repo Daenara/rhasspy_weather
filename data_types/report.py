@@ -210,7 +210,7 @@ class WeatherReport:
     # called by __generate_temperature_report()
     def __generate_temperature_report_day(self):
         log.debug("generating temperature day report - error: {0}".format(self.status.is_error))
-        if self.__request.detail:
+        if self.__request.detail and self.__request.requested is None:
             response = random.choice(self.__locale.temperature_answers["general_temperature_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
             for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
                 weather = self.__forecast.weather_for_interval(self.__request.request_date, fixed_time.value[0], fixed_time.value[1])
