@@ -184,7 +184,10 @@ def format_temperature_output(min_temperature, max_temperature):
 
 # condition report
 condition_answers = {
-    "general_weather_full": ["Der Wetterbericht {when} {where}: ", "Wetterbericht für {when} {where}: "],
+    "general_weather_full": ["Der Wetterbericht {when} {where}: ",
+                             "Wetterbericht für {when} {where}: ",
+                             "Das Wetter {when} {where}: ",
+                             "Das Wetter für {when} {where}: "],
     ConditionType.GENERAL: {
         "": ["Das Wetter {when} {where}: {weather}.",
              "{when} {where} ist das Wetter: {weather}.",

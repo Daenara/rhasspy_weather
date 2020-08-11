@@ -196,11 +196,10 @@ class WeatherReport:
         if self.__request.detail:
             response = random.choice(self.__locale.condition_answers["general_weather_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
             for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
-                response = response + " "
                 weather = self.__forecast.weather_for_interval(self.__request.request_date, fixed_time.value[0], fixed_time.value[1])
                 if weather is not None:
-                    response = response + " " + self.__answer_condition(weather).format(when=self.__locale.fixed_times[fixed_time], where="")
-                    response = response + " " + self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when="", where="")
+                    response = response + self.__locale.fixed_times[fixed_time] + ": " + self.__locale.combine_conditions(weather.get_output_condition_list()) + ". "
+                    response = response + self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when="", where="") + ". "
         else:
             weather_for_day = self.__forecast.weather_for_day(self.__request.request_date)
             response = self.__answer_condition(weather_for_day).format(when=self.__output_date_and_time, where=self.__output_location)
