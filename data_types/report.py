@@ -87,6 +87,7 @@ class WeatherReport:
         elif self.__request.forecast_type == ForecastType.ITEM:
             response = self.__generate_item_report()
 
+        log.debug(format_string(response))
         return format_string(response)
 
     # returns the answer to a question about the weather
@@ -211,12 +212,11 @@ class WeatherReport:
     def __generate_temperature_report_day(self):
         log.debug("generating temperature day report - error: {0}".format(self.status.is_error))
         if self.__request.detail:
-            response = random.choice(self.__locale.condition_answers["general_temperature_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
+            response = random.choice(self.__locale.temperature_answers["general_temperature_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
             for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
-                response = response + " "
                 weather = self.__forecast.weather_for_interval(self.__request.request_date, fixed_time.value[0], fixed_time.value[1])
                 if weather is not None:
-                    response = response + " " + self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when=self.__locale.fixed_times[fixed_time], where="")
+                    response = response + self.__locale.fixed_times[fixed_time] + ": " + self.__locale.format_temperature_output(weather.min_temperature, weather.max_temperature) + ". "
         else:
             weather = self.__forecast.weather_for_day(self.__request.request_date)
             response = self.__answer_temperature(weather.min_temperature, weather.max_temperature).format(when=self.__output_date_and_time, where=self.__output_location)

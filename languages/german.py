@@ -1,5 +1,6 @@
 import datetime
 
+from rhasspy_weather import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.status import StatusCode
@@ -157,7 +158,7 @@ fixed_times = {
 
 # temperature report
 temperature_answers = {
-    "general_temperature_full": ["Der Temperatur {when} {where}: ", "Temperatur für {when} {where}: "],
+    "general_temperature_full": ["Die Temperaturen {when} {where}: ", "Temperaturen für {when} {where}: "],
     TemperatureType.GENERAL: {
         "": ["Die Temperatur {when} {where} ist {temperature}.",
              "Es hat {where} {temperature} {when}.",
@@ -176,9 +177,9 @@ temperature_answers = {
 
 def format_temperature_output(min_temperature, max_temperature):
     if min_temperature == max_temperature:
-        return str(min_temperature) + " Grad"
+        return str(utils.normal_round(min_temperature)) + " Grad"
     else:
-        return "zwischen " + str(min_temperature) + " und " + str(max_temperature) + " Grad"
+        return "zwischen " + str(utils.normal_round(min_temperature)) + " und " + str(utils.normal_round(max_temperature)) + " Grad"
 
 
 # condition report

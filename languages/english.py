@@ -1,5 +1,6 @@
 import datetime
 
+from rhasspy_weather import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.status import StatusCode
@@ -170,9 +171,9 @@ temperature_answers = {
 
 def format_temperature_output(min_temperature, max_temperature):
     if min_temperature == max_temperature:
-        return str(min_temperature) + " degrees"  # Centigrade/Fahrenheit is handled through setting in config.ini
+        return str(utils.normal_round(min_temperature)) + " degrees"  # Centigrade/Fahrenheit is handled through setting in config.ini
     else:
-        return "between " + str(min_temperature) + " and " + str(max_temperature) + " degrees"
+        return "between " + str(utils.normal_round(min_temperature)) + " and " + str(utils.normal_round(max_temperature)) + " degrees"
 
 
 # condition report
