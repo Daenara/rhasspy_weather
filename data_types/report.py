@@ -264,43 +264,45 @@ class WeatherReport:
     # returns a string with the weather condition and placeholders for location and time
     def __answer_condition(self, weather_obj):
         log.debug("generating response for condition - error: {0}".format(self.status.is_error))
-        response_type = "general_weather"
+        response_type = ""
+        condition_type = ConditionType.GENERAL
         output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
-        if self.__request.forecast_type == ForecastType.CONDITION:
+        if self.__request.forecast_type == ForecastType.CONDITION and type(self.__request.requested) == ConditionType:
+            condition_type = self.__request.requested
             if self.__request.requested == ConditionType.SUN:
                 if self.__request.start_time > self.__forecast.sunset:
                     # start time after sunset
                     if self.__request.end_time < self.__forecast.sunrise:
                         # end time before sunrise
-                        response_type = "sun_false"
+                        response_type = "false"
                     else:
                         # end time after sunrise
                         # todo: figure out the difference between end_time and sunrise and only output sunny if it is the majority of time
 
                         day_weather = self.__forecast.weather_during_daytime(self.__request)
                         if day_weather is not None and day_weather.is_weather_chance(ConditionType.CLEAR):
-                            response_type = "sun_true"
+                            response_type = "true"
                         else:
-                            response_type = "sun_false"
+                            response_type = "false"
                 else:
                     day_weather = self.__forecast.weather_during_daytime(self.__request)
                     if day_weather is not None and day_weather.is_weather_chance(ConditionType.CLEAR):
-                        response_type = "sun_true"
+                        response_type = "true"
                     else:
-                        response_type = "sun_false"
+                        response_type = "false"
             elif self.__request.requested == ConditionType.WIND:
                 log.error("condition wind not implemented yet")
                 self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
                 return self.status.status_response()
             elif self.__request.requested == ConditionType.UNKNOWN:
-                response_type = "unknown_condition"
+                response_type = ""
             else:
                 if weather_obj.is_weather_chance(self.__request.requested):
-                    response_type = self.__request.requested.value + "_true"
+                    response_type = "true"
                 else:
-                    response_type = self.__request.requested.value + "_false"
+                    response_type = "false"
 
-        return random.choice(self.__locale.condition_answers[response_type]).format(weather=output_conditions, when="{when}", where="{where}")
+        return random.choice(self.__locale.condition_answers[condition_type][response_type]).format(weather=output_conditions, when="{when}", where="{where}")
 
     @property
     def __output_date_and_time(self):

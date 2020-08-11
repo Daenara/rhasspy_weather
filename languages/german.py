@@ -11,7 +11,8 @@ language_code = "de"
 
 # used in parsers
 weekday_names = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
-month_names = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+month_names = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober",
+               "November", "Dezember"]
 named_days = {"heute": 0, "morgen": 1, "übermorgen": 2}
 named_days_synonyms = {}
 named_times = {
@@ -79,10 +80,13 @@ def format_userdefined_time(hour, minutes=-1):
 # weather conditions
 
 conditions = {
-    ConditionType.WIND: {0: "Windstille", 1: "Windstille", 2: "leichte Briese", 3: "schwacher Wind", 4: "mäßiger Wind", 5: "frischer Wind", 6: "starker Wind", 7: "starker Wind", 8: "Sturm",
+    ConditionType.WIND: {0: "Windstille", 1: "Windstille", 2: "leichte Briese", 3: "schwacher Wind", 4: "mäßiger Wind",
+                         5: "frischer Wind", 6: "starker Wind", 7: "starker Wind", 8: "Sturm",
                          9: "Sturm", 10: "schwerer Sturm", 11: "orkanartiger Sturm", 12: "Orkan"},
-    ConditionType.CLOUDS: {0: "Klarer Himmel", 1: "Ein paar Wolken", 2: "Leicht bewölkt", 3: "Bewölkt", 4: "Stark bewölkt"},
-    ConditionType.RAIN: {0: "leichter Regen", 1: "mäßiger Regen", 2: "starker Regen", 3: "sehr starker Regen", 4: "extremer Regen"},
+    ConditionType.CLOUDS: {0: "Klarer Himmel", 1: "Ein paar Wolken", 2: "Leicht bewölkt", 3: "Bewölkt",
+                           4: "Stark bewölkt"},
+    ConditionType.RAIN: {0: "leichter Regen", 1: "mäßiger Regen", 2: "starker Regen", 3: "sehr starker Regen",
+                         4: "extremer Regen"},
     ConditionType.SNOW: {0: "leichter Schneefall", 1: "Schneefall", 2: "starker Schneefall"},
     ConditionType.THUNDERSTORM: {0: "leichtes Gewitter", 1: "Gewitter", 2: "starkes Gewitter"}}
 
@@ -100,11 +104,14 @@ status_response = {
                                       "Dieses Datum liegt zu weit in der Zukunft."],
     StatusCode.NOT_IMPLEMENTED_ERROR: ["Diese Funktion wird noch nicht unterstützt.",
                                        "Ich weiß nicht wie ich diese Anfrage verarbeiten soll."],
-    StatusCode.LOCATION_ERROR: ["Ich kann die angegebene Stadt nich finden. Vielleicht habe ich sie nicht richtig verstanden"],
+    StatusCode.LOCATION_ERROR: [
+        "Ich kann die angegebene Stadt nich finden. Vielleicht habe ich sie nicht richtig verstanden"],
     StatusCode.PAST_WEATHER_ERROR: ["Ich kann dir das Wetter aus der Vergangenheit leider nicht sagen."],
-    StatusCode.NO_WEATHER_FOR_DAY_ERROR: ["Es ist so kurz vor Mitternacht, dass ich das Wetter für heute nicht abrufen kann."],
+    StatusCode.NO_WEATHER_FOR_DAY_ERROR: [
+        "Es ist so kurz vor Mitternacht, dass ich das Wetter für heute nicht abrufen kann."],
     StatusCode.DATE_ERROR: ["Irgendwas stimmt mit dem Datum nicht."],
-    StatusCode.API_TIMEOUT_ERROR: ["Mit diesem API-Schlüssel wurden zu viele Anfragen gesenden. Versuche es später erneut."],
+    StatusCode.API_TIMEOUT_ERROR: [
+        "Mit diesem API-Schlüssel wurden zu viele Anfragen gesenden. Versuche es später erneut."],
     StatusCode.CONFIG_ERROR: ["Es gab ein Problem beim Laden der Konfigurationsdatei."],
     StatusCode.TIME_ERROR: ["Irgendwas stimmt mit der angegebenen Zeit nicht."],
     StatusCode.GENERAL_ERROR: ["Es ist ein Fehler aufgetreten.", "Hier ist ein Fehler aufgetreten."]
@@ -168,36 +175,56 @@ def format_temperature_output(min_temperature, max_temperature):
 # condition report
 condition_answers = {
     "general_weather_full": ["Der Wetterbericht {when} {where}: ", "Wetterbericht für {when} {where}: "],
-    "general_weather": ["Das Wetter {when} {where}: {weather}.",
-                        "{when} {where} ist das Wetter: {weather}.",
-                        "Wetter {when} {where}: {weather}."],
-    "rain_true": ["Ja, {when} wird es {where} regnen.",
-                  "Ja, {when} gibt es {where} Regen.",
-                  "Ja, es regnet {when} {where}.",
-                  "Ja, {when} regnet es {where}."],
-    "rain_false": ["Nein, es regnet {when} {where} nicht. Das Wetter ist: {weather}.",
-                   "Nein, {when} regnet es {where} nicht. Stattdessen ist das Wetter: {weather}.",
-                   "Nein, {when} gibt es keinen Regen {where}. Das Wetter ist: {weather}."],
-    "snow_true": ["Ja, {when} wird es {where} schneien.",
-                  "Ja, {when} gibt es {where} Schnee.",
-                  "Ja, es schneit {when} {where}.",
-                  "Ja, {when} schneit es {where}."],
-    "snow_false": ["Nein, es schneit {when} {where} nicht. Das Wetter ist: {weather}.",
-                   "Nein, {when} schneit es {where} nicht. Stattdessen ist das Wetter: {weather}.",
-                   "Nein, {when} gibt es keinen Schnee {where}. Das Wetter ist: {weather}."],
-    "thunderstorm_true": ["Ja, {when} gibt es {where} Gewitter."],
-    "thunderstorm_false": ["Nein, {when} {where} gewittert es nicht. Das Wetter ist: {weather}."],
-    "clouds_true": ["Ja, {when} kann es {where} bewölkt sein."],
-    "clouds_false": ["Nein, {when} {where} ist es nicht bewölkt. Das Wetter ist: {weather}."],
-    "sun_true": ["Ja, {when} {where} scheint die Sonne."],
-    "sun_false": ["Nein, {when} {where} scheint keine Sonne. Das Wetter ist: {weather}."],
-    "stars_true": ["Ja, man kann {when} {where} die Sterne sehen."],
-    "stars_false": ["Keine Sterne zu sehen {when} {where}, stattdessen gibt es: {weather}."],
-    "clear_true": ["Der Himmel ist klar {when} {where}."],
-    "clear_false": ["Kein klarer Himmel {when} {where}, stattdessen {weather}."],
-    "mist_true": ["Ja, {when} {where} ist es neblig."],
-    "mist_false": ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."],
-    "unknown_condition": ["Ich weiß nicht, was genau du wissen willst. Hier das allgemeine Wetter: {weather}"]
+    ConditionType.GENERAL: {
+        "": ["Das Wetter {when} {where}: {weather}.",
+             "{when} {where} ist das Wetter: {weather}.",
+             "Wetter {when} {where}: {weather}."]
+    },
+    ConditionType.RAIN: {
+        "true": ["Ja, {when} wird es {where} regnen.",
+                 "Ja, {when} gibt es {where} Regen.",
+                 "Ja, es regnet {when} {where}.",
+                 "Ja, {when} regnet es {where}."],
+        "false": ["Nein, es regnet {when} {where} nicht. Das Wetter ist: {weather}.",
+                  "Nein, {when} regnet es {where} nicht. Stattdessen ist das Wetter: {weather}.",
+                  "Nein, {when} gibt es keinen Regen {where}. Das Wetter ist: {weather}."]
+    },
+    ConditionType.SNOW: {
+        "true": ["Ja, {when} wird es {where} schneien.",
+                 "Ja, {when} gibt es {where} Schnee.",
+                 "Ja, es schneit {when} {where}.",
+                 "Ja, {when} schneit es {where}."],
+        "false": ["Nein, es schneit {when} {where} nicht. Das Wetter ist: {weather}.",
+                  "Nein, {when} schneit es {where} nicht. Stattdessen ist das Wetter: {weather}.",
+                  "Nein, {when} gibt es keinen Schnee {where}. Das Wetter ist: {weather}."]
+    },
+    ConditionType.THUNDERSTORM: {
+        "true": ["Ja, {when} gibt es {where} Gewitter."],
+        "false": ["Nein, {when} {where} gewittert es nicht. Das Wetter ist: {weather}."]
+    },
+    ConditionType.CLOUDS: {
+        "true": ["Ja, {when} kann es {where} bewölkt sein."],
+        "false": ["Nein, {when} {where} ist es nicht bewölkt. Das Wetter ist: {weather}."]
+    },
+    ConditionType.SUN: {
+        "true": ["Ja, {when} {where} scheint die Sonne."],
+        "false": ["Nein, {when} {where} scheint keine Sonne. Das Wetter ist: {weather}."]
+    },
+    ConditionType.STARS: {
+        "true": ["Ja, man kann {when} {where} die Sterne sehen."],
+        "false": ["Keine Sterne zu sehen {when} {where}, stattdessen gibt es: {weather}."]
+    },
+    ConditionType.CLEAR: {
+        "true": ["Der Himmel ist klar {when} {where}."],
+        "false": ["Kein klarer Himmel {when} {where}, stattdessen {weather}."]
+    },
+    ConditionType.MIST: {
+        "true": ["Ja, {when} {where} ist es neblig."],
+        "false": ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."]
+    },
+    ConditionType.UNKNOWN: {
+        "": ["Ich weiß nicht, was genau du wissen willst. Hier das allgemeine Wetter: {weather}"]
+    }
 }
 
 
@@ -257,10 +284,12 @@ cold_items = items.get_item_names_for_condition("cold")
 sun_items = items.get_item_names_for_condition("sun")
 
 item_answers = {
-    "rain": ["Es könnte {when} {where} regnen, {item} keine schlechte Idee.", "Es könnte {when} {where} Regen geben. {item} keine schlechte Idee."],
+    "rain": ["Es könnte {when} {where} regnen, {item} keine schlechte Idee.",
+             "Es könnte {when} {where} Regen geben. {item} keine schlechte Idee."],
     "no_rain": ["Es ist {when} {where} kein Regen gemeldet. {item} also vermutlich unnötig."],
     "warm_and_sunny": ["Es ist {when} warm {where} und tagsüber kommt die Sonne raus. {item} daher eine gute Idee."],
-    "not_warm_and_sunny": ["Es ist {when} {where} nicht sonderlich warm aber trotzdem sonnig. {item} vielleicht trotzdem nützlich."],
+    "not_warm_and_sunny": [
+        "Es ist {when} {where} nicht sonderlich warm aber trotzdem sonnig. {item} vielleicht trotzdem nützlich."],
     "not_sunny": ["Es ist {when} {where} nicht unbedingt sonnig. {item} vermutlich eher überflüssig."],
     "nighttime": ["Es ist {when} {where} dunkel. Im Dunkeln ist {item} unnötig"],
     "warm": ["Es ist {when} warm {where}. {item} daher eine gute Idee."],

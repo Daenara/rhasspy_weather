@@ -27,5 +27,5 @@ class ConditionType(Enum):
     WIND = "wind"
     SUN = "sun"  # clear during daytime
     STARS = "stars"  # clear during night
-    MISC = "misc"
+    GENERAL = "general"
     UNKNOWN = "unknown"

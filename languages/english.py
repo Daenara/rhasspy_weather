@@ -168,24 +168,44 @@ def format_temperature_output(min_temperature, max_temperature):
 # condition report
 condition_answers = {
     "general_weather_full": ["The weather {when} {where}: ", "Weather for {when} {where}: "],
-    "general_weather": ["The weather {when} {where}: {weather}."],
-    "rain_true": ["Yes, {when} could be rainy {where}."],
-    "rain_false": ["No, it will not rain {when} {where}. The weather will be: {weather}."],
-    "snow_true": ["Yes, {when} {where} might have snow."],
-    "snow_false": ["No, there will be no snow {when} {where}. The weather will be: {weather}."],
-    "thunderstorm_true": ["Yes, {when} could have a thunderstorm {where}."],
-    "thunderstorm_false": ["I don't know about a thunderstorm {when} {where}. The weather will be: {weather}."],
-    "clouds_true": ["Yes, {when} {where} could be cloudy."],
-    "clouds_false": ["No, {when} {where} will not be cloudy. The weather will be: {weather}."],
-    "sun_true": ["Yes, {when} {where} will be sunny."],
-    "sun_false": ["No, {when} {where} won't be sunny. The weather will be: {weather}."],
-    "stars_true": ["Yes, you can see the stars {when} {where}."],
-    "stars_false": ["No stars {when} {where}, instead it will be: {weather}."],
-    "clear_true": ["The sky will be clear {when} {where}."],
-    "clear_false": ["No clear skies {when} {where}, {weather} instead."],
-    "mist_true": ["Yes, {when} {where} might be foggy."],
-    "mist_false": ["No, {when} {where} will have no fog. The weather will be: {weather}."],
-    "unknown_condition": ["I don't know what you want to know. Here the general weather: {weather}"]
+    ConditionType.GENERAL: {
+        "": ["The weather {when} {where}: {weather}."]
+    },
+    ConditionType.RAIN: {
+        "true": ["Yes, {when} could be rainy {where}."],
+        "false": ["No, it will not rain {when} {where}. The weather will be: {weather}."]
+    },
+    ConditionType.SNOW: {
+        "true": ["Yes, {when} {where} might have snow."],
+        "false": ["No, there will be no snow {when} {where}. The weather will be: {weather}."]
+    },
+    ConditionType.THUNDERSTORM: {
+        "true": ["Yes, {when} could have a thunderstorm {where}."],
+        "false": ["I don't know about a thunderstorm {when} {where}. The weather will be: {weather}."]
+    },
+    ConditionType.CLOUDS: {
+        "true": ["Yes, {when} {where} could be cloudy."],
+        "false": ["No, {when} {where} will not be cloudy. The weather will be: {weather}."]
+    },
+    ConditionType.SUN: {
+        "true": ["Yes, {when} {where} will be sunny."],
+        "false": ["No, {when} {where} won't be sunny. The weather will be: {weather}."]
+    },
+    ConditionType.STARS: {
+        "true": ["Yes, you can see the stars {when} {where}."],
+        "false": ["No stars {when} {where}, instead it will be: {weather}."]
+    },
+    ConditionType.CLEAR: {
+        "true": ["The sky will be clear {when} {where}."],
+        "false": ["No clear skies {when} {where}, {weather} instead."]
+    },
+    ConditionType.MIST: {
+        "true": ["Yes, {when} {where} might be foggy."],
+        "false": ["No, {when} {where} will have no fog. The weather will be: {weather}."]
+    },
+    ConditionType.UNKNOWN: {
+        "": ["I don't know what you want to know. Here the general weather: {weather}"]
+    }
 }
 
 
