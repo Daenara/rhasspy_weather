@@ -228,13 +228,12 @@ class WeatherReport:
         if self.__request.detail:
             response = random.choice(self.__locale.condition_answers["general_weather_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
             for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
-                response = response + " "
                 weather = self.__forecast.weather_for_interval(self.__request.request_date, fixed_time.value[0], fixed_time.value[1])
                 if weather is not None:
-                    response = response + " " + self.__answer_condition(weather).format(when=self.__locale.fixed_times[fixed_time], where="")
+                    response = response + self.__answer_condition(weather, False).format(when=self.__locale.fixed_times[fixed_time], where="") + ". "
         else:
             weather = self.__forecast.weather_for_day(self.__request.request_date)
-            response = self.__answer_condition(weather).format(when=self.__output_date_and_time, where=self.__output_location)
+            response = self.__answer_condition(weather, True).format(when=self.__output_date_and_time, where=self.__output_location)
         return response
 
     # returns a string with the temperature and placeholders for location and time
@@ -261,10 +260,12 @@ class WeatherReport:
         return random.choice(self.__locale.temperature_answers[temperature_type][response_type]).format(temperature=self.__locale.format_temperature_output(min_temp, max_temp), when="{when}", where="{where}")
 
     # returns a string with the weather condition and placeholders for location and time
-    def __answer_condition(self, weather_obj):
+    def __answer_condition(self, weather_obj, answer_question=True):
         log.debug("generating response for condition - error: {0}".format(self.status.is_error))
         response_type = ""
         condition_type = ConditionType.GENERAL
+        prefix = ""
+        suffix = ""
         output_conditions = self.__locale.combine_conditions(weather_obj.get_output_condition_list())
         if self.__request.forecast_type == ForecastType.CONDITION and type(self.__request.requested) == ConditionType:
             condition_type = self.__request.requested
@@ -299,7 +300,18 @@ class WeatherReport:
                 else:
                     response_type = "false"
 
-        return random.choice(self.__locale.condition_answers[condition_type][response_type]).format(weather=output_conditions, when="{when}", where="{where}")
+        if answer_question:
+            log.debug("Should answer question")
+            if response_type == "true":
+                prefix = random.choice(self.__locale.general_answers["affirmative"]) + ", "
+            elif response_type == "false":
+                prefix = random.choice(self.__locale.general_answers["negative"]) + ", "
+
+        log.debug(prefix)
+
+        if response_type == "false" or condition_type == ConditionType.UNKNOWN:
+            suffix = " " + random.choice(self.__locale.general_answers["alternate_weather"])
+        return (prefix + random.choice(self.__locale.condition_answers[condition_type][response_type]) + suffix).format(weather=output_conditions, when="{when}", where="{where}")
 
     @property
     def __output_date_and_time(self):

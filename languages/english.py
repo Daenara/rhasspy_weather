@@ -183,40 +183,46 @@ condition_answers = {
         "": ["The weather {when} {where}: {weather}."]
     },
     ConditionType.RAIN: {
-        "true": ["Yes, {when} could be rainy {where}."],
-        "false": ["No, it will not rain {when} {where}. The weather will be: {weather}."]
+        "true": ["{when} could be rainy {where}."],
+        "false": ["It will not rain {when} {where}."]
     },
     ConditionType.SNOW: {
-        "true": ["Yes, {when} {where} might have snow."],
-        "false": ["No, there will be no snow {when} {where}. The weather will be: {weather}."]
+        "true": ["{when} {where} might have snow."],
+        "false": ["There will be no snow {when} {where}."]
     },
     ConditionType.THUNDERSTORM: {
-        "true": ["Yes, {when} could have a thunderstorm {where}."],
-        "false": ["I don't know about a thunderstorm {when} {where}. The weather will be: {weather}."]
+        "true": ["{when} could have a thunderstorm {where}."],
+        "false": ["I don't know about a thunderstorm {when} {where}."]
     },
     ConditionType.CLOUDS: {
-        "true": ["Yes, {when} {where} could be cloudy."],
-        "false": ["No, {when} {where} will not be cloudy. The weather will be: {weather}."]
+        "true": ["{when} {where} could be cloudy."],
+        "false": ["{when} {where} will not be cloudy."]
     },
     ConditionType.SUN: {
-        "true": ["Yes, {when} {where} will be sunny."],
-        "false": ["No, {when} {where} won't be sunny. The weather will be: {weather}."]
+        "true": ["{when} {where} will be sunny."],
+        "false": ["{when} {where} won't be sunny."]
     },
     ConditionType.STARS: {
-        "true": ["Yes, you can see the stars {when} {where}."],
-        "false": ["No stars {when} {where}, instead it will be: {weather}."]
+        "true": ["You can see the stars {when} {where}."],
+        "false": ["No stars {when} {where}."]
     },
     ConditionType.CLEAR: {
         "true": ["The sky will be clear {when} {where}."],
-        "false": ["No clear skies {when} {where}, {weather} instead."]
+        "false": ["No clear skies {when} {where}."]
     },
     ConditionType.MIST: {
-        "true": ["Yes, {when} {where} might be foggy."],
-        "false": ["No, {when} {where} will have no fog. The weather will be: {weather}."]
+        "true": ["{when} {where} might be foggy."],
+        "false": ["{when} {where} will have no fog."]
     },
     ConditionType.UNKNOWN: {
-        "": ["I don't know what you want to know. Here the general weather: {weather}"]
+        "": ["I don't know what you want to know."]
     }
+}
+
+general_answers = {
+    "affirmative": ["Yes"],
+    "negative": ["No"],
+    "alternate_weather": ["The weather will be: {weather}", "Instead it will be: {weather}", "Instead: {weather}", "Here the general weather: {weather}"]
 }
 
 

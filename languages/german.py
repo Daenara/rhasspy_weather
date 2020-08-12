@@ -194,50 +194,56 @@ condition_answers = {
              "Wetter {when} {where}: {weather}."]
     },
     ConditionType.RAIN: {
-        "true": ["Ja, {when} wird es {where} regnen.",
-                 "Ja, {when} gibt es {where} Regen.",
-                 "Ja, es regnet {when} {where}.",
-                 "Ja, {when} regnet es {where}."],
-        "false": ["Nein, es regnet {when} {where} nicht. Das Wetter ist: {weather}.",
-                  "Nein, {when} regnet es {where} nicht. Stattdessen ist das Wetter: {weather}.",
-                  "Nein, {when} gibt es keinen Regen {where}. Das Wetter ist: {weather}."]
+        "true": ["{when} wird es {where} regnen.",
+                 "{when} gibt es {where} Regen.",
+                 "Es regnet {when} {where}.",
+                 "{when} regnet es {where}."],
+        "false": ["Es regnet {when} {where} nicht.",
+                  "{when} regnet es {where} nicht.",
+                  "{when} gibt es keinen Regen {where}."]
     },
     ConditionType.SNOW: {
-        "true": ["Ja, {when} wird es {where} schneien.",
-                 "Ja, {when} gibt es {where} Schnee.",
-                 "Ja, es schneit {when} {where}.",
-                 "Ja, {when} schneit es {where}."],
-        "false": ["Nein, es schneit {when} {where} nicht. Das Wetter ist: {weather}.",
-                  "Nein, {when} schneit es {where} nicht. Stattdessen ist das Wetter: {weather}.",
-                  "Nein, {when} gibt es keinen Schnee {where}. Das Wetter ist: {weather}."]
+        "true": ["{when} wird es {where} schneien.",
+                 "{when} gibt es {where} Schnee.",
+                 "Es schneit {when} {where}.",
+                 "{when} schneit es {where}."],
+        "false": ["Es schneit {when} {where} nicht.",
+                  "{when} schneit es {where} nicht.",
+                  "{when} gibt es keinen Schnee {where}."]
     },
     ConditionType.THUNDERSTORM: {
-        "true": ["Ja, {when} gibt es {where} Gewitter."],
-        "false": ["Nein, {when} {where} gewittert es nicht. Das Wetter ist: {weather}."]
+        "true": ["{when} gibt es {where} Gewitter."],
+        "false": ["{when} {where} gewittert es nicht."]
     },
     ConditionType.CLOUDS: {
-        "true": ["Ja, {when} kann es {where} bewölkt sein."],
-        "false": ["Nein, {when} {where} ist es nicht bewölkt. Das Wetter ist: {weather}."]
+        "true": ["{when} kann es {where} bewölkt sein."],
+        "false": ["{when} {where} ist es nicht bewölkt."]
     },
     ConditionType.SUN: {
-        "true": ["Ja, {when} {where} scheint die Sonne."],
-        "false": ["Nein, {when} {where} scheint keine Sonne. Das Wetter ist: {weather}."]
+        "true": ["{when} {where} scheint die Sonne."],
+        "false": ["{when} {where} scheint keine Sonne."]
     },
     ConditionType.STARS: {
-        "true": ["Ja, man kann {when} {where} die Sterne sehen."],
-        "false": ["Keine Sterne zu sehen {when} {where}, stattdessen gibt es: {weather}."]
+        "true": ["Man kann {when} {where} die Sterne sehen."],
+        "false": ["Keine Sterne zu sehen {when} {where}."]
     },
     ConditionType.CLEAR: {
         "true": ["Der Himmel ist klar {when} {where}."],
-        "false": ["Kein klarer Himmel {when} {where}, stattdessen {weather}."]
+        "false": ["Kein klarer Himmel {when} {where}."]
     },
     ConditionType.MIST: {
-        "true": ["Ja, {when} {where} ist es neblig."],
-        "false": ["Nein, {when} {where} ist es nicht neblig. Das Wetter ist: {weather}."]
+        "true": ["{when} {where} ist es neblig."],
+        "false": ["{when} {where} ist es nicht neblig.."]
     },
     ConditionType.UNKNOWN: {
-        "": ["Ich weiß nicht, was genau du wissen willst. Hier das allgemeine Wetter: {weather}"]
+        "": ["Ich weiß nicht, was genau du wissen willst."]
     }
+}
+
+general_answers = {
+    "affirmative": ["Ja"],
+    "negative": ["Nein"],
+    "alternate_weather": ["Das Wetter ist: {weather}", "Stattdessen ist das Wetter {weather}", "Stattdessen ist es {weather}", "Das Wetter: {weather}"]
 }
 
 
