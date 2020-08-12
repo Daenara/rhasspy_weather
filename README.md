@@ -317,7 +317,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
     * [ ] actually use the new item system
         * [ ] replace function from language files
         * [ ] add in new condition types
-        * [ ] actually use ConditionType for conditions
+        * [X] actually use ConditionType for conditions
         * [ ] add ConditionType.SUN and ConditionType.STARS to make asking after sun and sunny items easier
         * [ ] rework answers to (optionally) use a generalized answer that has a slot for the condition
 * [ ] **(maybe) add a dict full of aliases for weather conditions to language files and import everything in it as rhasspy slot program as well as map those aliases to conditions (similar to named_days and named_times aliases)**
