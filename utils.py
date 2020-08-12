@@ -40,6 +40,7 @@ def normal_round(n):
 
 
 def format_string(input_string):
+    input_string = input_string.replace("..", ".")
     input_string = input_string.replace(" .", ".")
     input_string = input_string.replace("   ", " ")
     input_string = input_string.replace("  ", " ")
