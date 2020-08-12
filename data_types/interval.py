@@ -36,7 +36,6 @@ class WeatherInterval:
 
     # counts how many occurrences of a certain weather type there are
     def __increase_counter(self, condition_type):
-        log.debug(str(condition_type))
         if condition_type not in self.__condition_counts:
             self.__condition_counts[condition_type] = 0
         self.__condition_counts[condition_type] = self.__condition_counts[condition_type] + 1

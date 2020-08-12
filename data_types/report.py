@@ -301,13 +301,10 @@ class WeatherReport:
                     response_type = "false"
 
         if answer_question:
-            log.debug("Should answer question")
             if response_type == "true":
                 prefix = random.choice(self.__locale.general_answers["affirmative"]) + ", "
             elif response_type == "false":
                 prefix = random.choice(self.__locale.general_answers["negative"]) + ", "
-
-        log.debug(prefix)
 
         if response_type == "false" or condition_type == ConditionType.UNKNOWN:
             suffix = " " + random.choice(self.__locale.general_answers["alternate_weather"])
