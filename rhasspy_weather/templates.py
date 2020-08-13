@@ -27,9 +27,9 @@ def fill_template(intent_message, report):
 
 def intent_to_template_values(intent_message):
     template_values = {}
-    for key, value in slot_programs.items():
+    for key, value in intent_message.items():
         if key == "intent":
-            for i_key, i_value in slot_programs.items():
+            for i_key, i_value in value.items():
                 template_values["intent_" + i_key] = i_value
         else:
             template_values["intent_" + key] = value
@@ -45,7 +45,7 @@ def weather_report_to_template_values(report):
 
 def weather_object_to_template_values(weather_object, name):
     template_values = {}
-    for key, value in slot_programs.items():
+    for key, value in weather_object.__dict__.items():
         new_key = name + "_" + key.replace("_"+ type(weather_object).__name__+ "__", "")
         if isinstance(value, str) and not value == "":
             template_values[new_key] = value
@@ -56,7 +56,7 @@ def weather_object_to_template_values(weather_object, name):
         elif isinstance(value, datetime.time) or isinstance(value, datetime.date):
             template_values[new_key] = str(value)
         elif isinstance(value, Location):
-            for l_key, l_value in slot_programs.items():
+            for l_key, l_value in value.__dict__.items():
                 new_l_key = new_key + "_" + l_key
                 template_values[new_l_key] = l_value
         elif isinstance(value, Status):

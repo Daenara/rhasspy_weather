@@ -55,7 +55,7 @@ def get_weather(location):
                 forecasts[str(datetime.date.fromtimestamp(x["dt"]))] = \
                     list(filter(lambda forecast: datetime.date.fromtimestamp(forecast["dt"]) == datetime.date.fromtimestamp(x["dt"]), response["list"]))
 
-        for key, forecast in slot_programs.items():
+        for key, forecast in forecasts.items():
             condition_list = []
             weather_condition = [x["weather"][0]["main"] for x in forecast]
             weather_description = [x["weather"][0]["description"] for x in forecast]
