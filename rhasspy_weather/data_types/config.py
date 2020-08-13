@@ -12,16 +12,16 @@ log = logging.getLogger(__name__)
 
 
 class WeatherConfig:
-    def __init__(self):
+    def __init__(self, config_path):
         log.info("Loading config")
         base_path = str(Path(__file__).parent.parent)
-        config_path = os.path.join(base_path, 'config.ini')
-        default_config_path = os.path.join(base_path, 'config.default')
+        # config_path = os.path.join(base_path, 'config.ini')
+        # default_config_path = os.path.join(base_path, 'config.default')
         config_parser = configparser.ConfigParser(allow_no_value=True)
         self.__error = False
-        if not os.path.isfile(config_path):
-            log.info("No config found, creating config")
-            shutil.copy(default_config_path, config_path)
+        # if not os.path.isfile(config_path):
+        #    log.info("No config found, creating config")
+        #    shutil.copy(default_config_path, config_path)
         config_parser.read(config_path)
 
         if not (config_parser.has_section("General") and config_parser.has_section("Location")):
@@ -240,5 +240,15 @@ __config = None
 def get_config():
     global __config
     if __config is None:
-        __config = WeatherConfig()
+        rhasspy_weather_path = str(Path(__file__).parent.parent.parent)
+        home_path = os.path.join(os.path.expanduser("~"), ".config", "rhasspy_weather")
+        config_name = "rhasspy_weather_config.ini"
+        default_config_path = os.path.join(rhasspy_weather_path, 'config.default')
+        for loc in rhasspy_weather_path, home_path:
+            config_path = os.path.join(loc, config_name)
+            if os.path.exists(config_path):
+                __config = WeatherConfig(config_path)
+        if __config is None:
+            raise Exception(f"No config file found in {rhasspy_weather_path} or {home_path}. Please copy \
+                            config.default into one of those paths and rename it to {config_name}")
     return __config

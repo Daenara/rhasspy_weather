@@ -133,7 +133,7 @@ dmypy.json
 *.iml
 
 # project specific ignores
-rhasspy_weather/config.ini
+rhasspy_weather_config.ini
 not_working
 output.log
 slot_programs/
