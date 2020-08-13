@@ -2,11 +2,9 @@
 import datetime
 import logging
 import os
-import sys
 
 import pytz
 
-sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), '..'), '..'), "custom_command")))
 from rhasspy_weather.data_types.config import get_config
 
 logging_format = '%(asctime)s - %(levelname)-5s - %(name)s.%(funcName)s[%(lineno)d]: %(message)s'
