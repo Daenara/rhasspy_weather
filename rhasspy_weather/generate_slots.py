@@ -35,9 +35,13 @@ if __name__ == "__main__":
         executable = True
 
     for key in slots.keys():
-        f = open(os.path.join("slot_programs", key), mode="w", encoding="utf-8")
+        folder = "slots"
         if executable:
-            f = open(os.path.join("slot_programs", key), mode="w", encoding="utf-8")
+            folder = "slot_programs"
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+        f = open(os.path.join(folder, key), mode="w", encoding="utf-8")
+        if executable:
             out = "#!/usr/bin/python3\n"
             out += "from rhasspy_weather.data_types.config import get_config\n"
             out += "config = get_config()\n"
@@ -46,7 +50,6 @@ if __name__ == "__main__":
             out += "\tprint(output)"
             f.write(out)
         else:
-            f = open(os.path.join("slots", key), mode="w", encoding="utf-8")
             for s in eval(slots[key]):
                 f.write(s + "\n")
         f.close()
