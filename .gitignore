@@ -128,11 +128,13 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# project specific ignores
-rhasspy_weather/config.ini
-rhasspy_weather/-files
-not_working
-output.log
-slot_programs/output.log
+# PyCharm & IntelliJ
 .idea/
 *.iml
+
+# project specific ignores
+rhasspy_weather/config.ini
+not_working
+output.log
+slot_programs/
+slots/

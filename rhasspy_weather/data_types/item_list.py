@@ -45,3 +45,6 @@ class WeatherItemList:
         if self.is_in_list(item_name):
             item = WeatherItem(item_name)
             return self.__items[self.__items.index(item)]
+
+    def get_all_item_names(self):
+        return [i.name for i in self.__items]
