@@ -6,7 +6,7 @@ import logging
 import os
 import sys
 import pytz
-import rhasspy_weather.rhasspy_weather as weather
+import rhasspy_weather.weather as weather
 from custom_logger import custom_logger
 
 logfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output.log')

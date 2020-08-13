@@ -45,7 +45,7 @@ import sys
 import json
 import datetime
 import pytz
-import rhasspy_weather.rhasspy_weather as weather
+import rhasspy_weather.weather as weather
 
 import os
 import logging
