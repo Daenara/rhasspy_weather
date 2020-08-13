@@ -129,5 +129,10 @@ dmypy.json
 .pyre/
 
 # project specific ignores
-config.ini
--files
+rhasspy_weather/config.ini
+rhasspy_weather/-files
+not_working
+output.log
+slot_programs/output.log
+.idea/
+*.iml

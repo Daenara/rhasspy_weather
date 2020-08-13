@@ -20,7 +20,7 @@ logging.Formatter.converter = custom_time
 
 config = get_config()
 
-items = config.locale.items
+items = slot_programs.items
 
 for item in items:
     print(item.name)

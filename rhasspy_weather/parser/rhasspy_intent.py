@@ -41,7 +41,7 @@ def parse_intent_message(intent_message):
     slots = intent_message["slots"]
     if slot_day_name in slots and slots[slot_day_name] != "":
         log.debug("it was a day specified")
-        named_days_lowercase = [x.lower() for x in config.locale.named_days]
+        named_days_lowercase = [x.lower() for x in slot_programs.named_days]
         weekdays_lowercase = [x.lower() for x in config.locale.weekday_names]
         named_days_synonyms_lowercase = [x.lower() for x in config.locale.named_times_synonyms]
         named_days_combined = named_days_lowercase + named_days_synonyms_lowercase
@@ -51,11 +51,11 @@ def parse_intent_message(intent_message):
             if slots[slot_day_name].lower() in named_days_synonyms_lowercase:
                 index = named_days_synonyms_lowercase.index(slots[slot_day_name].lower())
                 name = list(config.locale.named_days_synonyms.keys())[index]
-                value = config.locale.named_days[config.locale.named_days_synonyms[name]]
+                value = slot_programs.named_days[config.locale.named_days_synonyms[name]]
             else:
                 index = named_days_lowercase.index(slots[slot_day_name].lower())
-                name = list(config.locale.named_days.keys())[index]
-                value = list(config.locale.named_days.values())[index]
+                name = list(slot_programs.named_days.keys())[index]
+                value = list(slot_programs.named_days.values())[index]
             if isinstance(value, datetime.date):
                 log.debug("    named day seems to be a date")
                 new_request.request_date = value
@@ -91,7 +91,7 @@ def parse_intent_message(intent_message):
             log.debug("it was a time specified")
             new_request.grain = Grain.HOUR
 
-            named_times_lowercase = [x.lower() for x in config.locale.named_times]
+            named_times_lowercase = [x.lower() for x in slot_programs.named_times]
             named_times_synonyms_lowercase = [x.lower() for x in config.locale.named_times_synonyms]
             named_times_combined = named_times_lowercase + named_times_synonyms_lowercase
             # was something like midday specified (listed in locale.named_times or in locale.named_times_synonyms)?
@@ -100,11 +100,11 @@ def parse_intent_message(intent_message):
                 if slots[slot_time_name].lower() in named_times_synonyms_lowercase:
                     index = named_times_synonyms_lowercase.index(slots[slot_time_name].lower())
                     name = list(config.locale.named_times_synonyms.keys())[index]
-                    value = config.locale.named_times[config.locale.named_times_synonyms[name]]
+                    value = slot_programs.named_times[config.locale.named_times_synonyms[name]]
                 else:
                     index = named_times_lowercase.index(slots[slot_time_name].lower())
-                    name = list(config.locale.named_times.keys())[index]
-                    value = list(config.locale.named_times.values())[index]
+                    name = list(slot_programs.named_times.keys())[index]
+                    value = list(slot_programs.named_times.values())[index]
                 log.debug(value)
                 if isinstance(value, datetime.time):
                     log.debug("    named time seems to be a certain time")

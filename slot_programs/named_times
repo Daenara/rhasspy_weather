@@ -20,7 +20,7 @@ logging.Formatter.converter = custom_time
 
 config = get_config()
 
-named_times = list(config.locale.named_times.keys()) + list(config.locale.named_times_synonyms.keys())
+named_times = list(slot_programs.named_times.keys()) + list(config.locale.named_times_synonyms.keys())
 
 for s in named_times:
     print(s)
