@@ -1,5 +1,0 @@
-requests
-pytz
-paho-mqtt
-suntime
-python-dateutil
