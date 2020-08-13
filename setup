@@ -1,0 +1,9 @@
+profile=/profiles/de
+rhasspy_weather=/opt/rhasspy_weather
+python3 rhasspy_weather/generate_slots.py -x
+chmod +x $rhasspy_weather/slot_programs/*
+mkdir -p $profile/custom_command
+ln -s $rhasspy_weather/custom_commands.py $profile/custom_command
+slots=slot_programs/rhasspy_weather_slots
+mkdir -p $profile/$slots
+ln -s $rhasspy_weather/slot_programs/* $profile/$slots
