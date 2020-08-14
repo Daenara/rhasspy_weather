@@ -21,7 +21,7 @@ class WeatherInterval:
         self.__condition_counts = {}
 
     def __str__(self):
-        return "{ count: " + str(self.__change_count) + ", min_temp: " + str(self.min_temperature) + ", max_temp: " + str(self.max_temperature) + ", pressure: " + str(self.pressure) + ", humidity: " + str(self.humidity) + " }"
+        return f"[count: {self.__change_count}, min_temp: {self.min_temperature}, max_temp: {self.max_temperature}, pressure: {self.pressure}, humidity: {self.humidity}]"
 
     # puts information into itself
     def add_information(self, weather_at_time):

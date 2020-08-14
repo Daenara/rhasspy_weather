@@ -25,12 +25,12 @@ def get_weather(location):
     weather_forecast = WeatherForecast()
 
     if hasattr(location, "lat") and hasattr(location, "lon"):
-        url_location = "lat={lat}&lon={lon}".format(lat=location.lat, lon=location.lon)
+        url_location = f"lat={location.lat}&lon={location.lon}"
     elif hasattr(location, "zipcode") and hasattr(location, "country_code"):
-        url_location = "zip={zip},{country_code}".format(zip=location.zipcode, country_code=location.country_code)
+        url_location = f"zip={location.zipcode},{location.country_code}"
     else:
-        url_location = "q={city_name}".format(city_name=location.city)
-    forecast_url = "http://api.openweathermap.org/data/2.5/forecast?{location}&APPID={api_key}&units={units}&lang={language_code}".format(location=url_location, api_key=config.api_key, units=config.units, language_code=config.locale.language_code)
+        url_location = f"q={location.city}"
+    forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?{url_location}&APPID={config.api_key}&units={config.units}&lang={config.locale.language_code}"
     try:
         response = requests.get(forecast_url)
         response = response.json()
