@@ -73,7 +73,7 @@ class WeatherConfig:
             self.__timezone = pytz.timezone(self.__get_required_option(section_general, "timezone", "Europe/Berlin"))
 
         else:
-            log.error("Section [{0}] is missing from config. Please refer to 'config.default' for an example config.".format(section_name_general))
+            log.error(f"Section [{section_name_general}] is missing from config. Please refer to 'config.default' for an example config.")
             self.__error = True
 
         section_name_weather = "Weather"
@@ -83,7 +83,7 @@ class WeatherConfig:
             self.__temp_cold_to = self.__get_required_option(section_weather, "temp_cold", 5, "int")
             self.__detail = self.__get_required_option(section_weather, "level_of_detail", False, "bool")
         else:
-            log.error("Section [{0}] is missing from config. Please refer to 'config.default' for an example config.".format(section_name_general))
+            log.error(f"Section [{section_name_general}] is missing from config. Please refer to 'config.default' for an example config.")
             self.__error = True
 
         section_name_location = "Location"
@@ -99,7 +99,7 @@ class WeatherConfig:
             if not ((lat is None or lon is None) or (lat == "" or lon == "")):
                 self.__location.set_lat_and_lon(lat, lon)
         else:
-            log.error("Section [{0}] is missing from config. Please refer to 'config.default' for an example config.".format(section_name_location))
+            log.error(f"Section [{section_name_location}] is missing from config. Please refer to 'config.default' for an example config.")
             self.__error = True
 
         if api == "openweathermap":
@@ -226,11 +226,11 @@ class WeatherConfig:
             else:
                 temp = section.get(option)
             if option is None:
-                log.warning("Setting '{0}' is present but has no value. Please refer to 'config.default' for an example config.".format(option))
+                log.warning(f"Setting '{option}' is present but has no value. Please refer to 'config.default' for an example config.")
                 return default_value
             else:
                 return temp
-        log.warning("Setting '{0}' is missing from config. Please refer to 'config.default' for an example config.".format(option))
+        log.warning(f"Setting '{option}' is missing from config. Please refer to 'config.default' for an example config.")
         return default_value
 
 

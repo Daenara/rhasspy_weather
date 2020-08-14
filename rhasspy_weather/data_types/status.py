@@ -59,9 +59,9 @@ class Status:
         response = self.get_error_message(self.__status_code)
 
         if self.is_error:
-            log.error("Status: {0} - {1}".format(StatusCode(self.status_code), response))
+            log.error(f"Status: {StatusCode(self.status_code)} - {response}")
         else:
-            log.info("Status: {0} - {1}".format(StatusCode(self.status_code), response))
+            log.info(f"Status: {StatusCode(self.status_code)} - {response}")
         return response
 
     def __log_status(self):
@@ -69,7 +69,7 @@ class Status:
 
         current_frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(current_frame, 3)
-        self.__last_change = '{0}.{1} set the status to {2}'.format(caller_frame[3][3], caller_frame[2][3], self.status_code)
+        self.__last_change = 'f{caller_frame[3][3]}.{caller_frame[2][3]} set the status to {self.status_code}'
         if self.is_error:
             log.error(self.__last_change)
         else:

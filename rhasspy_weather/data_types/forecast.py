@@ -62,7 +62,7 @@ class WeatherForecast:
 
     # calculates the time for sunrise and sunset
     def calculate_sunrise_and_sunset(self, lat, lon):
-        log.debug("Calculating Sunrise and Sunset - error: {0}".format(self.status.is_error))
+        log.debug(f"Calculating Sunrise and Sunset - error: {self.status.is_error}")
 
         import suntime
 
@@ -75,7 +75,7 @@ class WeatherForecast:
         Parameters:
         request : WeatherRequest
         """
-        log.debug("getting weather for daytime - error: {0}".format(self.status.is_error))
+        log.debug(f"getting weather for daytime - error: {self.status.is_error}")
 
         start_time = self.sunrise
         end_time = self.sunset
@@ -97,7 +97,7 @@ class WeatherForecast:
         Parameters:
         request : WeatherRequest
         """
-        log.debug("getting weather for nighttime - error: {0}".format(self.status.is_error))
+        log.debug(f"getting weather for nighttime - error: {self.status.is_error}")
 
         start_time = self.sunset
         end_time = self.sunrise
@@ -114,7 +114,7 @@ class WeatherForecast:
         Parameters:
         date : datetime.date
         """
-        log.debug("getting weather for the whole day - error: {0}".format(self.status.is_error))
+        log.debug(f"getting weather for the whole day - error: {self.status.is_error}")
 
         return self.weather_for_interval(date, datetime.time.min, datetime.time.max)
 
@@ -124,7 +124,7 @@ class WeatherForecast:
             date : datetime.date
             time : datetime.time
         """
-        log.debug("getting weather at a certain time - error: {0}".format(self.status.is_error))
+        log.debug(f"getting weather at a certain time - error: {self.status.is_error}")
 
         return self.weather_for_interval(date, time, time)
 
@@ -135,7 +135,7 @@ class WeatherForecast:
             start : datetime.time
             end : datetime.time
         """
-        log.debug("getting weather for an interval - error: {0}".format(self.status.is_error))
+        log.debug(f"getting weather for an interval - error: {self.status.is_error}")
 
         weather = self.__get_forecast_for_date(date)
 
@@ -152,7 +152,7 @@ class WeatherForecast:
 
     # returns the forecast at the specified date
     def __get_forecast_for_date(self, date):
-        log.debug("getting the complete forecast for a date - error: {0}".format(self.status.is_error))
+        log.debug(f"getting the complete forecast for a date - error: {self.status.is_error}")
 
         if self.status.is_error:
             return self.status
@@ -167,7 +167,7 @@ class WeatherForecast:
         Parameters:
         date : datetime.date
         """
-        log.debug("checking if there is weather for the date - error: {0}".format(self.status.is_error))
+        log.debug(f"checking if there is weather for the date - error: {self.status.is_error}")
 
         return self.__get_forecast_for_date(date) is not None
 
