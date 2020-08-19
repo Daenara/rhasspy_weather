@@ -6,6 +6,8 @@ from .config import get_config
 
 log = logging.getLogger(__name__)
 
+# TODO: remove status class, should not be needed with exception handling
+
 
 class StatusCode(Enum):
     NORMAL = "normal"

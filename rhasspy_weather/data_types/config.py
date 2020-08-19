@@ -1,7 +1,6 @@
 import configparser
 import logging
 import os
-import shutil
 from pathlib import Path
 
 import pytz
@@ -9,6 +8,9 @@ import pytz
 from .location import Location
 
 log = logging.getLogger(__name__)
+
+# TODO: implement custom config path and config names
+# TODO: figure out what to do with config errors (if locale is working throw a WeatherError, else throw general config error maybe?)
 
 
 class WeatherConfig:
@@ -19,9 +21,6 @@ class WeatherConfig:
         # default_config_path = os.path.join(base_path, 'config.default')
         config_parser = configparser.ConfigParser(allow_no_value=True)
         self.__error = False
-        # if not os.path.isfile(config_path):
-        #    log.info("No config found, creating config")
-        #    shutil.copy(default_config_path, config_path)
         config_parser.read(config_path)
 
         if not (config_parser.has_section("General") and config_parser.has_section("Location")):

@@ -8,8 +8,10 @@ from .templates import fill_template
 
 log = logging.getLogger(__name__)
 
+# TODO: find a better name for this file
 
-# function being called when snips detects an intent related to the weather
+
+# function being called when rhasspy detects an intent related to the weather
 def get_weather_forecast(intent_message):
     config = get_config()
 

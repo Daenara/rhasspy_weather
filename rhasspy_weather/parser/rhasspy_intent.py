@@ -9,6 +9,8 @@ from rhasspy_weather.data_types.config import get_config
 
 log = logging.getLogger(__name__)
 
+# TODO: split into smaller sections to make testing easier (and try to make it easier to read/use while at it)
+
 
 def parse_intent_message(intent_message):
     intent = None
