@@ -150,8 +150,6 @@ class WeatherForecast:
     def __get_forecast_for_date(self, date):
         log.debug(f"getting the complete forecast for a date")
 
-        if self.status.is_error:
-            return self.status
         for x in self.forecast:
             if x.date == date:
                 return x
