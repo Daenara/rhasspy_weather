@@ -6,6 +6,7 @@ import pytest
 import pytz
 
 from rhasspy_weather.data_types.location import Location
+from tests.data.openweathermap_weather import MockResponse
 
 
 class MockConfig:
@@ -75,15 +76,6 @@ class MockConfig:
         return False
 
 
-class MockResponse:
-    def __init__(self, response_type):
-        if response_type == "error_401":
-            self.__response = '{"cod":401, "message": "Invalid API key. Please see http://openweathermap.org/faq#error401 for more info."}'
-
-    def json(self):
-        return json.loads(self.__response)
-
-
 @pytest.fixture()
 def request_full_weather():
     return json.loads('{ "entities": [], "intent": {"confidence": 1, "name": "GetWeatherForecast"}, "raw_text": "wie '
@@ -113,7 +105,7 @@ def mock_config_detail_false(monkeypatch):
 @pytest.fixture
 def mock_request_401(monkeypatch):
     def mock_get(*args, **kwargs):
-        return MockResponse("error_401")
+        return MockResponse("response_401")
 
     import requests
     monkeypatch.setattr(requests, "get", mock_get)
@@ -122,7 +114,25 @@ def mock_request_401(monkeypatch):
 @pytest.fixture
 def mock_request_404(monkeypatch):
     def mock_get(*args, **kwargs):
-        return MockResponse("error_404")
+        return MockResponse("response_404")
 
     import requests
     monkeypatch.setattr(requests, "get", mock_get)
+
+
+@pytest.fixture
+def mock_request_200(monkeypatch):
+    def mock_get(*args, **kwargs):
+        data_input = [
+            {"temp": 30, "f_temp": 29, "min_temp": 28, "max_temp": 31, "pressure": 1009, "humidity": 50, "weather_id": 500},
+            {"temp": 25, "f_temp": 27, "min_temp": 23, "max_temp": 28, "pressure": 1006, "humidity": 58, "weather_id": 503},
+            {"temp": 0, "f_temp": 3, "min_temp": -3, "max_temp": 5, "pressure": 1009, "humidity": 11, "weather_id": 601},
+            {"temp": 5, "f_temp": 4, "min_temp": 3, "max_temp": 7, "pressure": 1015, "humidity": 20, "weather_id": 800},
+            {"temp": 15, "f_temp": 18, "min_temp": 14, "max_temp": 17, "pressure": 1020, "humidity": 33, "weather_id": 800},
+            {"temp": 18, "f_temp": 16, "min_temp": 17, "max_temp": 18, "pressure": 1019, "humidity": 35, "weather_id": 803}
+        ]
+        return MockResponse("response_404", data_input)
+
+    import requests
+    monkeypatch.setattr(requests, "get", mock_get)
+
