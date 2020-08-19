@@ -23,6 +23,15 @@ class StatusCode(Enum):
     GENERAL_ERROR = "general_error"
 
 
+class WeatherError(Exception):
+    def __init__(self, message):
+        locale = get_config().locale
+        self.message = message
+        if type(message) == StatusCode:
+            self.message = random.choice(locale.status_response[message])
+        super().__init__(self.message)
+
+
 class Status:
     def __init__(self, status_code=StatusCode.NORMAL):
         self.status_code = status_code

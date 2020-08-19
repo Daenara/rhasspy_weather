@@ -3,7 +3,7 @@ import logging
 from enum import Enum
 
 from .config import get_config
-from .status import Status, StatusCode
+from .status import Status, StatusCode, WeatherError
 
 log = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class WeatherRequest:
         if self.request_date < datetime.datetime.now(self.__timezone).date() \
                 or self.grain == Grain.HOUR and self.__request.request_date == datetime.datetime.now(self.__timezone).date() \
                 and self.__request.start_time < datetime.datetime.now(self.__timezone).time():
-            self.status.set_status(StatusCode.PAST_WEATHER_ERROR)
+            raise WeatherError(StatusCode.PAST_WEATHER_ERROR)
 
     def __str__(self):
         return "(" + str(self.forecast_type) + ", " + str(self.date_type) + ", " + \
@@ -151,7 +151,7 @@ class WeatherRequest:
         elif type(val) is str:
             self.__request_date = datetime.datetime.strptime(val, "%Y-%m-%d").date()
         else:
-            self.status.set_status(StatusCode.DATE_ERROR)
+            raise WeatherError(StatusCode.DATE_ERROR)
 
     @property
     def start_time(self):

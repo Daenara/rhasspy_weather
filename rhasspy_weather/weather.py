@@ -3,6 +3,7 @@ import logging
 
 from .data_types.report import WeatherReport
 from .data_types.config import get_config
+from .data_types.status import WeatherError
 from .templates import fill_template
 
 log = logging.getLogger(__name__)
@@ -15,20 +16,21 @@ def get_weather_forecast(intent_message):
     if config is None or config.error:
         return "Configuration could not be read. Please make sure everything is set up correctly"
 
-    log.info("Parsing rhasspy intent")
-    request = config.parser.parse_intent_message(intent_message)
-    if request.status.is_error:
-        return request.status.status_response()
+    try:
+        log.info("Parsing rhasspy intent")
+        request = config.parser.parse_intent_message(intent_message)
 
-    log.info("Requesting weather")
-    forecast = config.api.get_weather(request.location)
-    if forecast.status.is_error:
-        return forecast.status.status_response()
+        log.info("Requesting weather")
+        forecast = config.api.get_weather(request.location)
 
-    log.info("Formulating answer")
-    report = WeatherReport(request, forecast)
+        log.info("Formulating answer")
+        report = WeatherReport(request, forecast)
 
-    log.info("Answering question")
-    filled_template = fill_template(intent_message, report)
-    config.output.output_response(filled_template)
+        log.info("Answering question")
+        filled_template = fill_template(intent_message, report)
+        config.output.output_response(filled_template)
+    except WeatherError as error:
+        filled_template = fill_template(intent_message, error)
+        config.output.output_response(filled_template)
+
     return filled_template

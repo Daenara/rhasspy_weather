@@ -5,7 +5,7 @@ import random
 from .config import get_config
 from .fixed_times import FixedTimes
 from .request import DateType, ForecastType, Grain
-from .status import Status, StatusCode
+from .status import StatusCode, WeatherError
 from .condition import ConditionType
 from .temperature import TemperatureType
 from ..utils import format_string
@@ -44,39 +44,32 @@ class WeatherReport:
         self.__request = request
         self.__timezone = self.__config.timezone
         self.__locale = self.__config.locale
-        self.status = Status()
 
     def generate_report(self):
         """
         generates and returns the answer to the WeatherRequest as string
         If an error occurs it will return the error message as a string instead
         """
-        log.debug(f"generating weather report - error: {self.status.is_error}")
+        log.debug(f"generating weather report")
 
         response = ""
 
-        if StatusCode.PAST_WEATHER_ERROR in self.__request.status.error_codes:
-            return Status.get_error_message(StatusCode.PAST_WEATHER_ERROR)
-        elif not self.__forecast.has_weather_for_date(self.__request.request_date):
+        if not self.__forecast.has_weather_for_date(self.__request.request_date):
             log.debug("No weather for today")
             if self.__request.request_date == datetime.datetime.now(self.__timezone).date():
                 if self.__request.date_type == DateType.FIXED:
                     log.debug("only weather for one day was requested, we don't have weather for that day so return with error message")
-                    self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
-                    return self.status.status_response()
+                    raise WeatherError(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
                 # overnight request and no weather for the other day, also
                 elif self.__request.request_date == DateType.INTERVAL and self.__request.grain == Grain.HOUR \
                         and self.__request.end_time < self.__request.start_time \
                         and not self.__forecast.has_weather_for_date(self.__request.request_date + datetime.timedelta(days=1)):
-                    self.status.set_status(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
-                    return self.status.status_response()
+                    raise WeatherError(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
             else:
-                self.status.set_status(StatusCode.FUTURE_WEATHER_ERROR)
-                return self.status.status_response()
+                raise WeatherError(StatusCode.FUTURE_WEATHER_ERROR)
 
         if not (self.__request.grain == Grain.DAY or self.__request.grain == Grain.HOUR):
-            self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
-            return self.status.status_response()
+            raise WeatherError(StatusCode.NOT_IMPLEMENTED_ERROR)
 
         if self.__request.forecast_type == ForecastType.TEMPERATURE:
             response = self.__generate_temperature_report()
@@ -93,7 +86,7 @@ class WeatherReport:
     # returns the answer to a question about the weather
     # called by generate_report()
     def __generate_full_report(self):
-        log.debug(f"generating full report - error: {self.status.is_error}")
+        log.debug(f"generating full report")
         response = ""
         if self.__request.date_type == DateType.FIXED:
             if self.__request.grain == Grain.DAY:
@@ -111,7 +104,7 @@ class WeatherReport:
     # returns the answer to a question about the temperature
     # called by generate_report()
     def __generate_temperature_report(self):
-        log.debug(f"generating temperature report - error: {self.status.is_error}")
+        log.debug(f"generating temperature report")
         response = ""
         if self.__request.date_type == DateType.FIXED:
             if self.__request.grain == Grain.DAY:
@@ -127,7 +120,7 @@ class WeatherReport:
     # returns a string answer to a question about the weather condition
     # called by generate_report()
     def __generate_condition_report(self):
-        log.debug(f"generating condition report - error: {self.status.is_error}")
+        log.debug(f"generating condition report")
         response = ""
         if self.__request.date_type == DateType.FIXED:
             if self.__request.grain == Grain.DAY:
@@ -143,7 +136,7 @@ class WeatherReport:
     # returns a string with the answer to the question about an item
     # called by generate_report()
     def __generate_item_report(self):
-        log.debug(f"generating item report - error: {self.status.is_error}")
+        log.debug(f"generating item report")
 
         item = self.__request.requested
         weather = None
@@ -192,7 +185,7 @@ class WeatherReport:
     # returns a string response with the weather forecast for a full day if detail=True in the config this answer may be rather long
     # called by __generate_full_report()
     def __generate_full_report_day(self):
-        log.debug(f"generating full day report - error: {self.status.is_error}")
+        log.debug(f"generating full day report")
         if self.__request.detail:
             response = random.choice(self.__locale.condition_answers["general_weather_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
             for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
@@ -209,7 +202,7 @@ class WeatherReport:
     # returns a string response with the temperatures for a full day if detail=True in the config this answer may be rather long
     # called by __generate_temperature_report()
     def __generate_temperature_report_day(self):
-        log.debug(f"generating temperature day report - error: {self.status.is_error}")
+        log.debug(f"generating temperature day report")
         if self.__request.detail and self.__request.requested is None:
             response = random.choice(self.__locale.temperature_answers["general_temperature_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
             for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
@@ -224,7 +217,7 @@ class WeatherReport:
     # returns a string response with the weather conditions for a full day if detail=True in the config this answer may be rather long
     # called by __generate_condition_report()
     def __generate_condition_report_day(self):
-        log.debug(f"generating condition day report - error: {self.status.is_error}")
+        log.debug(f"generating condition day report")
         if self.__request.detail:
             response = random.choice(self.__locale.condition_answers["general_weather_full"]).format(when=self.__output_date_and_time, where=self.__output_location)
             for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
@@ -238,7 +231,7 @@ class WeatherReport:
 
     # returns a string with the temperature and placeholders for location and time
     def __answer_temperature(self, min_temp, max_temp=""):
-        log.debug(f"generating response for temperature - error: {self.status.is_error}")
+        log.debug(f"generating response for temperature")
 
         if max_temp == "":
             max_temp = min_temp
@@ -261,7 +254,7 @@ class WeatherReport:
 
     # returns a string with the weather condition and placeholders for location and time
     def __answer_condition(self, weather_obj, answer_question=True):
-        log.debug(f"generating response for condition - error: {self.status.is_error}")
+        log.debug(f"generating response for condition")
         response_type = ""
         condition_type = ConditionType.GENERAL
         prefix = ""
@@ -312,7 +305,7 @@ class WeatherReport:
 
     @property
     def __output_date_and_time(self):
-        log.debug(f"generating time and date for response - error: {self.status.is_error}")
+        log.debug(f"generating time and date for response")
 
         if self.__request.date_specified != "":
             date = self.__request.date_specified
@@ -332,7 +325,7 @@ class WeatherReport:
 
     @property
     def __output_location(self):
-        log.debug(f"generating location for response - error: {self.status.is_error}")
+        log.debug(f"generating location for response")
         return self.__locale.format_output_location(self.__request.location.name) if self.__request.location_specified else ""
 
     @property

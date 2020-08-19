@@ -6,20 +6,22 @@ from string import Template
 
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.location import Location
-from rhasspy_weather.data_types.status import Status
+from rhasspy_weather.data_types.status import Status, WeatherError
 
 log = logging.getLogger(__name__)
 
 
-def fill_template(intent_message, report):
+def fill_template(intent_message, result):
     config = get_config()
     template = Template(config.output_template)
-    rhasspy_intent_values = {}
-    weather_report_values = weather_report_to_template_values(report)
-    weather_request_values = weather_object_to_template_values(report.request, "request")
+    template_values = {}
+    if type(result) == WeatherError:
+        template_values = {**template_values, **weather_error_to_template_values(result)}
+    else:
+        template_values = {**template_values, **weather_report_to_template_values(result), **weather_object_to_template_values(result.request, "request")}
     if "rhasspy_intent" in config.parser.__name__:
-        rhasspy_intent_values = intent_to_template_values(intent_message)
-    template_values = {**rhasspy_intent_values, **weather_report_values, **weather_request_values}
+        template_values = {**template_values, **intent_to_template_values(intent_message)}
+
     output = template.safe_substitute(template_values)
     output = output.replace("None", "null").replace("'", "\"")
     return output
@@ -39,6 +41,13 @@ def intent_to_template_values(intent_message):
 def weather_report_to_template_values(report):
     template_values = {
         "weather_text": report.generate_report()
+    }
+    return template_values
+
+
+def weather_error_to_template_values(error):
+    template_values = {
+        "weather_text": error.message
     }
     return template_values
 
