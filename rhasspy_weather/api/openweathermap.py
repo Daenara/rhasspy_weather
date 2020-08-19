@@ -6,7 +6,7 @@ import requests
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
 from rhasspy_weather.data_types.forecast import WeatherForecast
-from rhasspy_weather.data_types.status import StatusCode, WeatherError
+from rhasspy_weather.data_types.error import ErrorCode, WeatherError
 
 log = logging.getLogger(__name__)
 
@@ -36,11 +36,11 @@ def get_weather(location):
         response = response.json()
 
         if str(response["cod"]) == "401":
-            raise WeatherError(StatusCode.API_ERROR)
+            raise WeatherError(ErrorCode.API_ERROR)
         elif str(response["cod"]) == "429":
-            raise WeatherError(StatusCode.API_TIMEOUT_ERROR)
+            raise WeatherError(ErrorCode.API_TIMEOUT_ERROR)
         elif str(response["cod"]) == "404":
-            raise WeatherError(StatusCode.LOCATION_ERROR)
+            raise WeatherError(ErrorCode.LOCATION_ERROR)
 
         # Parse the output of Open Weather Map's forecast endpoint
         if not (hasattr(location, "lat") and hasattr(location, "lon")):
@@ -70,7 +70,7 @@ def get_weather(location):
             )
             weather_forecast.forecast.append(tmp)
     except (requests.exceptions.ConnectionError, ValueError):
-        weather_forecast.status.set_status(StatusCode.NO_NETWORK_ERROR)
+        weather_forecast.status.set_status(ErrorCode.NO_NETWORK_ERROR)
     return weather_forecast
 
 

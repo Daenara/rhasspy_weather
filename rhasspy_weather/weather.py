@@ -3,7 +3,7 @@ import logging
 
 from .data_types.report import WeatherReport
 from .data_types.config import get_config
-from .data_types.status import WeatherError
+from .data_types.error import WeatherError
 from .templates import fill_template
 
 log = logging.getLogger(__name__)

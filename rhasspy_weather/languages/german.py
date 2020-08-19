@@ -3,7 +3,7 @@ import datetime
 from rhasspy_weather import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.item_list import WeatherItemList
-from rhasspy_weather.data_types.status import StatusCode
+from rhasspy_weather.data_types.error import ErrorCode
 
 # general stuff
 from rhasspy_weather.data_types.fixed_times import FixedTimes
@@ -95,31 +95,30 @@ conditions = {
     ConditionType.SNOW: {0: "leichter Schneefall", 1: "Schneefall", 2: "starker Schneefall"},
     ConditionType.THUNDERSTORM: {0: "leichtes Gewitter", 1: "Gewitter", 2: "starkes Gewitter"}}
 
-# used in status.py to output status messages
+# used in error.py to output status messages
 status_response = {
-    StatusCode.NORMAL: ["Sieht alles normal aus."],
-    StatusCode.NO_NETWORK_ERROR: ["Es ist leider kein Internet verfügbar.",
+    ErrorCode.NO_NETWORK_ERROR: ["Es ist leider kein Internet verfügbar.",
                                   "Ich bin nicht mit dem Internet verbunden.",
                                   "Es ist kein Internet vorhanden."],
-    StatusCode.API_ERROR: ["Das Wetter konnte nicht abgerufen werden. Vermutlich ist der API-Schlüssel ungültig.",
+    ErrorCode.API_ERROR: ["Das Wetter konnte nicht abgerufen werden. Vermutlich ist der API-Schlüssel ungültig.",
                            "Fehler beim Abrufen. Der API-Schlüssel ist ungültig."],
-    StatusCode.FUTURE_WEATHER_ERROR: ["So weit in die Zukunft kenne ich das Wetter nicht.",
+    ErrorCode.FUTURE_WEATHER_ERROR: ["So weit in die Zukunft kenne ich das Wetter nicht.",
                                       "Ich kann nicht soweit in die Zukunft sehen.",
                                       "Das Wetter für diesen Tag wurde noch nicht beschlossen.",
                                       "Dieses Datum liegt zu weit in der Zukunft."],
-    StatusCode.NOT_IMPLEMENTED_ERROR: ["Diese Funktion wird noch nicht unterstützt.",
+    ErrorCode.NOT_IMPLEMENTED_ERROR: ["Diese Funktion wird noch nicht unterstützt.",
                                        "Ich weiß nicht wie ich diese Anfrage verarbeiten soll."],
-    StatusCode.LOCATION_ERROR: [
+    ErrorCode.LOCATION_ERROR: [
         "Ich kann die angegebene Stadt nich finden. Vielleicht habe ich sie nicht richtig verstanden"],
-    StatusCode.PAST_WEATHER_ERROR: ["Ich kann dir das Wetter aus der Vergangenheit leider nicht sagen."],
-    StatusCode.NO_WEATHER_FOR_DAY_ERROR: [
+    ErrorCode.PAST_WEATHER_ERROR: ["Ich kann dir das Wetter aus der Vergangenheit leider nicht sagen."],
+    ErrorCode.NO_WEATHER_FOR_DAY_ERROR: [
         "Es ist so kurz vor Mitternacht, dass ich das Wetter für heute nicht abrufen kann."],
-    StatusCode.DATE_ERROR: ["Irgendwas stimmt mit dem Datum nicht."],
-    StatusCode.API_TIMEOUT_ERROR: [
+    ErrorCode.DATE_ERROR: ["Irgendwas stimmt mit dem Datum nicht."],
+    ErrorCode.API_TIMEOUT_ERROR: [
         "Mit diesem API-Schlüssel wurden zu viele Anfragen gesenden. Versuche es später erneut."],
-    StatusCode.CONFIG_ERROR: ["Es gab ein Problem beim Laden der Konfigurationsdatei."],
-    StatusCode.TIME_ERROR: ["Irgendwas stimmt mit der angegebenen Zeit nicht."],
-    StatusCode.GENERAL_ERROR: ["Es ist ein Fehler aufgetreten.", "Hier ist ein Fehler aufgetreten."]
+    ErrorCode.CONFIG_ERROR: ["Es gab ein Problem beim Laden der Konfigurationsdatei."],
+    ErrorCode.TIME_ERROR: ["Irgendwas stimmt mit der angegebenen Zeit nicht."],
+    ErrorCode.GENERAL_ERROR: ["Es ist ein Fehler aufgetreten.", "Hier ist ein Fehler aufgetreten."]
 }
 
 

@@ -5,7 +5,7 @@ import random
 from .config import get_config
 from .fixed_times import FixedTimes
 from .request import DateType, ForecastType, Grain
-from .status import StatusCode, WeatherError
+from .error import ErrorCode, WeatherError
 from .condition import ConditionType
 from .temperature import TemperatureType
 from ..utils import format_string
@@ -39,7 +39,6 @@ class WeatherReport:
         log.debug("weather report initialized")
 
         self.__config = get_config()
-
         self.__forecast = forecast
         self.__request = request
         self.__timezone = self.__config.timezone
@@ -59,17 +58,17 @@ class WeatherReport:
             if self.__request.request_date == datetime.datetime.now(self.__timezone).date():
                 if self.__request.date_type == DateType.FIXED:
                     log.debug("only weather for one day was requested, we don't have weather for that day so return with error message")
-                    raise WeatherError(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
+                    raise WeatherError(ErrorCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
                 # overnight request and no weather for the other day, also
                 elif self.__request.request_date == DateType.INTERVAL and self.__request.grain == Grain.HOUR \
                         and self.__request.end_time < self.__request.start_time \
                         and not self.__forecast.has_weather_for_date(self.__request.request_date + datetime.timedelta(days=1)):
-                    raise WeatherError(StatusCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
+                    raise WeatherError(ErrorCode.NO_WEATHER_FOR_DAY_ERROR)  # Error: day nearly over, no forecast in api response
             else:
-                raise WeatherError(StatusCode.FUTURE_WEATHER_ERROR)
+                raise WeatherError(ErrorCode.FUTURE_WEATHER_ERROR)
 
         if not (self.__request.grain == Grain.DAY or self.__request.grain == Grain.HOUR):
-            raise WeatherError(StatusCode.NOT_IMPLEMENTED_ERROR)
+            raise WeatherError(ErrorCode.NOT_IMPLEMENTED_ERROR)
 
         if self.__request.forecast_type == ForecastType.TEMPERATURE:
             response = self.__generate_temperature_report()
@@ -285,7 +284,7 @@ class WeatherReport:
                         response_type = "false"
             elif self.__request.requested == ConditionType.WIND:
                 log.error("condition wind not implemented yet")
-                self.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
+                self.status.set_status(ErrorCode.NOT_IMPLEMENTED_ERROR)
                 return self.status.status_response()
             else:
                 if weather_obj.is_weather_chance(self.__request.requested):

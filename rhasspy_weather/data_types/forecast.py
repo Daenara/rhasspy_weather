@@ -4,7 +4,6 @@ import logging
 from .condition import WeatherCondition, ConditionType
 from .config import get_config
 from .interval import WeatherInterval
-from .status import Status
 from ..utils import normal_round
 
 log = logging.getLogger(__name__)
@@ -15,8 +14,6 @@ class WeatherForecast:
     A class requesting and containing data from the API
 
     Attributes:
-    status : Status
-        contains the status code
     forecast : list[WeatherAtDate]
         list containing all the information from the API
     config : WeatherConfig
@@ -51,7 +48,6 @@ class WeatherForecast:
     def __init__(self):
         log.debug("initializing forecast")
 
-        self.status = Status()
         self.forecast = []
         self.__timezone = get_config().timezone
         self.sunset = None
@@ -62,7 +58,7 @@ class WeatherForecast:
 
     # calculates the time for sunrise and sunset
     def calculate_sunrise_and_sunset(self, lat, lon):
-        log.debug(f"Calculating Sunrise and Sunset - error: {self.status.is_error}")
+        log.debug(f"Calculating Sunrise and Sunset")
 
         import suntime
 
@@ -75,7 +71,7 @@ class WeatherForecast:
         Parameters:
         request : WeatherRequest
         """
-        log.debug(f"getting weather for daytime - error: {self.status.is_error}")
+        log.debug(f"getting weather for daytime")
 
         start_time = self.sunrise
         end_time = self.sunset
@@ -97,7 +93,7 @@ class WeatherForecast:
         Parameters:
         request : WeatherRequest
         """
-        log.debug(f"getting weather for nighttime - error: {self.status.is_error}")
+        log.debug(f"getting weather for nighttime")
 
         start_time = self.sunset
         end_time = self.sunrise
@@ -114,7 +110,7 @@ class WeatherForecast:
         Parameters:
         date : datetime.date
         """
-        log.debug(f"getting weather for the whole day - error: {self.status.is_error}")
+        log.debug(f"getting weather for the whole day")
 
         return self.weather_for_interval(date, datetime.time.min, datetime.time.max)
 
@@ -124,7 +120,7 @@ class WeatherForecast:
             date : datetime.date
             time : datetime.time
         """
-        log.debug(f"getting weather at a certain time - error: {self.status.is_error}")
+        log.debug(f"getting weather at a certain time")
 
         return self.weather_for_interval(date, time, time)
 
@@ -135,7 +131,7 @@ class WeatherForecast:
             start : datetime.time
             end : datetime.time
         """
-        log.debug(f"getting weather for an interval - error: {self.status.is_error}")
+        log.debug(f"getting weather for an interval")
 
         weather = self.__get_forecast_for_date(date)
 
@@ -152,7 +148,7 @@ class WeatherForecast:
 
     # returns the forecast at the specified date
     def __get_forecast_for_date(self, date):
-        log.debug(f"getting the complete forecast for a date - error: {self.status.is_error}")
+        log.debug(f"getting the complete forecast for a date")
 
         if self.status.is_error:
             return self.status
@@ -167,7 +163,7 @@ class WeatherForecast:
         Parameters:
         date : datetime.date
         """
-        log.debug(f"checking if there is weather for the date - error: {self.status.is_error}")
+        log.debug(f"checking if there is weather for the date")
 
         return self.__get_forecast_for_date(date) is not None
 

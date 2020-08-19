@@ -6,7 +6,7 @@ from string import Template
 
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.location import Location
-from rhasspy_weather.data_types.status import Status, WeatherError
+from rhasspy_weather.data_types.error import WeatherError
 
 log = logging.getLogger(__name__)
 
@@ -70,7 +70,5 @@ def weather_object_to_template_values(weather_object, name):
             for l_key, l_value in value.__dict__.items():
                 new_l_key = new_key + "_" + l_key
                 template_values[new_l_key] = l_value
-        elif isinstance(value, Status):
-            template_values[new_key] = str(value.status_code)
     return template_values
 

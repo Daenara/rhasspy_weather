@@ -3,7 +3,7 @@ import datetime
 from rhasspy_weather import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.item_list import WeatherItemList
-from rhasspy_weather.data_types.status import StatusCode
+from rhasspy_weather.data_types.error import ErrorCode
 
 # general stuff
 from rhasspy_weather.data_types.fixed_times import FixedTimes
@@ -97,25 +97,24 @@ conditions = {
     ConditionType.SNOW: {0: "light snow", 1: "snow", 2: "heavy snow"},
     ConditionType.THUNDERSTORM: {0: "light thunderstorm", 1: "thunderstorm", 2: "strong thunderstorm"}}
 
-# used in status.py to output status messages
+# used in error.py to output status messages
 status_response = {
-    StatusCode.NORMAL: ["Everything seems to be okay."],
-    StatusCode.NO_NETWORK_ERROR: ["I don't have network.",
+    ErrorCode.NO_NETWORK_ERROR: ["I don't have network.",
                                   "I seem not be connected to the internet."],
-    StatusCode.API_ERROR: ["There is a problem with the API Key.",
+    ErrorCode.API_ERROR: ["There is a problem with the API Key.",
                            "the API key is invalid."],
-    StatusCode.FUTURE_WEATHER_ERROR: ["I don't know the weather this far ahead.",
+    ErrorCode.FUTURE_WEATHER_ERROR: ["I don't know the weather this far ahead.",
                                       "There is not prediction data for your requested date yet."],
-    StatusCode.NOT_IMPLEMENTED_ERROR: ["This function is not implemented."],
-    StatusCode.LOCATION_ERROR: ["I can't find the location."],
-    StatusCode.PAST_WEATHER_ERROR: ["I don't know the weather of the past.",
+    ErrorCode.NOT_IMPLEMENTED_ERROR: ["This function is not implemented."],
+    ErrorCode.LOCATION_ERROR: ["I can't find the location."],
+    ErrorCode.PAST_WEATHER_ERROR: ["I don't know the weather of the past.",
                                     "I am a forecasting service not a historian."],
-    StatusCode.NO_WEATHER_FOR_DAY_ERROR: ["There seems to be no weather for today."],
-    StatusCode.DATE_ERROR: ["Something is wrong with the date."],
-    StatusCode.API_TIMEOUT_ERROR: ["API Key was used to often, try again later."],
-    StatusCode.CONFIG_ERROR: ["There seems to be something wrong with the configuration file."],
-    StatusCode.TIME_ERROR: ["Something is wrong with the time."],
-    StatusCode.GENERAL_ERROR: ["Something went wrong."]
+    ErrorCode.NO_WEATHER_FOR_DAY_ERROR: ["There seems to be no weather for today."],
+    ErrorCode.DATE_ERROR: ["Something is wrong with the date."],
+    ErrorCode.API_TIMEOUT_ERROR: ["API Key was used to often, try again later."],
+    ErrorCode.CONFIG_ERROR: ["There seems to be something wrong with the configuration file."],
+    ErrorCode.TIME_ERROR: ["Something is wrong with the time."],
+    ErrorCode.GENERAL_ERROR: ["Something went wrong."]
 }
 
 
