@@ -29,4 +29,6 @@ def get_weather_forecast(intent_message):
     report = WeatherReport(request, forecast)
 
     log.info("Answering question")
-    config.output.output_response(fill_template(intent_message, report))
+    filled_template = fill_template(intent_message, report)
+    config.output.output_response(filled_template)
+    return filled_template
