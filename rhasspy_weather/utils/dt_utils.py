@@ -1,5 +1,6 @@
 import datetime
 import logging
+from typing import Union, Tuple
 
 from dateutil.relativedelta import relativedelta
 
@@ -176,3 +177,50 @@ def date_string_to_date(input_string: str, separator: str = " ") -> datetime.dat
         log.error("Unknown format for day")
         raise WeatherError(ErrorCode.DATE_ERROR)
     return get_date_with_year(day_number, month_number)
+
+
+def named_time_to_date(named_time: str) -> Union[datetime.time, Tuple[datetime.time, datetime.time]]:
+    """
+    Parsed a string containing a named time into the time.
+
+    Args:
+        named_time: a valid named time(locale.named_times or locale.named_times_synonyms)
+
+    Returns: either a time or a tuple containing start and end time of an interval
+    """
+    locale = get_config().locale
+    named_times_lowercase = [x.lower() for x in locale.named_times.keys()]
+    named_times_synonyms_lowercase = [x.lower() for x in locale.named_times_synonyms.keys()]
+    if named_time.lower() in named_times_synonyms_lowercase:
+        index = named_times_synonyms_lowercase.index(named_time.lower())
+        name = list(locale.named_times_synonyms.keys())[index]
+        value = locale.named_times[locale.named_times_synonyms[name]]
+    else:
+        index = named_times_lowercase.index(named_time.lower())
+        value = list(locale.named_times.values())[index]
+    if isinstance(value, datetime.time) or isinstance(value, tuple):
+        return value
+    else:
+        log.error("Invalid time specified in locale.named_times or locale.named_times_synonyms")
+        raise WeatherError(ErrorCode.TIME_ERROR)
+
+
+def named_time_to_str(named_time: str) -> str:
+    """
+    Takes a named_time and formats it for output.
+    Args:
+        named_time: a valid named time(locale.named_times or locale.named_times_synonyms)
+
+    Returns: the formatted string
+
+    """
+    locale = get_config().locale
+    named_times_lowercase = [x.lower() for x in locale.named_times.keys()]
+    named_times_synonyms_lowercase = [x.lower() for x in locale.named_times_synonyms.keys()]
+
+    if named_time.lower() in named_times_synonyms_lowercase:
+        index = named_times_synonyms_lowercase.index(named_time.lower())
+        return list(locale.named_times_synonyms.keys())[index]
+    else:
+        index = named_times_lowercase.index(named_time.lower())
+        return list(locale.named_times.keys())[index]

@@ -191,20 +191,7 @@ def parse_time(slots, locale):
             # was something like midday specified (listed in locale.named_times or in locale.named_times_synonyms)?
             if slots[slot_names["time"]].lower() in named_times_lowercase + named_times_synonyms_lowercase:
                 log.debug("time is specified by name")
-                if slots[slot_names["time"]].lower() in named_times_synonyms_lowercase:
-                    index = named_times_synonyms_lowercase.index(slots[slot_names["time"]].lower())
-                    name = list(locale.named_times_synonyms.keys())[index]
-                    value = locale.named_times[locale.named_times_synonyms[name]]
-                else:
-                    index = named_times_lowercase.index(slots[slot_names["time"]].lower())
-                    name = list(locale.named_times.keys())[index]
-                    value = list(locale.named_times.values())[index]
-                log.debug(value)
-                if isinstance(value, datetime.time) or isinstance(value, tuple):
-                    return value, name
-                else:
-                    log.error("Invalid time specified in locale.named_times or locale.named_times_synonyms")
-                    raise WeatherError(ErrorCode.TIME_ERROR)
+                return dt_utils.named_time_to_date(slots[slot_names["time"]]), dt_utils.named_day_to_str(slots[slot_names["time"]])
 
             # was it hours and minutes (specified as "HH MM" by rhasspy intent)?
             if ' ' in slots[slot_names["time"]]:
