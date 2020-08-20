@@ -8,20 +8,21 @@ import pytz
 from rhasspy_weather.data_types.location import Location
 
 log = logging.getLogger(__name__)
+config_path = os.path.join(str(Path(__file__).parent.parent.parent), 'config.ini')
 
-# TODO: implement custom config path and config names
+# TODO: write config exception with message and long description, use long description to explain how to setup config using set_config()
 # TODO: figure out what to do with config errors (if locale is working throw a WeatherError, else throw general config error maybe?)
 
 
 class WeatherConfig:
-    def __init__(self, config_path):
+    def __init__(self, current_config_path):
         log.info("Loading config")
         base_path = str(Path(__file__).parent.parent)
         # config_path = os.path.join(base_path, 'config.ini')
         # default_config_path = os.path.join(base_path, 'config.default')
         config_parser = configparser.ConfigParser(allow_no_value=True)
         self.__error = False
-        config_parser.read(config_path)
+        config_parser.read(current_config_path)
 
         if not (config_parser.has_section("General") and config_parser.has_section("Location")):
             log.error("At least one required section is missing. Please refer to 'config.default' for an example config.")
@@ -238,16 +239,28 @@ __config = None
 
 def get_config():
     global __config
+    global config_path
     if __config is None:
         rhasspy_weather_path = str(Path(__file__).parent.parent.parent)
         home_path = os.path.join(os.path.expanduser("~"), ".config", "rhasspy_weather")
-        config_name = "rhasspy_weather_config.ini"
-        default_config_path = os.path.join(rhasspy_weather_path, 'config.default')
-        for loc in rhasspy_weather_path, home_path:
-            config_path = os.path.join(loc, config_name)
-            if os.path.exists(config_path):
-                __config = WeatherConfig(config_path)
+        config_names = ["rhasspy_weather_config.ini", "config.ini", "rhasspy_weather.ini"]
+        if os.path.exists(config_path):
+            __config = WeatherConfig(config_path)
+        else:
+            log.warning(f"Config not found at '{config_path}'. Searching elsewhere.")
+            for loc in rhasspy_weather_path, home_path:
+                for config_name in config_names:
+                    tmp_config_path = os.path.join(loc, config_name)
+                    if os.path.exists(config_path):
+                        __config = WeatherConfig(tmp_config_path)
         if __config is None:
-            raise Exception(f"No config file found in {rhasspy_weather_path} or {home_path}. Please copy \
-                            config.default into one of those paths and rename it to {config_name}")
+            message = f"No config file found in '{rhasspy_weather_path}' or '{home_path}'. Please copy config.default into one of those paths and rename it to one of {str(config_names)}"
+            print(message)
+            raise Exception(message)
     return __config
+
+
+def set_config_path(new_config_path: str):
+    global config_path
+    if os.path.exists(new_config_path):
+        config_path = new_config_path
