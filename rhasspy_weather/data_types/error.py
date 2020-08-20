@@ -2,7 +2,7 @@ import logging
 import random
 from enum import Enum
 
-from .config import get_config
+from rhasspy_weather.data_types.config import get_config
 
 log = logging.getLogger(__name__)
 

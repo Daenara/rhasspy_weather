@@ -1,9 +1,9 @@
 import datetime
 import logging
 
-from .condition import WeatherCondition, ConditionType
-from .config import get_config
-from .interval import WeatherInterval
+from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
+from rhasspy_weather.data_types.config import get_config
+from rhasspy_weather.data_types.interval import WeatherInterval
 from rhasspy_weather.utils.utils import normal_round
 
 log = logging.getLogger(__name__)

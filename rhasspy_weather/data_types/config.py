@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytz
 
-from .location import Location
+from rhasspy_weather.data_types.location import Location
 
 log = logging.getLogger(__name__)
 

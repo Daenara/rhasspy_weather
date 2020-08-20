@@ -2,12 +2,12 @@ import datetime
 import logging
 import random
 
-from .config import get_config
-from .fixed_times import FixedTimes
-from .request import DateType, ForecastType, Grain
-from .error import ErrorCode, WeatherError
-from .condition import ConditionType
-from .temperature import TemperatureType
+from rhasspy_weather.data_types.config import get_config
+from rhasspy_weather.data_types.fixed_times import FixedTimes
+from rhasspy_weather.data_types.request import DateType, ForecastType, Grain
+from rhasspy_weather.data_types.error import ErrorCode, WeatherError
+from rhasspy_weather.data_types.condition import ConditionType
+from rhasspy_weather.data_types.temperature import TemperatureType
 from rhasspy_weather.utils.utils import format_string
 
 log = logging.getLogger(__name__)

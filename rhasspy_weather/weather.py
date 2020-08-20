@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 import logging
 
-from .data_types.report import WeatherReport
-from .data_types.config import get_config
-from .data_types.error import WeatherError
-from .templates import fill_template
+from rhasspy_weather.data_types.report import WeatherReport
+from rhasspy_weather.data_types.config import get_config
+from rhasspy_weather.data_types.error import WeatherError
+from rhasspy_weather.templates import fill_template
 
 log = logging.getLogger(__name__)
 

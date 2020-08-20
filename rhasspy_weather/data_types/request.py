@@ -2,8 +2,8 @@ import datetime
 import logging
 from enum import Enum
 
-from .config import get_config
-from .error import ErrorCode, WeatherError
+from rhasspy_weather.data_types.config import get_config
+from rhasspy_weather.data_types.error import ErrorCode, WeatherError
 
 log = logging.getLogger(__name__)
 
