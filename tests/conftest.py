@@ -76,7 +76,7 @@ class MockConfig:
         return False
 
 
-@pytest.fixture()
+@pytest.fixture
 def request_full_weather():
     return json.loads('{ "entities": [], "intent": {"confidence": 1, "name": "GetWeatherForecast"}, "raw_text": "wie '
                       'wird das wetter", "raw_tokens": ["wie", "wird", "das", "wetter"], "recognize_seconds": '
@@ -86,20 +86,20 @@ def request_full_weather():
 
 @pytest.fixture
 def mock_config_detail_true(monkeypatch):
-    def mock_get_config(*args, **kwargs):
+    def mock_get_config():
+        from tests.conftest import MockConfig
         return MockConfig(True, "rhasspy_intent", "console_json", "rhasspy.json", "german")
 
-    from rhasspy_weather.data_types import config
-    monkeypatch.setattr(config, "get_config", mock_get_config)
+    monkeypatch.setattr("rhasspy_weather.data_types.config.get_config.__code__", mock_get_config.__code__)
 
 
 @pytest.fixture
 def mock_config_detail_false(monkeypatch):
-    def mock_get_config(*args, **kwargs):
+    def mock_get_config():
+        from tests.conftest import MockConfig
         return MockConfig(False, "rhasspy_intent", "console_json", "rhasspy.json", "german")
 
-    from rhasspy_weather.data_types import config
-    monkeypatch.setattr(config, "get_config", mock_get_config)
+    monkeypatch.setattr("rhasspy_weather.data_types.config.get_config.__code__", mock_get_config.__code__)
 
 
 @pytest.fixture
