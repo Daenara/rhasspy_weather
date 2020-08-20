@@ -1,6 +1,6 @@
 import datetime
 
-from rhasspy_weather import utils
+from rhasspy_weather.utils import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.error import ErrorCode

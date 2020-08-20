@@ -4,7 +4,7 @@ import logging
 from .condition import WeatherCondition, ConditionType
 from .config import get_config
 from .interval import WeatherInterval
-from ..utils import normal_round
+from rhasspy_weather.utils.utils import normal_round
 
 log = logging.getLogger(__name__)
 

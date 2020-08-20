@@ -8,7 +8,7 @@ from .request import DateType, ForecastType, Grain
 from .error import ErrorCode, WeatherError
 from .condition import ConditionType
 from .temperature import TemperatureType
-from ..utils import format_string
+from rhasspy_weather.utils.utils import format_string
 
 log = logging.getLogger(__name__)
 
