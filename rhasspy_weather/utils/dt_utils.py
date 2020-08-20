@@ -31,7 +31,7 @@ def get_date_with_year(day: int, month: int, can_be_past_date: bool = False) -> 
     delta_month = month - today.month
     delta_year = 0
     if not can_be_past_date:
-        if delta_month < 0:
+        if delta_month < 0 or delta_days < 0:
             delta_year = 1
 
     return today + relativedelta(years=delta_year, months=delta_month, days=delta_days)
