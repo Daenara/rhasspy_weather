@@ -179,7 +179,7 @@ def date_string_to_date(input_string: str, separator: str = " ") -> datetime.dat
     return get_date_with_year(day_number, month_number)
 
 
-def named_time_to_date(named_time: str) -> Union[datetime.time, Tuple[datetime.time, datetime.time]]:
+def named_time_to_time(named_time: str) -> Union[datetime.time, Tuple[datetime.time, datetime.time]]:
     """
     Parsed a string containing a named time into the time.
 
