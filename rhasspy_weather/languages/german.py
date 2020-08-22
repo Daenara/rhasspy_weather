@@ -1,6 +1,6 @@
 import datetime
 
-from rhasspy_weather.utils import utils
+from rhasspy_weather.utils import utils, dt_utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.error import ErrorCode
@@ -15,8 +15,8 @@ language_code = "de"
 weekday_names = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 month_names = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober",
                "November", "Dezember"]
-named_days = {"heute": 0, "morgen": 1, "übermorgen": 2}
-named_days_synonyms = {}
+named_days = {"heute": 0, "morgen": 1, "übermorgen": 2, "weihnachten": dt_utils.get_date_with_year(24, 12)}
+named_days_synonyms = {"heilig abend": "weihnachten"}
 named_times = {
     "Morgen": (datetime.time(6, 0), datetime.time(10, 0)),
     "Vormittag": (datetime.time(10, 0), datetime.time(12, 0)),
