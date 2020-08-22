@@ -191,7 +191,7 @@ def parse_time(slots, locale):
             # was something like midday specified (listed in locale.named_times or in locale.named_times_synonyms)?
             if slots[slot_names["time"]].lower() in named_times_lowercase + named_times_synonyms_lowercase:
                 log.debug("time is specified by name")
-                return dt_utils.named_time_to_date(slots[slot_names["time"]]), dt_utils.named_day_to_str(slots[slot_names["time"]])
+                return dt_utils.named_time_to_time(slots[slot_names["time"]]), dt_utils.named_day_to_str(slots[slot_names["time"]])
 
             # was it hours and minutes (specified as "HH MM" by rhasspy intent)?
             if ' ' in slots[slot_names["time"]]:
