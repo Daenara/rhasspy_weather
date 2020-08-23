@@ -49,11 +49,12 @@ def named_day_to_date(named_day: str) -> datetime.date:
     locale = get_config().locale
     named_days_lowercase = [x.lower() for x in locale.named_days]
     named_days_synonyms_lowercase = [x.lower() for x in locale.named_days_synonyms]
+    value = None
     if named_day.lower() in named_days_synonyms_lowercase:
         index = named_days_synonyms_lowercase.index(named_day.lower())
         name = list(locale.named_days_synonyms.keys())[index]
         value = locale.named_days[locale.named_days_synonyms[name]]
-    else:
+    elif named_day.lower() in named_days_lowercase:
         index = named_days_lowercase.index(named_day.lower())
         value = list(locale.named_days.values())[index]
     if isinstance(value, datetime.date):
@@ -67,7 +68,8 @@ def named_day_to_date(named_day: str) -> datetime.date:
 
 def named_day_to_str(named_day: str) -> str:
     """
-    Takes a valid named day and formats it for output.
+    Takes a named day and formats it for output.
+    If named day is not in locale, returns the input
 
     Args:
         named_day: string containing a valid named day (locale.named_days and locale.named_days_synonyms)
@@ -80,9 +82,11 @@ def named_day_to_str(named_day: str) -> str:
     if named_day.lower() in named_days_synonyms_lowercase:
         index = named_days_synonyms_lowercase.index(named_day.lower())
         return list(locale.named_days_synonyms.keys())[index]
-    else:
+    elif named_day.lower() in named_days_lowercase:
         index = named_days_lowercase.index(named_day.lower())
         return list(locale.named_days.keys())[index]
+
+    return named_day
 
 
 def weekday_to_date(weekday: str, next_week: bool = False) -> datetime.date:
@@ -155,7 +159,11 @@ def date_string_to_date(input_string: str, separator: str = " ") -> datetime.dat
 
     """
     locale = get_config().locale
-    day, month = input_string.split(separator)
+    try:
+        day, month = input_string.split(separator)
+    except ValueError:
+        raise WeatherError(ErrorCode.DATE_ERROR, "Unknown format for day")
+
     months_lowercase = [x.lower() for x in locale.month_names]
     if month.lower() in months_lowercase:
         month_number = months_lowercase.index(month.lower()) + 1
@@ -191,11 +199,12 @@ def named_time_to_time(named_time: str) -> Union[datetime.time, Tuple[datetime.t
     locale = get_config().locale
     named_times_lowercase = [x.lower() for x in locale.named_times.keys()]
     named_times_synonyms_lowercase = [x.lower() for x in locale.named_times_synonyms.keys()]
+    value = None
     if named_time.lower() in named_times_synonyms_lowercase:
         index = named_times_synonyms_lowercase.index(named_time.lower())
         name = list(locale.named_times_synonyms.keys())[index]
         value = locale.named_times[locale.named_times_synonyms[name]]
-    else:
+    elif named_time.lower() in named_times_lowercase:
         index = named_times_lowercase.index(named_time.lower())
         value = list(locale.named_times.values())[index]
     if isinstance(value, datetime.time) or isinstance(value, tuple):
@@ -207,7 +216,7 @@ def named_time_to_time(named_time: str) -> Union[datetime.time, Tuple[datetime.t
 
 def named_time_to_str(named_time: str) -> str:
     """
-    Takes a named_time and formats it for output.
+    Takes a named_time and formats it for output. If named time not in locale, it returns the input.
     Args:
         named_time: a valid named time(locale.named_times or locale.named_times_synonyms)
 
@@ -221,6 +230,8 @@ def named_time_to_str(named_time: str) -> str:
     if named_time.lower() in named_times_synonyms_lowercase:
         index = named_times_synonyms_lowercase.index(named_time.lower())
         return list(locale.named_times_synonyms.keys())[index]
-    else:
+    elif named_time.lower() in named_times_lowercase:
         index = named_times_lowercase.index(named_time.lower())
         return list(locale.named_times.keys())[index]
+
+    return named_time
