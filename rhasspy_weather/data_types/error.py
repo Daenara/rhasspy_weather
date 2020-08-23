@@ -2,8 +2,6 @@ import logging
 import random
 from enum import Enum
 
-from rhasspy_weather.data_types.config import get_config
-
 log = logging.getLogger(__name__)
 
 
@@ -22,10 +20,25 @@ class ErrorCode(Enum):
     GENERAL_ERROR = "general_error"
 
 
-class WeatherError(Exception):
-    def __init__(self, message):
+class Error(Exception):
+    pass
+
+
+class WeatherError(Error):
+    def __init__(self, error_code: ErrorCode, description: str = ""):
+        from rhasspy_weather.data_types.config import get_config
         locale = get_config().locale
+        self.description = description
+        self.error_code = error_code
+        self.message = random.choice(locale.status_response[error_code])
+        log.error(description)
+
+
+class ConfigError(Error):
+    def __init__(self, message: str, description: str = "", error_code=None):
         self.message = message
-        if type(message) == ErrorCode:
-            self.message = random.choice(locale.status_response[message])
-        super().__init__(self.message)
+        self.description = description
+        if type(error_code) == ErrorCode:
+            from rhasspy_weather.data_types.config import get_config
+            locale = get_config().locale
+            self.message = random.choice(locale.status_response[error_code])

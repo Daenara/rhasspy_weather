@@ -167,15 +167,15 @@ def date_string_to_date(input_string: str, separator: str = " ") -> datetime.dat
 
     if not 1 <= month_number <= 12:
         log.error("There are exactly 12 months, but the specified date was outside of that")
-        raise WeatherError(ErrorCode.DATE_ERROR)
+        raise WeatherError(ErrorCode.DATE_ERROR, "There are exactly 12 months, but the specified date was outside of that")
     if day.isnumeric():
         day_number = int(day)
         if not 1 <= day_number <= 31:
             log.error("Days of the Month can only be between 1 and 31.")
-            raise WeatherError(ErrorCode.DATE_ERROR)
+            raise WeatherError(ErrorCode.DATE_ERROR, "Days of the Month can only be between 1 and 31.")
     else:
         log.error("Unknown format for day")
-        raise WeatherError(ErrorCode.DATE_ERROR)
+        raise WeatherError(ErrorCode.DATE_ERROR, "Unknown format for day")
     return get_date_with_year(day_number, month_number)
 
 
@@ -202,7 +202,7 @@ def named_time_to_time(named_time: str) -> Union[datetime.time, Tuple[datetime.t
         return value
     else:
         log.error("Invalid time specified in locale.named_times or locale.named_times_synonyms")
-        raise WeatherError(ErrorCode.TIME_ERROR)
+        raise WeatherError(ErrorCode.TIME_ERROR, "Invalid time specified in locale.named_times or locale.named_times_synonyms")
 
 
 def named_time_to_str(named_time: str) -> str:
