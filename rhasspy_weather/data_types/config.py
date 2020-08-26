@@ -251,7 +251,7 @@ def get_config():
             for loc in rhasspy_weather_path, home_path:
                 for config_name in config_names:
                     tmp_config_path = os.path.join(loc, config_name)
-                    if os.path.exists(config_path):
+                    if os.path.exists(tmp_config_path):
                         __config = WeatherConfig(tmp_config_path)
         if __config is None:
             message = f"No config file found in '{rhasspy_weather_path}' or '{home_path}'. Please copy config.default into one of those paths and rename it to one of {str(config_names)}"
@@ -264,3 +264,5 @@ def set_config_path(new_config_path: str):
     global config_path
     if os.path.exists(new_config_path):
         config_path = new_config_path
+    else:
+        log.warning(f"Config at {new_config_path} not found.")
