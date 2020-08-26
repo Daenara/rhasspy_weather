@@ -118,6 +118,7 @@ status_response = {
         "Mit diesem API-Schlüssel wurden zu viele Anfragen gesenden. Versuche es später erneut."],
     ErrorCode.CONFIG_ERROR: ["Es gab ein Problem beim Laden der Konfigurationsdatei."],
     ErrorCode.TIME_ERROR: ["Irgendwas stimmt mit der angegebenen Zeit nicht."],
+    ErrorCode.MQTT_CONNECTION_ERROR: ["Ich kann keine Verbindung zum MQTT Broker herstellen."],
     ErrorCode.GENERAL_ERROR: ["Es ist ein Fehler aufgetreten.", "Hier ist ein Fehler aufgetreten."]
 }
 

@@ -3,7 +3,7 @@ import logging
 
 from rhasspy_weather.data_types.report import WeatherReport
 import rhasspy_weather.data_types.config as cf
-from rhasspy_weather.data_types.error import WeatherError
+from rhasspy_weather.data_types.error import WeatherError, ErrorCode
 from rhasspy_weather.templates import fill_template
 
 log = logging.getLogger(__name__)
@@ -15,10 +15,8 @@ log = logging.getLogger(__name__)
 def get_weather_forecast(intent_message, config_path=None):
     if config_path is not None:
         cf.set_config_path(config_path)
-    config = cf.get_config()
 
-    if config is None or config.error:
-        return "Configuration could not be read. Please make sure everything is set up correctly"
+    config = cf.get_config()
 
     try:
         log.info("Parsing rhasspy intent")
@@ -35,6 +33,10 @@ def get_weather_forecast(intent_message, config_path=None):
         config.output.output_response(filled_template)
     except WeatherError as error:
         filled_template = fill_template(intent_message, error)
+
+    try:
         config.output.output_response(filled_template)
+    except WeatherError:
+        log.error("Can't output response")
 
     return filled_template

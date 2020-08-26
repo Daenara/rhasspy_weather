@@ -114,6 +114,7 @@ status_response = {
     ErrorCode.API_TIMEOUT_ERROR: ["API Key was used to often, try again later."],
     ErrorCode.CONFIG_ERROR: ["There seems to be something wrong with the configuration file."],
     ErrorCode.TIME_ERROR: ["Something is wrong with the time."],
+    ErrorCode.MQTT_CONNECTION_ERROR: ["I can't contact the mqtt broker."],
     ErrorCode.GENERAL_ERROR: ["Something went wrong."]
 }
 

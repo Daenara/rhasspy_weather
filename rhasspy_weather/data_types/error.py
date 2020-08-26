@@ -18,6 +18,7 @@ class ErrorCode(Enum):
     CONFIG_ERROR = "config_error"
     TIME_ERROR = "time_error"
     GENERAL_ERROR = "general_error"
+    MQTT_CONNECTION_ERROR = "mqtt_error"
 
 
 class Error(Exception):
