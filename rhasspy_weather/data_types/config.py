@@ -11,8 +11,7 @@ from rhasspy_weather.data_types.location import Location
 log = logging.getLogger(__name__)
 config_path = os.path.join(str(Path(__file__).parent.parent.parent), 'config.ini')
 
-# TODO: write config exception with message and long description, use long description to explain how to setup config using set_config()
-# TODO: figure out what to do with config errors (if locale is working throw a WeatherError, else throw general config error maybe?)
+# TODO: make multiple outputs possible
 
 config_sections = {
     "General": "__parse_section_general",
