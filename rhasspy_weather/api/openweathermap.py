@@ -72,7 +72,7 @@ def get_weather(location):
             )
             weather_forecast.forecast.append(tmp)
     except (requests.exceptions.ConnectionError, ValueError):
-        weather_forecast.status.set_status(ErrorCode.NO_NETWORK_ERROR)
+        raise WeatherError(ErrorCode.NO_NETWORK_ERROR, "Weather could not be fetched.")
     return weather_forecast
 
 
