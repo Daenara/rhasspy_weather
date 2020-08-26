@@ -3,7 +3,7 @@ import logging
 
 from rhasspy_weather.data_types.report import WeatherReport
 import rhasspy_weather.data_types.config as cf
-from rhasspy_weather.data_types.error import WeatherError, ErrorCode
+from rhasspy_weather.data_types.error import WeatherError
 from rhasspy_weather.templates import fill_template
 
 log = logging.getLogger(__name__)
