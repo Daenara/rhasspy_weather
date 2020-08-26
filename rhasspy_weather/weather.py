@@ -2,7 +2,7 @@
 import logging
 
 from rhasspy_weather.data_types.report import WeatherReport
-from rhasspy_weather.data_types.config import get_config
+import rhasspy_weather.data_types.config as cf
 from rhasspy_weather.data_types.error import WeatherError
 from rhasspy_weather.templates import fill_template
 
@@ -12,8 +12,10 @@ log = logging.getLogger(__name__)
 
 
 # function being called when rhasspy detects an intent related to the weather
-def get_weather_forecast(intent_message):
-    config = get_config()
+def get_weather_forecast(intent_message, config_path=None):
+    if config_path is not None:
+        cf.set_config_path(config_path)
+    config = cf.get_config()
 
     if config is None or config.error:
         return "Configuration could not be read. Please make sure everything is set up correctly"
