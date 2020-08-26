@@ -6,9 +6,11 @@ import requests
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
 from rhasspy_weather.data_types.forecast import WeatherForecast
-from rhasspy_weather.data_types.error import ErrorCode, WeatherError
+from rhasspy_weather.data_types.error import ErrorCode, WeatherError, ConfigError
 
 log = logging.getLogger(__name__)
+
+api_key = None
 
 
 def get_weather(location):
@@ -30,7 +32,7 @@ def get_weather(location):
         url_location = f"zip={location.zipcode},{location.country_code}"
     else:
         url_location = f"q={location.city}"
-    forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?{url_location}&APPID={config.api_key}&units={config.units}&lang={config.locale.language_code}"
+    forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?{url_location}&APPID={api_key}&units={config.units}&lang={config.locale.language_code}"
     try:
         response = requests.get(forecast_url)
         response = response.json()
@@ -72,6 +74,26 @@ def get_weather(location):
     except (requests.exceptions.ConnectionError, ValueError):
         weather_forecast.status.set_status(ErrorCode.NO_NETWORK_ERROR)
     return weather_forecast
+
+
+def parse_config(config_parser):
+    """
+    Parses config options that are api specific from the config file.
+    Args:
+        config_parser: ConfigParser.configparser object pointing to the correct config file
+
+    Returns: Nothing
+
+    """
+    global api_key
+    section = config_parser["OpenWeatherMap"]
+
+    if section is None:
+        log.error(f"API is set to {section} but that section is missing in the config. Please refer to 'config.default' for an example config.")
+
+    api_key = section.get("api_key")
+    if api_key is None or api_key is "":
+        raise ConfigError("API Error", "API is set to OpenWeatherMap yet no API-Key is found. Please refer to 'config.default' for an example config.")
 
 
 # parses the weather condition into my own format (WeatherCondition)

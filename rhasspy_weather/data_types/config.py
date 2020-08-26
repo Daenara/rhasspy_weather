@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytz
 
+from rhasspy_weather.data_types.error import ConfigError, ErrorCode
 from rhasspy_weather.data_types.location import Location
 
 log = logging.getLogger(__name__)
@@ -13,224 +14,158 @@ config_path = os.path.join(str(Path(__file__).parent.parent.parent), 'config.ini
 # TODO: write config exception with message and long description, use long description to explain how to setup config using set_config()
 # TODO: figure out what to do with config errors (if locale is working throw a WeatherError, else throw general config error maybe?)
 
+config_sections = {
+    "General": "__parse_section_general",
+    "Weather": "__parse_section_weather",
+    "Location": "__parse_section_location"
+}
+
 
 class WeatherConfig:
+
     def __init__(self, current_config_path):
         log.info("Loading config")
-        base_path = str(Path(__file__).parent.parent)
-        # config_path = os.path.join(base_path, 'config.ini')
-        # default_config_path = os.path.join(base_path, 'config.default')
-        config_parser = configparser.ConfigParser(allow_no_value=True)
-        self.__error = False
-        config_parser.read(current_config_path)
 
-        if not (config_parser.has_section("General") and config_parser.has_section("Location")):
-            log.error("At least one required section is missing. Please refer to 'config.default' for an example config.")
-            self.__error = True
+        self.__api = None
+        self.__parser = None
+        self.__output = None
+        self.__output_template = None
+        self.units = None
+        self.timezone = None
+        self.__locale = None
 
-        section_name_general = "General"
-        if config_parser.has_section(section_name_general):
-            section_general = config_parser[section_name_general]
-            self.__units = self.__get_required_option(section_general, "units", "metric")
-            api = self.__get_required_option(section_general, "api", "openweathermap")
-            try:
-                name = "rhasspy_weather.api." + api
-                self.__api = __import__(name, fromlist=[''])
-            except ImportError:
-                log.error("There is no module in the api folder that matches the api name in your config.")
-                self.__error = True
-            parser = self.__get_required_option(section_general, "parser", "rhasspy_intent")
-            try:
-                name = "rhasspy_weather.parser." + parser
-                self.__parser = __import__(name, fromlist=[''])
-            except ImportError:
-                log.error("There is no module in the parser folder that matches the parser name in your config.")
-                self.__error = True
+        self.temp_warm_from = None,
+        self.temp_cold_to = None
+        self.detail = None
 
-            output = self.__get_required_option(section_general, "output", "console_json")
-            try:
-                name = "rhasspy_weather.output." + output
-                self.__output = __import__(name, fromlist=[''])
-            except ImportError:
-                log.error("There is no module in the output folder that matches the output name in your config.")
-                self.__error = True
+        self.location = None
 
-            output_template = self.__get_required_option(section_general, "output_template", "rhasspy.json")
-            try:
-                path = os.path.join(base_path, "output_templates", output_template)
-                self.__output_template = open(path, 'r').read()
-            except OSError:
-                log.error("There is no template that matches the name of your config.")
-                self.__error = True
+        self.__config_parser = configparser.ConfigParser(allow_no_value=True)
+        self.__config_parser.read(current_config_path)
 
-            locale = self.__get_required_option(section_general, "locale", "german")
-            try:
-                name = "rhasspy_weather.languages." + locale
-                self.__locale = __import__(name, fromlist=[''])
-            except ImportError:
-                log.error("There is no module in the locale folder that matches the locale name in your config.")
-                self.__error = True
-            self.__timezone = pytz.timezone(self.__get_required_option(section_general, "timezone", "Europe/Berlin"))
+        for section, function_string in config_sections.items():
+            getattr(self, "_WeatherConfig" + function_string)(self.__config_parser[section])
 
-        else:
-            log.error(f"Section [{section_name_general}] is missing from config. Please refer to 'config.default' for an example config.")
-            self.__error = True
+        log.info("Config Loaded")
 
-        section_name_weather = "Weather"
-        if config_parser.has_section(section_name_weather):
-            section_weather = config_parser[section_name_weather]
-            self.__temp_warm_from = self.__get_required_option(section_weather, "temp_warm", 20, "int")
-            self.__temp_cold_to = self.__get_required_option(section_weather, "temp_cold", 5, "int")
-            self.__detail = self.__get_required_option(section_weather, "level_of_detail", False, "bool")
-        else:
-            log.error(f"Section [{section_name_general}] is missing from config. Please refer to 'config.default' for an example config.")
-            self.__error = True
+    def __parse_section_general(self, section):
+        if section is None:
+            log.error(f"Required section {section} is missing. Please refer to 'config.default' for an example config.")
 
-        section_name_location = "Location"
-        if config_parser.has_section(section_name_location):
-            section_location = config_parser[section_name_location]
-            self.__location = Location(self.__get_required_option(section_location, "city", "Berlin"))
-            zipcode = section_location.get("zipcode")
-            country_code = section_location.get("country_code")
-            if not (zipcode is None or country_code is None):
-                self.__location.set_zipcode(zipcode, country_code)
-            lat = section_location.get("lat")
-            lon = section_location.get("lon")
-            if not ((lat is None or lon is None) or (lat == "" or lon == "")):
-                self.__location.set_lat_and_lon(lat, lon)
-        else:
-            log.error(f"Section [{section_name_location}] is missing from config. Please refer to 'config.default' for an example config.")
-            self.__error = True
+        self.locale = self.__get_option_with_default_value(section, "locale", "german")  # locale needs to be first because of localized errors
+        self.units = self.__get_option_with_default_value(section, "units", "metric")
+        self.api = self.__get_option_with_default_value(section, "api", "openweathermap")
+        self.api.parse_config(self.__config_parser)
+        self.parser = self.__get_option_with_default_value(section, "parser", "rhasspy_intent")
+        self.output = self.__get_option_with_default_value(section, "output", "console_json")
+        self.output.parse_config(self.__config_parser)
+        self.output_template = self.__get_option_with_default_value(section, "output_template", "rhasspy.json")
+        self.timezone = pytz.timezone(self.__get_option_with_default_value(section, "timezone", "Europe/Berlin"))
 
-        if api == "openweathermap":
-            section_name_openweathermap = "OpenWeatherMap"
-            if config_parser.has_section(section_name_openweathermap):
-                has_error = False
-                section_openweathermap = config_parser[section_name_openweathermap]
-                if "api_key" in section_openweathermap:
-                    api_key = section_openweathermap.get("api_key")
-                    if api_key is None:
-                        self.__error = True
-                    else:
-                        self.__api_key = api_key
-                else:
-                    self.__error = True
-                    has_error = True
+    def __parse_section_weather(self, section):
+        if section is None:
+            log.error(f"Required section {section} is missing. Please refer to 'config.default' for an example config.")
 
-                if has_error:
-                    log.error("API is set to OpenWeatherMap yet no API-Key is found. Please refer to 'config.default' for an example config.")
-            else:
-                log.error("API is set to OpenWeatherMap yet no config section for that is found. Please refer to 'config.default' for an example config.")
-                self.__error = True
+        self.temp_warm_from = self.__get_option_with_default_value(section, "temp_warm", 20, "int")
+        self.temp_cold_to = self.__get_option_with_default_value(section, "temp_cold", 5, "int")
+        self.detail = self.__get_option_with_default_value(section, "level_of_detail", False, "bool")
 
-        if "mqtt" in output:
-            section_name_mqtt = "mqtt"
-            if config_parser.has_section(section_name_mqtt):
-                section_mqtt = config_parser[section_name_mqtt]
-                self.__mqtt_address = self.__get_required_option(section_mqtt, "address", "")
-                self.__mqtt_port = self.__get_required_option(section_mqtt, "port", 1883, "int")
-                if self.__mqtt_address == "" or self.__mqtt_port == "":
-                    log.error("You need to specify address and port for the mqtt output to work.")
-                    self.__error = True
-                self.__mqtt_user = section_mqtt.get("user")
-                log.debug(section_mqtt.get("user"))
-                self.__mqtt_password = section_mqtt.get("password")
-                self.__mqtt_topic = self.__get_required_option(section_mqtt, "topic", "rhasspy_weather/response")
+    def __parse_section_location(self, section):
+        if section is None:
+            log.error(f"Required section {section} is missing. Please refer to 'config.default' for an example config.")
 
-        if self.__error:
-            log.error("Config Error")
-        else:
-            log.info("Config Loaded")
-
-    @property
-    def detail(self):
-        return self.__detail
+        self.location = self.__get_option_with_default_value(section, "city", "Berlin"), section.get("zipcode"), section.get("country_code"), section.get("lat"), section.get("lon")
 
     @property
     def api(self):
         return self.__api
 
+    @api.setter
+    def api(self, val: str):
+        if val is None or val is "":
+            raise ConfigError("API Error", "API is set to OpenWeatherMap yet no API-Key is found. Please refer to 'config.default' for an example config.")
+        try:
+            self.__api = __import__("rhasspy_weather.api." + val, fromlist=[''])
+        except ImportError:
+            raise ConfigError("No api found", "There is no module in the api folder that matches the api name in your config.", ErrorCode.CONFIG_ERROR)
+
     @property
     def parser(self):
         return self.__parser
+
+    @parser.setter
+    def parser(self, val):
+        try:
+            self.__parser = __import__("rhasspy_weather.parser." + val, fromlist=[''])
+        except ImportError:
+            raise ConfigError("No parser found", "There is no module in the parser folder that matches the parser name in your config.", ErrorCode.CONFIG_ERROR)
 
     @property
     def output(self):
         return self.__output
 
+    @output.setter
+    def output(self, val):
+        try:
+            self.__output = __import__("rhasspy_weather.output." + val, fromlist=[''])
+        except ImportError:
+            raise ConfigError("No output found", "There is no module in the output folder that matches the output name in your config.", ErrorCode.CONFIG_ERROR)
+
     @property
     def output_template(self):
         return self.__output_template
 
-    @property
-    def temperature_warm_from(self):
-        return self.__temp_warm_from
-
-    @property
-    def temperature_cold_to(self):
-        return self.__temp_cold_to
-
-    @property
-    def timezone(self):
-        return self.__timezone
-
-    @property
-    def units(self):
-        return self.__units
+    @output_template.setter
+    def output_template(self, val):
+        try:
+            base_path = str(Path(__file__).parent.parent)
+            self.__output_template = open(os.path.join(base_path, "output_templates", val), 'r').read()
+        except OSError:
+            raise ConfigError("No output template found", "There is no template that matches the name of your config.", ErrorCode.CONFIG_ERROR)
 
     @property
     def locale(self):
         return self.__locale
 
+    @locale.setter
+    def locale(self, val):
+        try:
+            self.__locale = __import__("rhasspy_weather.languages." + val, fromlist=[''])
+        except ImportError:
+            raise ConfigError("No locale found", "There is no module in the locale folder that matches the locale name in your config.")
+
     @property
     def location(self):
         return self.__location
 
-    @property
-    def api_key(self):
-        return self.__api_key
-
-    @property
-    def mqtt_address(self):
-        return self.__mqtt_address
-
-    @property
-    def mqtt_port(self):
-        return self.__mqtt_port
-
-    @property
-    def mqtt_user(self):
-        return self.__mqtt_user
-
-    @property
-    def mqtt_password(self):
-        return self.__mqtt_password
-
-    @property
-    def mqtt_topic(self):
-        return self.__mqtt_topic
-
-    @property
-    def error(self):
-        return self.__error
+    @location.setter
+    def location(self, city: str, zipcode=None, country_code=None, lat=None, lon=None):
+        self.__location = Location(city)
+        if not ((lat is None or lon is None) or (lat == "" or lon == "")):
+            self.location.set_lat_and_lon(lat, lon)
+        if not (zipcode is None or country_code is None) or (zipcode is "" or country_code is ""):
+            self.location.set_zipcode(zipcode, country_code)
 
     @staticmethod
-    def __get_required_option(section, option, default_value, data_type=""):
-        if option in section:
-            if data_type == "bool":
-                temp = section.getboolean(option)
-            elif data_type == "int":
-                temp = section.getint(option)
-            elif data_type == "float":
-                temp = section.getfloat(option)
-            else:
-                temp = section.get(option)
-            if option is None:
-                log.warning(f"Setting '{option}' is present but has no value. Please refer to 'config.default' for an example config.")
+    def __get_option_with_default_value(section: configparser.SectionProxy, option, default_value, data_type: str = ""):
+        if section is not None and option in section:
+            try:
+                if data_type == "bool":
+                    temp = section.getboolean(option)
+                elif data_type == "int":
+                    temp = section.getint(option)
+                elif data_type == "float":
+                    temp = section.getfloat(option)
+                else:
+                    temp = section.get(option)
+                if option is None:
+                    log.warning(f"Setting '{option}' is present but has no value. Please refer to 'config.default' for an example config.")
+                    return default_value
+                else:
+                    return temp
+            except ValueError:
                 return default_value
-            else:
-                return temp
-        log.warning(f"Setting '{option}' is missing from config. Please refer to 'config.default' for an example config.")
+        log.error(f"Setting '{option}' is missing from config. Please refer to 'config.default' for an example config.")
         return default_value
 
 
@@ -252,11 +187,11 @@ def get_config():
                 for config_name in config_names:
                     tmp_config_path = os.path.join(loc, config_name)
                     if os.path.exists(tmp_config_path):
-                        __config = WeatherConfig(tmp_config_path)
+                        config_path = tmp_config_path
+                        __config = WeatherConfig(config_path)
         if __config is None:
             message = f"No config file found in '{rhasspy_weather_path}' or '{home_path}'. Please copy config.default into one of those paths and rename it to one of {str(config_names)}"
-            print(message)
-            raise Exception(message)
+            raise ConfigError("No config found", message)
     return __config
 
 
