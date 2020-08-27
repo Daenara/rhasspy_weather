@@ -104,13 +104,15 @@ class WeatherConfig:
     def output(self, val):
         self.__output = []
         for x in range(0, len(val)):
+            output_module = "rhasspy_weather.output." + val[x]
             try:
-                self.__output.append(__import__("rhasspy_weather.output." + val[x], fromlist=['']))
+                self.__output.append(__import__(output_module, fromlist=['']))
             except ImportError:
-                pass
-            self.__output[x].parse_config(self.__config_parser)
+                log.error(f"Selected output '{output_module}' not found.")
         if len(self.__output) == 0:
             raise ConfigError("No output found", "There is no module in the output folder that matches one of the output names in your config.")
+        for output_item in self.__output:
+            output_item.parse_config(self.__config_parser)
 
     @property
     def output_template(self):
