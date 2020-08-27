@@ -36,10 +36,7 @@ class WeatherError(Error):
 
 
 class ConfigError(Error):
-    def __init__(self, message: str, description: str = "", error_code=None):
+    def __init__(self, message: str, description: str = ""):
+        self.error_code = ErrorCode.CONFIG_ERROR
         self.message = message
         self.description = description
-        if type(error_code) == ErrorCode:
-            from rhasspy_weather.data_types.config import get_config
-            locale = get_config().locale
-            self.message = random.choice(locale.status_response[error_code])

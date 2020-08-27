@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytz
 
-from rhasspy_weather.data_types.error import ConfigError, ErrorCode
+from rhasspy_weather.data_types.error import ConfigError
 from rhasspy_weather.data_types.location import Location
 
 log = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ class WeatherConfig:
         if section is None:
             log.error(f"Required section {section} is missing. Please refer to 'config.default' for an example config.")
 
-        self.locale = self.__get_option_with_default_value(section, "locale", "german")  # locale needs to be first because of localized errors
+        self.locale = self.__get_option_with_default_value(section, "locale", "german")
         self.units = self.__get_option_with_default_value(section, "units", "metric")
         self.api = self.__get_option_with_default_value(section, "api", "openweathermap")
         self.api.parse_config(self.__config_parser)
