@@ -39,6 +39,5 @@ def get_weather_forecast(intent_message, config_path=None):
             output_item.output_response(filled_template)
         except WeatherError as e:
             log.error(f"Can't output response on {output_item.__name__}: {e.description}")
-            log.error(filled_template)
 
     return filled_template
