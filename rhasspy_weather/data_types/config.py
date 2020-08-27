@@ -201,8 +201,9 @@ def get_config():
 
 
 def set_config_path(new_config_path: str):
-    global config_path
+    global config_path, __config
     if os.path.exists(new_config_path):
         config_path = new_config_path
+        __config = None
     else:
         log.warning(f"Config at {new_config_path} not found.")
