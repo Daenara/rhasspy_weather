@@ -9,7 +9,6 @@ from rhasspy_weather.templates import fill_template
 log = logging.getLogger(__name__)
 
 # TODO: find a better name for this file
-# TODO: work with multiple outputs
 
 
 # function being called when rhasspy detects an intent related to the weather
@@ -35,10 +34,11 @@ def get_weather_forecast(intent_message, config_path=None):
     except WeatherError as error:
         filled_template = fill_template(intent_message, error)
 
-    try:
-        config.output.output_response(filled_template)
-    except WeatherError as e:
-        log.error(f"Can't output response: {e.description}")
-        log.error(filled_template)
+    for output_item in config.output:
+        try:
+            output_item.output_response(filled_template)
+        except WeatherError as e:
+            log.error(f"Can't output response on {output_item.__name__}: {e.description}")
+            log.error(filled_template)
 
     return filled_template

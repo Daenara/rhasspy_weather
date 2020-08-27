@@ -11,8 +11,6 @@ from rhasspy_weather.data_types.location import Location
 log = logging.getLogger(__name__)
 config_path = os.path.join(str(Path(__file__).parent.parent.parent), 'config.ini')
 
-# TODO: make multiple outputs possible
-
 config_sections = {
     "General": "__parse_section_general",
     "Weather": "__parse_section_weather",
@@ -56,8 +54,7 @@ class WeatherConfig:
         self.api = self.__get_option_with_default_value(section, "api", "openweathermap")
         self.api.parse_config(self.__config_parser)
         self.parser = self.__get_option_with_default_value(section, "parser", "rhasspy_intent")
-        self.output = self.__get_option_with_default_value(section, "output", "console_json")
-        self.output.parse_config(self.__config_parser)
+        self.output = self.__get_option_with_default_value(section, "output", "console_json").replace(" ", "").split(",")
         self.output_template = self.__get_option_with_default_value(section, "output_template", "rhasspy.json")
         self.timezone = pytz.timezone(self.__get_option_with_default_value(section, "timezone", "Europe/Berlin"))
 
@@ -86,7 +83,7 @@ class WeatherConfig:
         try:
             self.__api = __import__("rhasspy_weather.api." + val, fromlist=[''])
         except ImportError:
-            raise ConfigError("No api found", "There is no module in the api folder that matches the api name in your config.", ErrorCode.CONFIG_ERROR)
+            raise ConfigError("No api found", "There is no module in the api folder that matches the api name in your config.")
 
     @property
     def parser(self):
@@ -97,7 +94,7 @@ class WeatherConfig:
         try:
             self.__parser = __import__("rhasspy_weather.parser." + val, fromlist=[''])
         except ImportError:
-            raise ConfigError("No parser found", "There is no module in the parser folder that matches the parser name in your config.", ErrorCode.CONFIG_ERROR)
+            raise ConfigError("No parser found", "There is no module in the parser folder that matches the parser name in your config.")
 
     @property
     def output(self):
@@ -105,10 +102,15 @@ class WeatherConfig:
 
     @output.setter
     def output(self, val):
-        try:
-            self.__output = __import__("rhasspy_weather.output." + val, fromlist=[''])
-        except ImportError:
-            raise ConfigError("No output found", "There is no module in the output folder that matches the output name in your config.", ErrorCode.CONFIG_ERROR)
+        self.__output = []
+        for x in range(0, len(val)):
+            try:
+                self.__output.append(__import__("rhasspy_weather.output." + val[x], fromlist=['']))
+            except ImportError:
+                pass
+            self.__output[x].parse_config(self.__config_parser)
+        if len(self.__output) == 0:
+            raise ConfigError("No output found", "There is no module in the output folder that matches one of the output names in your config.")
 
     @property
     def output_template(self):
@@ -120,7 +122,7 @@ class WeatherConfig:
             base_path = str(Path(__file__).parent.parent)
             self.__output_template = open(os.path.join(base_path, "output_templates", val), 'r').read()
         except OSError:
-            raise ConfigError("No output template found", "There is no template that matches the name of your config.", ErrorCode.CONFIG_ERROR)
+            raise ConfigError("No output template found", "There is no template that matches the name of your config.")
 
     @property
     def locale(self):
