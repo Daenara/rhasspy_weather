@@ -1,6 +1,4 @@
-import json
 import logging
-from rhasspy_weather.data_types.config import get_config
 
 import paho.mqtt.client as mqtt
 
@@ -21,7 +19,7 @@ def output_response(output):
         client = mqtt.Client()
         client.username_pw_set(mqtt_user, mqtt_password)
         client.connect(mqtt_address, mqtt_port, 60)
-        client.publish(mqtt_topic, json.dumps(json.loads(output)))
+        client.publish(mqtt_topic, output)
     except ConnectionRefusedError as e:
         raise WeatherError(ErrorCode.MQTT_CONNECTION_ERROR, e.strerror)
 

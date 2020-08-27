@@ -27,6 +27,7 @@ class WeatherConfig:
         self.__parser = None
         self.__output = None
         self.__output_template = None
+        self.output_template_name = None
         self.units = None
         self.timezone = None
         self.__locale = None
@@ -123,6 +124,7 @@ class WeatherConfig:
         try:
             base_path = str(Path(__file__).parent.parent)
             self.__output_template = open(os.path.join(base_path, "output_templates", val), 'r').read()
+            self.output_template_name = val
         except OSError:
             raise ConfigError("No output template found", "There is no template that matches the name of your config.")
 

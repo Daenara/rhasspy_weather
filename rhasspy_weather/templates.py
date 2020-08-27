@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 from enum import Enum
 from string import Template
@@ -25,7 +26,9 @@ def fill_template(intent_message, result):
         template_values = {**template_values, **intent_to_template_values(intent_message)}
 
     output = template.safe_substitute(template_values)
-    output = output.replace("None", "null").replace("'", "\"")
+    if ".json" in config.output_template_name:
+        output = output.replace("None", "null").replace("'", "\"")
+        output = json.dumps(json.loads(output))  # not the best way but otherwise the json is not correct
     return output
 
 
