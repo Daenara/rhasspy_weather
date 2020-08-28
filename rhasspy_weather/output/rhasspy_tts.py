@@ -11,7 +11,7 @@ rhasspy_url = None
 def output_response(output):
     log.debug("Selected output: rhasspy_tts")
     if rhasspy_url is None:
-        raise ConfigError("")
+        raise ConfigError("No URL found", "No rhasspy server url found.")
     headers = {"Content-Type": "text/plain"}
     url = rhasspy_url + "/api/text-to-speech?play=true"
     response = requests.post(url, data=output.encode(), headers=headers)
@@ -20,7 +20,7 @@ def output_response(output):
 def parse_config(config):
     global rhasspy_url
 
-    section = config.get_external_section("rhasspy_tts")
+    section = config.get_external_section("rhasspy")
 
     if section is not None:
         rhasspy_url = section.get("address")
