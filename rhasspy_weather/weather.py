@@ -3,7 +3,7 @@ import logging
 
 from rhasspy_weather.data_types.report import WeatherReport
 import rhasspy_weather.data_types.config as cf
-from rhasspy_weather.data_types.error import WeatherError
+from rhasspy_weather.data_types.error import WeatherError, ConfigError
 from rhasspy_weather.templates import fill_template
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def get_weather_forecast(intent_message, config_path=None):
         try:
             filled_template = fill_template(intent_message, output, output_item.get_template())
             output_item.output_response(filled_template)
-        except WeatherError as e:
+        except (WeatherError, ConfigError) as e:
             log.error(f"Can't output response on {output_item.__name__}: {e.description}")
 
     return output
