@@ -88,7 +88,7 @@ def request_full_weather():
 def mock_config_detail_true(monkeypatch):
     def mock_get_config():
         from tests.conftest import MockConfig
-        return MockConfig(True, "rhasspy_intent", "console_json", "rhasspy.json", "german")
+        return MockConfig(True, "rhasspy_intent", "console", "rhasspy.json", "german")
 
     monkeypatch.setattr("rhasspy_weather.data_types.config.get_config.__code__", mock_get_config.__code__)
 
@@ -97,7 +97,7 @@ def mock_config_detail_true(monkeypatch):
 def mock_config_detail_false(monkeypatch):
     def mock_get_config():
         from tests.conftest import MockConfig
-        return MockConfig(False, "rhasspy_intent", "console_json", "rhasspy.json", "german")
+        return MockConfig(False, "rhasspy_intent", "console", "rhasspy.json", "german")
 
     monkeypatch.setattr("rhasspy_weather.data_types.config.get_config.__code__", mock_get_config.__code__)
 
