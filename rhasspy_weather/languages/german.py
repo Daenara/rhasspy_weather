@@ -83,7 +83,7 @@ def format_userdefined_time(hour, minutes=-1):
 
 
 # weather conditions
-
+# TODO: add all condition types and severities
 conditions = {
     ConditionType.WIND: {0: "Windstille", 1: "Windstille", 2: "leichte Briese", 3: "schwacher Wind", 4: "mäßiger Wind",
                          5: "frischer Wind", 6: "starker Wind", 7: "starker Wind", 8: "Sturm",
