@@ -86,7 +86,7 @@ def parse_config(config):
 
     """
     global api_key
-    section = config.get_external_section("openweathermap")
+    section = config.get_external_section("OpenWeatherMap")
 
     if section is not None:
         api_key = section.get("api_key")
