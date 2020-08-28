@@ -14,7 +14,9 @@ mqtt_topic = "rhasspy_weather/response"
 
 
 def output_response(output):
-    log.debug("Selected output: mqtt_json")
+    log.debug("Selected output: mqtt")
+    if mqtt_address is None or mqtt_address is "":
+        raise ConfigError("No mqtt broker address found", "No mqtt address set. This is required for rhasspy weather to work.")
     try:
         client = mqtt.Client()
         client.username_pw_set(mqtt_user, mqtt_password)
@@ -32,7 +34,7 @@ def parse_config(config):
     if section is not None:
         mqtt_address = section.get("address")
         if mqtt_address is None or mqtt_address is "":
-            raise ConfigError("MQTT Error", "No mqtt address set. This is required for rhasspy weather to work.")
+            log.error("No mqtt address set. This is required for rhasspy weather to work.")
 
         port = section.get("port")
         if port.isnumeric():
