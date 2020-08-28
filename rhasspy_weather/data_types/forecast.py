@@ -233,6 +233,7 @@ class WeatherForecast:
                 return self.weather_condition
 
             def __get_wind_condition(self):
+                # TODO: finish this
                 units = get_config().units
                 if units == "imperial":
                     self.wind_speed = self.wind_speed / 2.237
