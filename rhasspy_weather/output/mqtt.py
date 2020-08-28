@@ -48,3 +48,7 @@ def parse_config(config):
         if user is not None and user is not "" and password is not None and password is not "":
             mqtt_user = user
             mqtt_password = password
+
+
+def get_template():
+    return None

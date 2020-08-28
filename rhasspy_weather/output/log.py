@@ -10,3 +10,7 @@ def output_response(output):
 
 def parse_config(config):
     pass
+
+
+def get_template():
+    return None

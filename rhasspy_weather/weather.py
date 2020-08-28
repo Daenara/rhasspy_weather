@@ -26,18 +26,16 @@ def get_weather_forecast(intent_message, config_path=None):
         forecast = config.api.get_weather(request.location)
 
         log.info("Formulating answer")
-        report = WeatherReport(request, forecast)
-
-        log.info("Answering question")
-        filled_template = fill_template(intent_message, report)
-        config.output.output_response(filled_template)
+        output = WeatherReport(request, forecast)
     except WeatherError as error:
-        filled_template = fill_template(intent_message, error)
+        output = error
 
+    log.info("Answering")
     for output_item in config.output:
         try:
+            filled_template = fill_template(intent_message, output, output_item.get_template())
             output_item.output_response(filled_template)
         except WeatherError as e:
             log.error(f"Can't output response on {output_item.__name__}: {e.description}")
 
-    return filled_template
+    return output

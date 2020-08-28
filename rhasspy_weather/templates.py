@@ -14,9 +14,12 @@ log = logging.getLogger(__name__)
 # TODO: add more detailed templates to use (especially debug/expanded to use with testcases)
 
 
-def fill_template(intent_message, result):
+def fill_template(intent_message, result, template_override=None):
     config = get_config()
-    template = Template(config.output_template)
+    if template_override is None:
+        template = Template(config.output_template)
+    else:
+        template = Template(template_override)
     template_values = {}
     if type(result) == WeatherError:
         template_values = {**template_values, **weather_error_to_template_values(result)}
@@ -26,7 +29,7 @@ def fill_template(intent_message, result):
         template_values = {**template_values, **intent_to_template_values(intent_message)}
 
     output = template.safe_substitute(template_values)
-    if ".json" in config.output_template_name:
+    if ".json" in config.output_template_name and template_override is None:
         output = output.replace("None", "null").replace("'", "\"")
         output = json.dumps(json.loads(output))  # not the best way but otherwise the json is not correct
     return output
