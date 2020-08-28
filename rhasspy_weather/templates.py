@@ -46,9 +46,15 @@ def intent_to_template_values(intent_message):
     return template_values
 
 
+__report = None
+
+
 def weather_report_to_template_values(report):
+    global __report
+    if __report is None:
+        __report = report.generate_report()
     template_values = {
-        "weather_text": report.generate_report()
+        "weather_text": __report
     }
     return template_values
 
