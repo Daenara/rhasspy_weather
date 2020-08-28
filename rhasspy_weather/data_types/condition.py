@@ -1,10 +1,17 @@
 from enum import Enum
 
+from rhasspy_weather.data_types.config import get_config
+
 
 class WeatherCondition:
     def __init__(self, severity, description, condition_type):
         self.severity = severity
         self.description = description
+        if description is "":
+            try:
+                self.description = get_config().locale.conditions[condition_type][severity]
+            except KeyError:
+                pass
         self.condition_type = condition_type
 
     def __eq__(self, other):
