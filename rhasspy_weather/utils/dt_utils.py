@@ -57,8 +57,8 @@ def named_day_to_date(named_day: str) -> datetime.date:
     elif named_day.lower() in named_days_lowercase:
         index = named_days_lowercase.index(named_day.lower())
         value = list(locale.named_days.values())[index]
-    if isinstance(value, datetime.date):
-        return value
+    if isinstance(value, Tuple):
+        return get_date_with_year(value[0], value[1])
     elif isinstance(value, int):
         return datetime.date.today() + datetime.timedelta(value)
     else:

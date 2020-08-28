@@ -15,7 +15,7 @@ language_code = "de"
 weekday_names = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 month_names = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober",
                "November", "Dezember"]
-named_days = {"heute": 0, "morgen": 1, "übermorgen": 2, "weihnachten": dt_utils.get_date_with_year(24, 12)}
+named_days = {"heute": 0, "morgen": 1, "übermorgen": 2, "weihnachten": (24, 12)}
 named_days_synonyms = {"heilig abend": "weihnachten"}
 named_times = {
     "Morgen": (datetime.time(6, 0), datetime.time(10, 0)),
