@@ -109,7 +109,7 @@ status_response = {
     ErrorCode.NOT_IMPLEMENTED_ERROR: ["Diese Funktion wird noch nicht unterstützt.",
                                        "Ich weiß nicht wie ich diese Anfrage verarbeiten soll."],
     ErrorCode.LOCATION_ERROR: [
-        "Ich kann die angegebene Stadt nich finden. Vielleicht habe ich sie nicht richtig verstanden"],
+        "Ich kann die angegebene Stadt nich finden. Vielleicht habe ich dich nicht richtig verstanden"],
     ErrorCode.PAST_WEATHER_ERROR: ["Ich kann dir das Wetter aus der Vergangenheit leider nicht sagen."],
     ErrorCode.NO_WEATHER_FOR_DAY_ERROR: [
         "Es ist so kurz vor Mitternacht, dass ich das Wetter für heute nicht abrufen kann."],
