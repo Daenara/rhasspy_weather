@@ -4,7 +4,7 @@ log = logging.getLogger(__name__)
 
 
 def output_response(output):
-    log.debug("Selected output: console_json")
+    log.debug("Selected output: console")
     print(output)
 
 
