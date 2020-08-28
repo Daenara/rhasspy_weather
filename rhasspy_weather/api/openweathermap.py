@@ -76,24 +76,22 @@ def get_weather(location):
     return weather_forecast
 
 
-def parse_config(config_parser):
+def parse_config(config):
     """
     Parses config options that are api specific from the config file.
     Args:
-        config_parser: ConfigParser.configparser object pointing to the correct config file
+        config: Config object
 
     Returns: Nothing
 
     """
     global api_key
-    section = config_parser["OpenWeatherMap"]
+    section = config.get_external_section("openweathermap")
 
-    if section is None:
-        log.error(f"API is set to {section} but that section is missing in the config. Please refer to 'config.default' for an example config.")
-
-    api_key = section.get("api_key")
-    if api_key is None or api_key is "":
-        raise ConfigError("API Error", "API is set to OpenWeatherMap yet no API-Key is found. Please refer to 'config.default' for an example config.")
+    if section is not None:
+        api_key = section.get("api_key")
+        if api_key is None or api_key is "":
+            raise ConfigError("API Error", "API is set to OpenWeatherMap yet no API-Key is found. Please refer to 'config.default' for an example config.")
 
 
 # parses the weather condition into my own format (WeatherCondition)

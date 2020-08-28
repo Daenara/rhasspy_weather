@@ -24,29 +24,27 @@ def output_response(output):
         raise WeatherError(ErrorCode.MQTT_CONNECTION_ERROR, e.strerror)
 
 
-def parse_config(config_parser):
+def parse_config(config):
     global mqtt_address, mqtt_port, mqtt_topic, mqtt_user, mqtt_password
-    section = config_parser["mqtt"]
 
-    if section is None:
-        log.error(
-            f"Output is set to {section} but that section is missing in the config. Please refer to 'config.default' for an example config.")
+    section = config.get_external_section("mqtt")
 
-    mqtt_address = section.get("address")
-    if mqtt_address is None or mqtt_address is "":
-        raise ConfigError("MQTT Error", "No mqtt address set. This is required for rhasspy weather to work.", ErrorCode.CONFIG_ERROR)
+    if section is not None:
+        mqtt_address = section.get("address")
+        if mqtt_address is None or mqtt_address is "":
+            raise ConfigError("MQTT Error", "No mqtt address set. This is required for rhasspy weather to work.")
 
-    port = section.get("port")
-    if port.isnumeric():
-        mqtt_port = port
+        port = section.get("port")
+        if port.isnumeric():
+            mqtt_port = int(port)
 
-    topic = section.get("topic")
-    if topic is not "":
-        mqtt_topic = topic
+        topic = section.get("topic")
+        if topic is not "":
+            mqtt_topic = topic
 
-    user = section.get("user")
-    password = section.get("password")
+        user = section.get("user")
+        password = section.get("password")
 
-    if user is not None and user is not "" and password is not None and password is not "":
-        mqtt_user = user
-        mqtt_password = password
+        if user is not None and user is not "" and password is not None and password is not "":
+            mqtt_user = user
+            mqtt_password = password

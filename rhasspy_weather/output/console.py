@@ -8,5 +8,5 @@ def output_response(output):
     print(output)
 
 
-def parse_config(config_parser):
+def parse_config(config):
     pass

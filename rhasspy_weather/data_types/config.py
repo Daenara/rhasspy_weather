@@ -53,7 +53,6 @@ class WeatherConfig:
         self.locale = self.__get_option_with_default_value(section, "locale", "german")
         self.units = self.__get_option_with_default_value(section, "units", "metric")
         self.api = self.__get_option_with_default_value(section, "api", "openweathermap")
-        self.api.parse_config(self.__config_parser)
         self.parser = self.__get_option_with_default_value(section, "parser", "rhasspy_intent")
         self.output = self.__get_option_with_default_value(section, "output", "console_json").replace(" ", "").split(",")
         self.output_template = self.__get_option_with_default_value(section, "output_template", "rhasspy.json")
@@ -73,6 +72,12 @@ class WeatherConfig:
 
         self.location = self.__get_option_with_default_value(section, "city", "Berlin"), section.get("zipcode"), section.get("country_code"), section.get("lat"), section.get("lon")
 
+    def get_external_section(self, section_name):
+        if self.__config_parser.has_section(section_name):
+            return self.__config_parser[section_name]
+        else:
+            log.error(f"The section {section_name} is missing but required.")
+
     @property
     def api(self):
         return self.__api
@@ -85,6 +90,7 @@ class WeatherConfig:
             self.__api = __import__("rhasspy_weather.api." + val, fromlist=[''])
         except ImportError:
             raise ConfigError("No api found", "There is no module in the api folder that matches the api name in your config.")
+        self.__api.parse_config(self)
 
     @property
     def parser(self):
@@ -113,7 +119,7 @@ class WeatherConfig:
         if len(self.__output) == 0:
             raise ConfigError("No output found", "There is no module in the output folder that matches one of the output names in your config.")
         for output_item in self.__output:
-            output_item.parse_config(self.__config_parser)
+            output_item.parse_config(self)
 
     @property
     def output_template(self):
