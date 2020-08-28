@@ -69,8 +69,7 @@ class WeatherConfig:
     def __parse_section_location(self, section):
         if section is None:
             log.error(f"Required section {section} is missing. Please refer to 'config.default' for an example config.")
-
-        self.location = self.__get_option_with_default_value(section, "city", "Berlin"), section.get("zipcode"), section.get("country_code"), section.get("lat"), section.get("lon")
+        self.location = Location(self.__get_option_with_default_value(section, "city", "Berlin"), section.get("zipcode"), section.get("country_code"), section.get("lat"), section.get("lon"))
 
     def get_external_section(self, section_name):
         if self.__config_parser.has_section(section_name):
@@ -144,18 +143,6 @@ class WeatherConfig:
             self.__locale = __import__("rhasspy_weather.languages." + val, fromlist=[''])
         except ImportError:
             raise ConfigError("No locale found", "There is no module in the locale folder that matches the locale name in your config.")
-
-    @property
-    def location(self):
-        return self.__location
-
-    @location.setter
-    def location(self, city: str, zipcode=None, country_code=None, lat=None, lon=None):
-        self.__location = Location(city)
-        if not ((lat is None or lon is None) or (lat == "" or lon == "")):
-            self.location.set_lat_and_lon(lat, lon)
-        if not (zipcode is None or country_code is None) or (zipcode is "" or country_code is ""):
-            self.location.set_zipcode(zipcode, country_code)
 
     @staticmethod
     def __get_option_with_default_value(section: configparser.SectionProxy, option, default_value, data_type: str = ""):
