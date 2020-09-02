@@ -166,11 +166,11 @@ temperature_answers = {
              "Es hat {when} {temperature} {where}."]
     },
     TemperatureType.COLD: {
-        "true": ["Ja, {when} {where} wird es kalt. Die Temperatur ist {temperature}."],
-        "false": ["Nein, {when} {where} wird es nicht kalt. Die Temperatur ist {temperature}."]},
+        "true": ["Ja, es wird {when} {where} kalt. Die Temperatur ist {temperature}."],
+        "false": ["Nein, es wird {when} {where} nicht kalt. Die Temperatur ist {temperature}."]},
     TemperatureType.WARM: {
-        "true": ["Ja, {when} {where} wird es warm. Die Temperatur ist {temperature}."],
-        "false": ["Nein, {when} {where} wird es nicht warm. Die Temperatur ist {temperature}."]
+        "true": ["Ja, es wird {when} {where} warm. Die Temperatur ist {temperature}."],
+        "false": ["Nein, es wird {when} {where} nicht warm. Die Temperatur ist {temperature}."]
     }
 }
 
