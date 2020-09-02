@@ -221,7 +221,8 @@ condition_answers = {
     },
     ConditionType.SUN: {
         "true": ["{when} {where} scheint die Sonne."],
-        "false": ["{when} {where} scheint keine Sonne."]
+        "false": ["{when} {where} scheint keine Sonne."],
+        "night": ["Es ist dunkel {when} {where}, im Dunkeln scheint keine Sonne."]
     },
     ConditionType.STARS: {
         "true": ["Man kann {when} {where} die Sterne sehen."],

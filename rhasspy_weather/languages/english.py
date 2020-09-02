@@ -200,7 +200,8 @@ condition_answers = {
     },
     ConditionType.SUN: {
         "true": ["{when} {where} will be sunny."],
-        "false": ["{when} {where} won't be sunny."]
+        "false": ["{when} {where} won't be sunny."],
+        "night": ["It is dark {when} {where}, the sun can't shine."]
     },
     ConditionType.STARS: {
         "true": ["You can see the stars {when} {where}."],

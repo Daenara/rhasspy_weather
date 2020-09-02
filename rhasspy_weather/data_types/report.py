@@ -262,26 +262,13 @@ class WeatherReport:
         if self.__request.forecast_type == ForecastType.CONDITION and type(self.__request.requested) == ConditionType:
             condition_type = self.__request.requested
             if self.__request.requested == ConditionType.SUN:
-                if self.__request.start_time > self.__forecast.sunset:
-                    # start time after sunset
-                    if self.__request.end_time < self.__forecast.sunrise:
-                        # end time before sunrise
-                        response_type = "false"
-                    else:
-                        # end time after sunrise
-                        # todo: figure out the difference between end_time and sunrise and only output sunny if it is the majority of time
-
-                        day_weather = self.__forecast.weather_during_daytime(self.__request)
-                        if day_weather is not None and day_weather.is_weather_chance(ConditionType.CLEAR):
-                            response_type = "true"
-                        else:
-                            response_type = "false"
+                day_weather = self.__forecast.weather_during_daytime(self.__request)
+                if day_weather is None:
+                    response_type = "night"
+                elif day_weather.is_weather_chance(ConditionType.CLEAR):
+                    response_type = "true"
                 else:
-                    day_weather = self.__forecast.weather_during_daytime(self.__request)
-                    if day_weather is not None and day_weather.is_weather_chance(ConditionType.CLEAR):
-                        response_type = "true"
-                    else:
-                        response_type = "false"
+                    response_type = "false"
             elif self.__request.requested == ConditionType.WIND:
                 log.error("condition wind not implemented yet")
                 self.status.set_status(ErrorCode.NOT_IMPLEMENTED_ERROR)

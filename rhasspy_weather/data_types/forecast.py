@@ -77,13 +77,13 @@ class WeatherForecast:
         end_time = self.sunset
         date = request.request_date
 
-        if request.end_time < request.start_time:
-            date = date + datetime.timedelta(days=1)
-
         if request.start_time is not None and self.sunrise <= request.start_time <= self.sunset:
             start_time = request.start_time
         if request.end_time is not None and self.sunrise <= request.end_time <= self.sunset:
             end_time = request.end_time
+
+        if end_time < start_time:
+            date = date + datetime.timedelta(days=1)
 
         return self.weather_for_interval(date, start_time, end_time)
 
