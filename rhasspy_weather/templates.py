@@ -12,6 +12,7 @@ from rhasspy_weather.data_types.error import WeatherError
 log = logging.getLogger(__name__)
 
 # TODO: add more detailed templates to use (especially debug/expanded to use with testcases)
+# TODO: move intent_to_template to parser and call it from there
 
 
 def fill_template(weather_input, result, template_override=None, remove_not_replaced_lines=True):

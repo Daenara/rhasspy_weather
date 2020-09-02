@@ -6,7 +6,7 @@ A python script that can make rhasspy voice assistant tell the weather.
 Just open an issue and supply me with the sentence that produced the bug. 
 
 ## Table of Contents
-* [Setup](#setup)
+* [Setup (out of date, will be fixed soon)](#setup)
     * [custom_command script](#custom_command-script)
     * [sentences and slots](#setting-up-sentences-and-slots)
     * [config file](#config-file)
@@ -338,7 +338,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.d
     * [ ] rhasspy web api tts
 * [ ] **add parsers for more than rhasspy local command script**
     * [ ] rhasspy_hermes-app
-    * [ ] cli (integrate [ulnos cli parser](https://github.com/ulno/cli_weather))
+    * [X] cli (integrate [ulnos cli parser](https://github.com/ulno/cli_weather))
 * [ ] **clean up code**
     * [ ] remove all comments referencing snips
     * [ ] replace comments documenting functions with pydoc strings
