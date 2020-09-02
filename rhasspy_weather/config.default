@@ -1,7 +1,7 @@
 [General]
 api=openweathermap
 parser=rhasspy_intent
-output=console_json
+output=log, console
 output_template=rhasspy.json
 units=metric
 timezone=Europe/Berlin
@@ -21,10 +21,3 @@ lon=
 
 [OpenWeatherMap]
 api_key=
-
-[mqtt]
-address=
-port=
-user=
-password=
-topic=rhasspy_weather/response
