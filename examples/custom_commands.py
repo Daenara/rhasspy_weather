@@ -27,7 +27,7 @@ def speech(text):
 # get json from stdin and load into python dict
 if debug_mode:
     o = json.loads(
-        '{ "entities": [], "intent": {"confidence": 1, "name": "GetWeatherForecast"}, "raw_text": "wie wird das wetter", "raw_tokens": ["wie", "wird", "das", "wetter"], "recognize_seconds": 0.08515081899531651, "slots": {}, "speech_confidence": 1, "text": "wie wird das wetter", "tokens": ["wie", "wird", "das", "wetter"], "wakeword_id": null}')
+        '{ "entities": [], "intent": {"confidence": 1, "name": "GetWeatherForecast"}, "raw_text": "wie wird das wetter morgen", "raw_tokens": ["wie", "wird", "das", "wetter", "morgen"], "recognize_seconds": 0.08515081899531651, "slots": {}, "speech_confidence": 1, "text": "wie wird das wetter morgen", "tokens": ["wie", "wird", "das", "wetter", "morgen"], "wakeword_id": null}')
 else:
     o = json.loads(sys.stdin.read())
 
@@ -41,7 +41,7 @@ if intent == "GetTime":
     print(json.dumps(o))
 elif intent.startswith("GetWeatherForecast"):
     log.info("Detected Weather Intent")
-    forecast = weather.get_weather_forecast(o)
+    forecast = weather.get_weather_forecast(o, config_path="../rhasspy_weather_config.ini")
 else:
     log.info("No intent found.")
     print(json.dumps(o))
