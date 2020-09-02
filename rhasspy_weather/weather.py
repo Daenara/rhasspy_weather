@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import logging
 
+from rhasspy_weather import fill_report
 from rhasspy_weather.data_types.report import WeatherReport
 import rhasspy_weather.data_types.config as cf
 from rhasspy_weather.data_types.error import WeatherError, ConfigError
@@ -26,7 +27,7 @@ def get_weather_forecast(weather_input, config_path=None):
         forecast = config.api.get_weather(request.location)
 
         log.info("Formulating answer")
-        output = WeatherReport(request, forecast)
+        output = fill_report.generate_report(request, forecast)
     except WeatherError as error:
         output = error
 
