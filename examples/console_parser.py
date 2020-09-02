@@ -38,7 +38,7 @@ def parse():
         else:
             weather_input = json.loads(args.json)
 
-    print(get_weather_forecast(weather_input, config_path=config_path))
+    get_weather_forecast(weather_input, config_path=config_path)
 
 
 if __name__ == '__main__':
