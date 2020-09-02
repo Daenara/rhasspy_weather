@@ -64,10 +64,10 @@ class WeatherInterval:
             # are added)
             if clouds_and_clear_exclusive:
                 if x.condition_type == ConditionType.CLOUDS:
-                    if self.__clouds >= self.__clear:
+                    if self.__condition_counts[ConditionType.CLOUDS] >= self.__condition_counts[ConditionType.CLEAR]:
                         self.__add_element_to_condition_list(x, selected)
                 if x.condition_type == ConditionType.CLEAR:
-                    if self.__clear > self.__clouds:
+                    if self.__condition_counts[ConditionType.CLEAR] > self.__condition_counts[ConditionType.CLOUDS]:
                         self.__add_element_to_condition_list(x, selected)
             else:
                 self.__add_element_to_condition_list(x, selected)
