@@ -135,6 +135,6 @@ dmypy.json
 # project specific ignores
 rhasspy_weather_config.ini
 not_working
-output.log
+*.log
 slot_programs/
 slots/
