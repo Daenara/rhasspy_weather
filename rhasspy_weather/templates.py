@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 # TODO: add more detailed templates to use (especially debug/expanded to use with testcases)
 
 
-def fill_template(weather_input, result, template_override=None):
+def fill_template(weather_input, result, template_override=None, remove_not_replaced_lines=True):
     config = get_config()
     if template_override is None:
         template = Template(config.output_template)
@@ -29,6 +29,18 @@ def fill_template(weather_input, result, template_override=None):
         template_values = {**template_values, **intent_to_template_values(weather_input)}
 
     output = template.safe_substitute(template_values)
+    if "\n" in output and remove_not_replaced_lines:
+        output_array = output.splitlines()
+        new_output = ""
+        for item in output_array:
+            if "$" in item:
+                pass
+            else:
+                if new_output is "":
+                    new_output = item
+                else:
+                    new_output = new_output + "\n" + item
+        output = new_output
     if ".json" in config.output_template_name and template_override is None:
         output = output.replace("None", "null").replace("'", "\"")
         output = json.dumps(json.loads(output))  # not the best way but otherwise the json is not correct
