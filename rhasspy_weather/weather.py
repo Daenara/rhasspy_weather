@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 # function being called when rhasspy detects an intent related to the weather
-def get_weather_forecast(intent_message, config_path=None):
+def get_weather_forecast(weather_input, config_path=None):
     if config_path is not None:
         cf.set_config_path(config_path)
 
@@ -20,7 +20,7 @@ def get_weather_forecast(intent_message, config_path=None):
 
     try:
         log.info("Parsing rhasspy intent")
-        request = config.parser.parse_intent_message(intent_message)
+        request = config.parser.parse_intent_message(weather_input)
 
         log.info("Requesting weather")
         forecast = config.api.get_weather(request.location)
@@ -33,7 +33,7 @@ def get_weather_forecast(intent_message, config_path=None):
     log.info("Answering")
     for output_item in config.output:
         try:
-            filled_template = fill_template(intent_message, output, output_item.get_template())
+            filled_template = fill_template(weather_input, output, output_item.get_template())
             output_item.output_response(filled_template)
         except (WeatherError, ConfigError) as e:
             log.error(f"Can't output response on {output_item.__name__}: {e.description}")

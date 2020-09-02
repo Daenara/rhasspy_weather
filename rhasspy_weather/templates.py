@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 # TODO: add more detailed templates to use (especially debug/expanded to use with testcases)
 
 
-def fill_template(intent_message, result, template_override=None):
+def fill_template(weather_input, result, template_override=None):
     config = get_config()
     if template_override is None:
         template = Template(config.output_template)
@@ -26,7 +26,7 @@ def fill_template(intent_message, result, template_override=None):
     else:
         template_values = {**template_values, **weather_report_to_template_values(result), **weather_object_to_template_values(result.request, "request")}
     if "rhasspy_intent" in config.parser.__name__:
-        template_values = {**template_values, **intent_to_template_values(intent_message)}
+        template_values = {**template_values, **intent_to_template_values(weather_input)}
 
     output = template.safe_substitute(template_values)
     if ".json" in config.output_template_name and template_override is None:
