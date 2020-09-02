@@ -32,8 +32,8 @@ class WeatherConfig:
         self.timezone = None
         self.__locale = None
 
-        self.temp_warm_from = None,
-        self.temp_cold_to = None
+        self.temperature_warm_from = None,
+        self.temperature_cold_to = None
         self.detail = None
 
         self.location = None
@@ -62,8 +62,8 @@ class WeatherConfig:
         if section is None:
             log.error(f"Required section {section} is missing. Please refer to 'config.default' for an example config.")
 
-        self.temp_warm_from = self.__get_option_with_default_value(section, "temp_warm", 20, "int")
-        self.temp_cold_to = self.__get_option_with_default_value(section, "temp_cold", 5, "int")
+        self.temperature_warm_from = self.__get_option_with_default_value(section, "temp_warm", 20, "int")
+        self.temperature_cold_to = self.__get_option_with_default_value(section, "temp_cold", 5, "int")
         self.detail = self.__get_option_with_default_value(section, "level_of_detail", False, "bool")
 
     def __parse_section_location(self, section):
