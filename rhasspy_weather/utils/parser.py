@@ -13,7 +13,7 @@ InputTime = TypeVar("InputTime", str, int)
 
 
 def parse_date(date: str, locale):
-    log.debug(f"parse date {date}")
+    log.debug(f"parse date - {date}")
 
     named_days_lowercase = [x.lower() for x in locale.named_days.keys()]
     named_days_synonyms_lowercase = [x.lower() for x in locale.named_days_synonyms.keys()]
