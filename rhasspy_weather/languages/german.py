@@ -311,7 +311,7 @@ item_answers = {
     "not_warm_and_sunny": [
         "Es ist {when} {where} nicht sonderlich warm aber trotzdem sonnig. {item} vielleicht trotzdem nützlich."],
     "not_sunny": ["Es ist {when} {where} nicht unbedingt sonnig. {item} vermutlich eher überflüssig."],
-    "nighttime": ["Es ist {when} {where} dunkel. Im Dunkeln ist {item} unnötig"],
+    "nighttime": ["Es ist {when} {where} dunkel, {item} unnötig"],
     "warm": ["Es ist {when} warm {where}. {item} daher eine gute Idee."],
     "not_warm": ["Es ist {when} {where} nicht sonderlich warm. {item} vermutlich unnötig."],
     "cold": ["Es ist {when} kalt {where}. {item} daher eine gute Idee."],
