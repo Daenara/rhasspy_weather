@@ -270,9 +270,7 @@ class WeatherReport:
                 else:
                     response_type = "false"
             elif self.__request.requested == ConditionType.WIND:
-                log.error("condition wind not implemented yet")
-                self.status.set_status(ErrorCode.NOT_IMPLEMENTED_ERROR)
-                return self.status.status_response()
+                raise WeatherError(ErrorCode.NOT_IMPLEMENTED_ERROR, "Wind Condition not implemented yet.")
             else:
                 if weather_obj.is_weather_chance(self.__request.requested):
                     response_type = "true"
