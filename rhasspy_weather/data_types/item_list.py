@@ -1,10 +1,17 @@
+from typing import List
+
 from rhasspy_weather.data_types.item import WeatherItem
+from rhasspy_weather.data_types.weather_type import WeatherType
+
+items = None
 
 
 class WeatherItemList:
 
     def __init__(self):
         self.__items = []
+        global items
+        items = self
 
     def __len__(self):
         return len(self.__items)
@@ -18,30 +25,30 @@ class WeatherItemList:
 
     __repr__ = __str__
 
-    def add_item(self, name, prefix, suffix, condition_list):
-        item = WeatherItem(name, prefix, suffix, condition_list)
+    def add_item(self, name: str, prefix: str, suffix: str, weather_list: List[WeatherType]):
+        item = WeatherItem(name, prefix, suffix, weather_list)
         if item not in self.__items:
             self.__items.append(item)
 
-    def get_items_for_condition(self, condition):
+    def get_items_for_weather(self, weather_type: WeatherType):
         output = []
         for item in self.__items:
-            if item.is_for_condition_type(condition):
+            if item.is_for_weather_type(weather_type):
                 output.append(item)
         return output
 
-    def get_item_names_for_condition(self, condition):
+    def get_item_names_for_weather(self, weather_type: WeatherType):
         output = []
         for item in self.__items:
-            if item.is_for_condition_type(condition):
+            if item.is_for_weather_type(weather_type):
                 output.append(item.name)
         return output
 
-    def is_in_list(self, item_name):
+    def is_in_list(self, item_name: str):
         item = WeatherItem(item_name)
         return item in self.__items
 
-    def get_item(self, item_name):
+    def get_item(self, item_name: str):
         if self.is_in_list(item_name):
             item = WeatherItem(item_name)
             return self.__items[self.__items.index(item)]

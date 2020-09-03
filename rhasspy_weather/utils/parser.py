@@ -1,6 +1,7 @@
 import datetime
 from typing import TypeVar
 
+from rhasspy_weather.data_types import item_list
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.error import WeatherError, ErrorCode
 from rhasspy_weather.data_types.location import Location
@@ -88,7 +89,7 @@ def parse_condition(condition: str, locale):
 
 def parse_item(item: str, locale):
     log.debug(f"parse item - {item}")
-    items = locale.rain_items + locale.cold_items + locale.warm_items + locale.sun_items
+    items = item_list.items.get_all_item_names()
     items_lowercase = [x.lower() for x in items]
     if item.lower() in items_lowercase:
         return items[items_lowercase.index(item.lower())]
