@@ -37,7 +37,9 @@ def get_weather(location):
         response = requests.get(forecast_url)
         response = response.json()
 
-        if str(response["cod"]) == "401":
+        if str(response["cod"]) == "400":
+            raise WeatherError(ErrorCode.LOCATION_ERROR, response["message"])
+        elif str(response["cod"]) == "401":
             raise WeatherError(ErrorCode.API_ERROR)
         elif str(response["cod"]) == "429":
             raise WeatherError(ErrorCode.API_TIMEOUT_ERROR)
