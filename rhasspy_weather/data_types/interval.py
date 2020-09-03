@@ -13,15 +13,11 @@ class WeatherInterval:
         self.min_temperature = 99
         self.max_temperature = 0
         self.weather_condition_list = []
-        self.pressure = 0
-        self.humidity = 0
-        self.wind_speed = 0
-        self.wind_direction = 0
         self.__change_count = 0
         self.__condition_counts = {}
 
     def __str__(self):
-        return f"[count: {self.__change_count}, min_temp: {self.min_temperature}, max_temp: {self.max_temperature}, pressure: {self.pressure}, humidity: {self.humidity}]"
+        return f"[count: {self.__change_count}, min_temp: {self.min_temperature}, max_temp: {self.max_temperature}]"
 
     # puts information into itself
     def add_information(self, weather_at_time):

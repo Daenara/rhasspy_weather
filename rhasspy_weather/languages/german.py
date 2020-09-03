@@ -1,13 +1,12 @@
 import datetime
 
-from rhasspy_weather.utils import utils, dt_utils
 from rhasspy_weather.data_types.condition import ConditionType
-from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.error import ErrorCode
-
 # general stuff
 from rhasspy_weather.data_types.fixed_times import FixedTimes
+from rhasspy_weather.data_types.item_list import WeatherItemList
 from rhasspy_weather.data_types.temperature import TemperatureType
+from rhasspy_weather.utils import utils
 
 language_code = "de"
 
@@ -98,16 +97,16 @@ conditions = {
 # used in error.py to output status messages
 status_response = {
     ErrorCode.NO_NETWORK_ERROR: ["Es ist leider kein Internet verfügbar.",
-                                  "Ich bin nicht mit dem Internet verbunden.",
-                                  "Es ist kein Internet vorhanden."],
+                                 "Ich bin nicht mit dem Internet verbunden.",
+                                 "Es ist kein Internet vorhanden."],
     ErrorCode.API_ERROR: ["Das Wetter konnte nicht abgerufen werden. Vermutlich ist der API-Schlüssel ungültig.",
-                           "Fehler beim Abrufen. Der API-Schlüssel ist ungültig."],
+                          "Fehler beim Abrufen. Der API-Schlüssel ist ungültig."],
     ErrorCode.FUTURE_WEATHER_ERROR: ["So weit in die Zukunft kenne ich das Wetter nicht.",
-                                      "Ich kann nicht soweit in die Zukunft sehen.",
-                                      "Das Wetter für diesen Tag wurde noch nicht beschlossen.",
-                                      "Dieses Datum liegt zu weit in der Zukunft."],
+                                     "Ich kann nicht soweit in die Zukunft sehen.",
+                                     "Das Wetter für diesen Tag wurde noch nicht beschlossen.",
+                                     "Dieses Datum liegt zu weit in der Zukunft."],
     ErrorCode.NOT_IMPLEMENTED_ERROR: ["Diese Funktion wird noch nicht unterstützt.",
-                                       "Ich weiß nicht wie ich diese Anfrage verarbeiten soll."],
+                                      "Ich weiß nicht wie ich diese Anfrage verarbeiten soll."],
     ErrorCode.LOCATION_ERROR: [
         "Ich kann die angegebene Stadt nich finden. Vielleicht habe ich dich nicht richtig verstanden"],
     ErrorCode.PAST_WEATHER_ERROR: ["Ich kann dir das Wetter aus der Vergangenheit leider nicht sagen."],
@@ -179,7 +178,8 @@ def format_temperature_output(min_temperature, max_temperature):
     if min_temperature == max_temperature:
         return str(utils.normal_round(min_temperature)) + " Grad"
     else:
-        return "zwischen " + str(utils.normal_round(min_temperature)) + " und " + str(utils.normal_round(max_temperature)) + " Grad"
+        return "zwischen " + str(utils.normal_round(min_temperature)) + " und " + str(
+            utils.normal_round(max_temperature)) + " Grad"
 
 
 # condition report
@@ -229,12 +229,16 @@ condition_answers = {
         "false": ["Keine Sterne zu sehen {when} {where}."]
     },
     ConditionType.CLEAR: {
-        "true": ["Der Himmel ist klar {when} {where}."],
-        "false": ["Kein klarer Himmel {when} {where}."]
+        "true": ["Der Himmel ist klar {when} {where}"],
+        "false": ["Kein klarer Himmel {when} {where}"]
     },
     ConditionType.MIST: {
-        "true": ["{when} {where} ist es neblig."],
-        "false": ["{when} {where} ist es nicht neblig.."]
+        "true": ["{when} {where} ist es neblig"],
+        "false": ["{when} {where} ist es nicht neblig"]
+    },
+    ConditionType.WIND: {
+        "true": ["{when} {where} kann es windig sein"],
+        "false": ["{when} {where} weht kein Wind"]
     },
     ConditionType.UNKNOWN: {
         "": ["Ich weiß nicht, was genau du wissen willst."]
@@ -244,7 +248,61 @@ condition_answers = {
 general_answers = {
     "affirmative": ["Ja"],
     "negative": ["Nein"],
-    "alternate_weather": ["Das Wetter ist: {weather}", "Stattdessen ist das Wetter {weather}", "Stattdessen ist es {weather}", "Das Wetter: {weather}"]
+    "item_needed": ["{item} macht Sinn", "{item} wäre praktisch"],
+    "item_not_needed": ["{item} unnötig", "{item} sinnlos"],
+    "alternate_weather": ["Das Wetter ist: {weather}", "Stattdessen ist das Wetter {weather}",
+                          "Stattdessen ist es {weather}", "Das Wetter: {weather}"]
+}
+
+answers_true = {
+    ConditionType.RAIN: {
+        "main": ["{when} gibt es {where} Regen",
+                 "Es regnet {when} {where}",
+                 "{when} regnet es {where}"],
+        "other": ["es gibt Regen",
+                  "es regnet",
+                  "es kann regnen",
+                  "es gibt eine Chance auf Regen"]
+    },
+    ConditionType.SNOW: {
+        "main": ["{when} wird es {where} schneien",
+                 "{when} gibt es {where} Schnee",
+                 "Es schneit {when} {where}",
+                 "{when} schneit es {where}"],
+        "other": [
+            "es wird schneien",
+            "es gibt Schnee",
+            "es kann Schnee geben"
+        ]
+    },
+    ConditionType.THUNDERSTORM: {
+        "main": ["{when} gibt es {where} Gewitter"],
+        "other": ["es kann gewittern"]
+    },
+    ConditionType.CLOUDS: {
+        "main": ["{when} kann es {where} bewölkt sein"],
+        "other": ["der Himmel ist bewölkt"]
+    },
+    ConditionType.SUN: {
+        "main": ["{when} {where} scheint die Sonne"],
+        "other": ["die Sonne kommt raus"],
+    },
+    ConditionType.STARS: {
+        "main": ["Man kann {when} {where} die Sterne sehen"],
+        "other": ["es gibt klaren Blick auf die Sterne"]
+    },
+    ConditionType.CLEAR: {
+        "main": ["Der Himmel ist klar {when} {where}"],
+        "other": ["der Himmel ist klar"]
+    },
+    ConditionType.MIST: {
+        "main": ["{when} {where} ist es neblig"],
+        "other": ["es kann neblig sein"]
+    },
+    ConditionType.WIND: {
+        "main": ["{when} {where} kann es windig sein"],
+        "other": ["es kann windig sein"]
+    }
 }
 
 
@@ -276,12 +334,15 @@ items.add_item("Sandalen", "", "sind", [TemperatureType.WARM, ConditionType.SUN]
 items.add_item("kurze Hosen", "", "sind", [TemperatureType.WARM, ConditionType.SUN])
 items.add_item("leichte Kleidung", "", "ist", [TemperatureType.WARM, ConditionType.SUN])
 items.add_item("Winterstiefel", "", "sind", [TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("Mantel", "ein", "ist", [TemperatureType.COLD, ConditionType.RAIN, ConditionType.SNOW, ConditionType.WIND, ConditionType.THUNDERSTORM])
+items.add_item("Mantel", "ein", "ist",
+               [TemperatureType.COLD, ConditionType.RAIN, ConditionType.SNOW, ConditionType.WIND,
+                ConditionType.THUNDERSTORM])
 items.add_item("Schal", "ein", "ist", [TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Handschuhe", "", "sind", [TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Mütze", "eine", "ist", [TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("dicke Kleidung", "", "ist", [TemperatureType.COLD])
-items.add_item("Stiefel", "", "sind", [ConditionType.RAIN, TemperatureType.COLD, ConditionType.SNOW, ConditionType.WIND])
+items.add_item("Stiefel", "", "sind",
+               [ConditionType.RAIN, TemperatureType.COLD, ConditionType.SNOW, ConditionType.WIND])
 items.add_item("lange Hosen", "", "sind", [ConditionType.WIND, TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("lange Unterhosen", "", "sind", [TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Fleece", "ein", "ist", [TemperatureType.COLD, ConditionType.WIND])
@@ -293,12 +354,13 @@ items.add_item("Sonnencreme", "", "ist", [ConditionType.SUN])
 items.add_item("paar Gummistiefel", "ein", "ist", [ConditionType.RAIN])
 items.add_item("paar lange Unterhosen", "ein", "ist", [TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("paar Handschuhe", "ein", "ist", [TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("paar Stiefel", "ein", "ist", [ConditionType.RAIN, TemperatureType.COLD, ConditionType.SNOW, ConditionType.WIND, ConditionType.THUNDERSTORM])
+items.add_item("paar Stiefel", "ein", "ist",
+               [ConditionType.RAIN, TemperatureType.COLD, ConditionType.SNOW, ConditionType.WIND,
+                ConditionType.THUNDERSTORM])
 items.add_item("paar Sandalen", "ein", "ist", [TemperatureType.WARM, ConditionType.SUN])
 items.add_item("paar Winterstiefel", "ein", "ist", [TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Winterjacke", "eine", "ist", [TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Teleskop", "ein", "ist", [ConditionType.STARS])
-
 
 item_answers = {
     "rain": ["Es könnte {when} {where} regnen, {item} keine schlechte Idee.",

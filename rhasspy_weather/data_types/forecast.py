@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
+from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType, WindCondition
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.interval import WeatherInterval
 from rhasspy_weather.utils.utils import normal_round
@@ -50,21 +50,10 @@ class WeatherForecast:
 
         self.forecast = []
         self.__timezone = get_config().timezone
-        self.sunset = None
-        self.sunrise = None
+        self.sunset, self.sunrise = None, None
 
     def __str__(self):
         return self.forecast
-
-    # calculates the time for sunrise and sunset
-    def calculate_sunrise_and_sunset(self, lat, lon):
-        log.debug(f"Calculating Sunrise and Sunset")
-
-        import suntime
-
-        sun = suntime.Sun(lat, lon)
-        self.sunrise = sun.get_local_sunrise_time().time()
-        self.sunset = sun.get_local_sunset_time().time()
 
     def weather_during_daytime(self, request):
         """returns WeatherInterval for a request only during daylight hours
@@ -169,10 +158,11 @@ class WeatherForecast:
 
     # saves the weather data at a specific date (list of WeatherAtTime)
     class WeatherAtDate:
-        def __init__(self, date):
+        def __init__(self, date, location):
             self.date = date
             self.weather = []
             self.interval = 3
+            self.location = location
 
         def __str__(self):
             str_weather = ""
@@ -187,7 +177,7 @@ class WeatherForecast:
         # list
         def parse_weather(self, time, temperature, weather_condition_list, pressure, humidity, wind_speed, wind_direction):
             for x in range(len(time)):
-                self.weather.append(self.WeatherAtTime(time[x], temperature[x], weather_condition_list[x], pressure[x], humidity[x], wind_speed[x], wind_direction[x], self.interval))
+                self.weather.append(self.WeatherAtTime(time[x], temperature[x], weather_condition_list[x], pressure[x], humidity[x], wind_speed[x], wind_direction[x], self.interval, self.location))
 
         # returns the weather during the specified interval
         def get_weather_for_interval(self, from_time, to_time, weather_for_interval=None):
@@ -214,35 +204,27 @@ class WeatherForecast:
 
         # saves the weather data at a specific time
         class WeatherAtTime:
-            def __init__(self, time, temperature, main_condition, pressure, humidity, wind_speed, wind_direction, interval):
+            def __init__(self, time, temperature, main_condition, pressure, humidity, wind_speed, wind_direction, interval, location):
                 self.interval = interval
                 self.time = time
                 self.temperature = temperature
                 self.main_condition = main_condition
+                self.other_conditions = [WindCondition(wind_speed, wind_direction)]
                 self.pressure = pressure
                 self.humidity = humidity
-                self.wind_speed = wind_speed
-                self.wind_direction = wind_direction
-                self.wind_condition = self.__get_wind_condition()
+                self.location = location
+                if self.main_condition.condition_type == ConditionType.CLEAR:
+                    if self.is_during_day:
+                        self.other_conditions.append(WeatherCondition(0, "", ConditionType.SUN))
+                    if self.is_during_night:
+                        self.other_conditions.append(WeatherCondition(0, "", ConditionType.STARS))
 
             def __str__(self):
                 return "[" + str(self.string_time) + ", " + str(self.temperature) + ", " + str(self.weather_condition) + \
-                       ", " + str(self.weather_description) + ", " + str(self.pressure) + ", " + str(self.wind_speed) + ", " + str(self.wind_direction) + "]"
+                       ", " + str(self.weather_description) + ", " + str(self.pressure) + "]"
 
             def __repr__(self):
                 return self.weather_condition
-
-            def __get_wind_condition(self):
-                # TODO: finish this
-                units = get_config().units
-                if units == "imperial":
-                    self.wind_speed = self.wind_speed / 2.237
-                severity = normal_round((self.wind_speed / 0.836) * (2 / 3))
-
-                compass_index = int((self.wind_direction/45)+0.5) % 8
-                compass_directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
-
-                return WeatherCondition(severity, "", ConditionType.WIND)
 
             @property
             def weather_condition(self):
@@ -274,3 +256,11 @@ class WeatherForecast:
             @property
             def string_time(self):
                 return self.__time.strftime("%H:%M:%S")
+
+            @property
+            def is_during_day(self):
+                return self.location.sunrise <= self.time <= self.location.sunset
+
+            @property
+            def is_during_night(self):
+                return self.location.sunset <= self.time <= self.location.sunrise

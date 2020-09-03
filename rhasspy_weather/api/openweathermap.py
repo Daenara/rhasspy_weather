@@ -7,6 +7,8 @@ from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
 from rhasspy_weather.data_types.forecast import WeatherForecast
 from rhasspy_weather.data_types.error import ErrorCode, WeatherError, ConfigError
+from rhasspy_weather.data_types.weather import Weather
+from rhasspy_weather.data_types.weather_at_time import WeatherAtTime
 
 log = logging.getLogger(__name__)
 
@@ -49,13 +51,14 @@ def get_weather(location):
         # Parse the output of Open Weather Map's forecast endpoint
         if not (hasattr(location, "lat") and hasattr(location, "lon")):
             location.set_lat_and_lon(response["city"]["coord"]["lat"], response["city"]["coord"]["lon"])
-        weather_forecast.calculate_sunrise_and_sunset(location.lat, location.lon)
+        weather_forecast.sunrise, weather_forecast.sunset = location.sunrise, location.sunset
         forecasts = {}
         for x in response["list"]:
             if str(datetime.date.fromtimestamp(x["dt"])) not in forecasts:
                 forecasts[str(datetime.date.fromtimestamp(x["dt"]))] = \
                     list(filter(lambda forecast: datetime.date.fromtimestamp(forecast["dt"]) == datetime.date.fromtimestamp(x["dt"]), response["list"]))
 
+        weather = Weather()
         for key, forecast in forecasts.items():
             condition_list = []
             weather_condition = [x["weather"][0]["main"] for x in forecast]
@@ -64,18 +67,23 @@ def get_weather(location):
             for x in range(len(weather_condition)):
                 temp_condition = WeatherCondition(__get_severity_from_open_weather_map_id(weather_id[x]), weather_description[x], __get_condition_type(weather_id[x]))
                 condition_list.append(temp_condition)
-            tmp = WeatherForecast.WeatherAtDate(datetime.datetime.strptime(key, "%Y-%m-%d").date())
-            tmp.parse_weather(
+
+            __parse_weather(
+                weather,
+                datetime.datetime.strptime(key, "%Y-%m-%d").date(),
+                location,
+                3,
                 [datetime.datetime.strptime(x, "%H:%M:%S").time() for x in [x["dt_txt"].split(" ")[1] for x in forecast]],
-                [x["main"]["temp"] for x in forecast], condition_list, [x["main"]["pressure"] for x in forecast],
+                [x["main"]["temp"] for x in forecast],
+                condition_list,
+                [x["main"]["pressure"] for x in forecast],
                 [x["main"]["humidity"] for x in forecast],
                 [x["wind"]["speed"] for x in forecast],
                 [x["wind"]["deg"] for x in forecast]
             )
-            weather_forecast.forecast.append(tmp)
     except (requests.exceptions.ConnectionError, ValueError):
         raise WeatherError(ErrorCode.NO_NETWORK_ERROR, "Weather could not be fetched.")
-    return weather_forecast
+    return weather
 
 
 def parse_config(config):
@@ -170,3 +178,9 @@ def __get_condition_type(owm_id):
         return ConditionType.MIST
     else:
         return ConditionType.MISC
+
+
+def __parse_weather(weather: Weather, date, location, interval, time, temperature, weather_condition_list, pressure, humidity, wind_speed, wind_direction):
+    for x in range(len(time)):
+        weather_at_time = WeatherAtTime(date, time[x], temperature[x], weather_condition_list[x], pressure[x], humidity[x], wind_speed[x], wind_direction[x], interval, location)
+        weather.add_weather(date, weather_at_time)
