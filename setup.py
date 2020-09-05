@@ -9,5 +9,8 @@ setuptools.setup(
     py_modules=["rhasspy_weather", "templates", "utils", "api", "data_types", "languages", "output"],
     python_requires='>=3.7',
     install_requires=["requests", "pytz", "paho-mqtt", "suntime", "python-dateutil"],
-    package_data={'': ['config.default']}
+    package_data={
+        '': ['config.default'],
+        'rhasspy_weather.output_templates': ['*','*/*','*/*/*'],
+    }
 )
