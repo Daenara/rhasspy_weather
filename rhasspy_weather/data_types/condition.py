@@ -29,7 +29,7 @@ class WeatherCondition:
         self.condition_type = condition_type
 
     def __eq__(self, other):
-        return self.description == other.description
+        return self.condition_type == other.condition_type and self.severity == other.severity
 
     def __str__(self):
         return "[" + str(self.condition_type) + ", " + str(self.severity) + ", " + str(self.description) + "]"
