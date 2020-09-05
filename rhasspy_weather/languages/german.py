@@ -361,26 +361,3 @@ items.add_item("paar Sandalen", NounType.SINGULAR, article="ein", weather_list=[
 items.add_item("paar Winterstiefel", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Winterjacke", NounType.SINGULAR, article="eine", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Teleskop", NounType.SINGULAR, article="ein", weather_list=[ConditionType.STARS])
-
-item_answers = {
-    "rain": ["Es könnte {when} {where} regnen, {item} keine schlechte Idee.",
-             "Es könnte {when} {where} Regen geben. {item} keine schlechte Idee."],
-    "no_rain": ["Es ist {when} {where} kein Regen gemeldet. {item} also vermutlich unnötig."],
-    "warm_and_sunny": ["Es ist {when} warm {where} und tagsüber kommt die Sonne raus. {item} daher eine gute Idee."],
-    "not_warm_and_sunny": [
-        "Es ist {when} {where} nicht sonderlich warm aber trotzdem sonnig. {item} vielleicht trotzdem nützlich."],
-    "not_sunny": ["Es ist {when} {where} nicht unbedingt sonnig. {item} vermutlich eher überflüssig."],
-    "nighttime": ["Es ist {when} {where} dunkel. {item} im Dunkeln unnötig."],
-    "warm": ["Es ist {when} warm {where}. {item} daher eine gute Idee."],
-    "not_warm": ["Es ist {when} {where} nicht sonderlich warm. {item} vermutlich unnötig."],
-    "cold": ["Es ist {when} kalt {where}. {item} daher eine gute Idee."],
-    "not_cold": ["Es ist {when} {where} nicht sonderlich kalt. {item} daher eher unnötig."],
-    "unknown_item": ["Ich bin mir nicht sicher, was ein {item} ist, tut mir leid."]
-}
-
-
-def format_item_for_output(item_name):
-    if items.is_in_list(item_name):
-        return items.get_item(item_name).format_for_output()
-    else:
-        return item_name
