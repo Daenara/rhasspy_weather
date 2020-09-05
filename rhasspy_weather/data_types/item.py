@@ -39,4 +39,4 @@ class WeatherItem:
         from rhasspy_weather.data_types.config import get_config
         locale = get_config().locale
 
-        return utils.remove_excessive_whitespaces(sentence.format(article=self.article, noun=self.name, verb=locale.grammar[self.noun_type]))
+        return utils.remove_excessive_whitespaces(sentence.format(article=self.article, noun=self.name, verb=locale.grammar[self.noun_type], when="{when}", where="{where}", weather="{weather}"))
