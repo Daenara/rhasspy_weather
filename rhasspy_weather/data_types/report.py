@@ -98,9 +98,15 @@ class WeatherReport:
                 self.min_humidity = weather_at_time.humidity
 
             # TODO: maybe do something about the order
-            for condition in weather_at_time.other_conditions + [weather_at_time.main_condition]:
-                if condition not in self.weather_condition_list:
+            for condition in [weather_at_time.main_condition] + weather_at_time.other_conditions:
+                condition_type_list = [x.condition_type for x in self.weather_condition_list]
+                if condition.condition_type not in condition_type_list:
                     self.weather_condition_list.append(condition)
+                else:
+                    condition_in_list = next(x for x in self.weather_condition_list if x.condition_type == condition.condition_type)
+                    if condition.severity > condition_in_list.severity:
+                        self.weather_condition_list.remove(condition_in_list)
+                        self.weather_condition_list.append(condition)
                 self.__increase_counter(condition.condition_type)
 
     # counts how many occurrences of a certain weather type there are
