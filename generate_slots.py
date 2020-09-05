@@ -30,16 +30,25 @@ slots = {
 
 if __name__ == "__main__":
     executable = False
-    if "-x" in sys.argv:
+    rhasspy_weather_folder = ""
+    
+    opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
+    args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+    
+    if "-x" in opts:
         executable = True
+        
+    if len(args) == 1:
+        rhasspy_weather_folder=args[0] + "/"
 
     for key in slots.keys():
         folder = "slots"
         if executable:
             folder = "slot_programs"
-        if not os.path.exists(folder):
-            os.mkdir(folder)
-        f = open(os.path.join(folder, key), mode="w", encoding="utf-8")
+        output_folder = rhasspy_weather_folder + folder
+        if not os.path.exists(output_folder):
+            os.mkdir(output_folder)
+        f = open(os.path.join(output_folder, key), mode="w", encoding="utf-8")
         if executable:
             out = "#!/usr/bin/python3\n"
             out += "from rhasspy_weather.data_types.config import get_config\n"
