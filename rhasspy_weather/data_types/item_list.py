@@ -1,6 +1,6 @@
 from typing import List
 
-from rhasspy_weather.data_types.item import WeatherItem
+from rhasspy_weather.data_types.item import WeatherItem, NounType
 from rhasspy_weather.data_types.weather_type import WeatherType
 
 items = None
@@ -25,8 +25,8 @@ class WeatherItemList:
 
     __repr__ = __str__
 
-    def add_item(self, name: str, prefix: str, suffix: str, weather_list: List[WeatherType]):
-        item = WeatherItem(name, prefix, suffix, weather_list)
+    def add_item(self, name: str, noun_type: NounType, weather_list: List[WeatherType], article: str = ""):
+        item = WeatherItem(name, noun_type, article, weather_list)
         if item not in self.__items:
             self.__items.append(item)
 

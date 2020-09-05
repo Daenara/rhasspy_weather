@@ -1,5 +1,6 @@
 import datetime
 
+from rhasspy_weather.data_types.item import NounType
 from rhasspy_weather.utils import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.item_list import WeatherItemList
@@ -242,35 +243,39 @@ def combine_conditions(condition_list):
 
 
 # items
+grammar = {
+    NounType.SINGULAR: "is",
+    NounType.PLURAL: "are"
+}
 
 items = WeatherItemList()
-items.add_item("umbrella", "an", "", [ConditionType.RAIN, ConditionType.SNOW])
-items.add_item("raincoat", "a", "", [ConditionType.RAIN, ConditionType.WIND])
-items.add_item("rain coat", "a", "", [ConditionType.RAIN, ConditionType.WIND])
-items.add_item("rubber boots", "", "", [ConditionType.RAIN])
-items.add_item("pair of rubber boots", "a", "", [ConditionType.RAIN])
-items.add_item("sandals", "", "", [TemperatureType.WARM, ConditionType.SUN])
-items.add_item("sunglasses", "", "", [ConditionType.SUN])
-items.add_item("sunscreen", "", "", [ConditionType.SUN])
-items.add_item("boots", "", "", [TemperatureType.COLD, ConditionType.WIND])
-items.add_item("scarf", "a", "", [TemperatureType.COLD])
-items.add_item("gloves", "", "", [TemperatureType.COLD])
-items.add_item("hat", "a", "", [TemperatureType.COLD])
-items.add_item("wool hat", "a", "", [TemperatureType.COLD])
-items.add_item("hoodie", "a", "", [TemperatureType.COLD])
-items.add_item("sun hat", "a", "", [ConditionType.SUN])
-items.add_item("cap", "a", "", [ConditionType.SUN])
-items.add_item("parasol", "a", "", [ConditionType.SUN])
-items.add_item("boots", "", "", [ConditionType.RAIN, TemperatureType.COLD, ConditionType.WIND])
-items.add_item("pair of boots", "a", "", [ConditionType.RAIN, TemperatureType.COLD, ConditionType.WIND])
-items.add_item("sun screen", "", "", [ConditionType.SUN])
-items.add_item("pair of gloves", "a", "", [TemperatureType.COLD])
-items.add_item("sneakers", "", "", [TemperatureType.COLD, ConditionType.WIND])
-items.add_item("winter boots", "", "", [TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("pair of winter boots", "a", "", [TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("winter coat", "a", "", [TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("sandals", "", "", [TemperatureType.WARM, ConditionType.SUN])
-items.add_item("pair of sandals", "a", "", [TemperatureType.WARM, ConditionType.SUN])
+items.add_item("umbrella", NounType.SINGULAR, article="an", weather_list=[ConditionType.RAIN, ConditionType.SNOW])
+items.add_item("raincoat", NounType.SINGULAR, article="a", weather_list=[ConditionType.RAIN, ConditionType.WIND])
+items.add_item("rain coat", NounType.SINGULAR, article="a", weather_list=[ConditionType.RAIN, ConditionType.WIND])
+items.add_item("rubber boots", NounType.PLURAL, weather_list=[ConditionType.RAIN])
+items.add_item("pair of rubber boots", NounType.SINGULAR, article="a", weather_list=[ConditionType.RAIN])
+items.add_item("sandals", NounType.PLURAL, weather_list=[TemperatureType.WARM, ConditionType.SUN])
+items.add_item("sunglasses", NounType.PLURAL, weather_list=[ConditionType.SUN])
+items.add_item("sunscreen", NounType.SINGULAR, weather_list=[ConditionType.SUN])
+items.add_item("boots", NounType.PLURAL, weather_list=[TemperatureType.COLD, ConditionType.WIND])
+items.add_item("scarf", NounType.SINGULAR, article="a", weather_list=[TemperatureType.COLD])
+items.add_item("gloves", NounType.PLURAL, weather_list=[TemperatureType.COLD])
+items.add_item("hat", NounType.SINGULAR, article="a", weather_list=[TemperatureType.COLD])
+items.add_item("wool hat", NounType.SINGULAR, article="a", weather_list=[TemperatureType.COLD])
+items.add_item("hoodie", NounType.SINGULAR, article="a", weather_list=[TemperatureType.COLD])
+items.add_item("sun hat", NounType.SINGULAR, article="a", weather_list=[ConditionType.SUN])
+items.add_item("cap", NounType.SINGULAR, article="a", weather_list=[ConditionType.SUN])
+items.add_item("parasol", NounType.SINGULAR, article="a", weather_list=[ConditionType.SUN])
+items.add_item("boots", NounType.PLURAL, weather_list=[ConditionType.RAIN, TemperatureType.COLD, ConditionType.WIND])
+items.add_item("pair of boots", NounType.SINGULAR, article="a", weather_list=[ConditionType.RAIN, TemperatureType.COLD, ConditionType.WIND])
+items.add_item("sun screen", NounType.SINGULAR, weather_list=[ConditionType.SUN])
+items.add_item("pair of gloves", NounType.SINGULAR, article="a", weather_list=[TemperatureType.COLD])
+items.add_item("sneakers", NounType.PLURAL, weather_list=[TemperatureType.COLD, ConditionType.WIND])
+items.add_item("winter boots", NounType.PLURAL, weather_list=[TemperatureType.COLD, ConditionType.SNOW])
+items.add_item("pair of winter boots", NounType.SINGULAR, article="a", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
+items.add_item("winter coat", NounType.SINGULAR, article="a", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
+items.add_item("sandals", NounType.PLURAL, weather_list=[TemperatureType.WARM, ConditionType.SUN])
+items.add_item("pair of sandals", NounType.SINGULAR, article="a", weather_list=[TemperatureType.WARM, ConditionType.SUN])
 
 item_answers = {
     "rain": ["It could be rainy {when} {where}. Taking {item} might be a good idea.",
