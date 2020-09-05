@@ -3,7 +3,6 @@ import datetime
 import logging
 import os
 import sys
-
 import pytz
 
 from rhasspy_weather.data_types.config import get_config
