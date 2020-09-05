@@ -51,7 +51,9 @@ if __name__ == "__main__":
         f = open(os.path.join(output_folder, key), mode="w", encoding="utf-8")
         if executable:
             out = "#!/usr/bin/python3\n"
+            out += "import logging"
             out += "from rhasspy_weather.data_types.config import get_config\n"
+            out += "logging.disable(10000)"
             out += "config = get_config()\n"
             out += "output_list = " + slots[key] + "\n\n"
             out += "for output in output_list:\n"
