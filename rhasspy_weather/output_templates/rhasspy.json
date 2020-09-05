@@ -9,7 +9,7 @@
     "raw_text": "$intent_raw_text",
     "tokens": $intent_tokens,
     "raw_tokens": $intent_raw_tokens,
-    "wakeword_id": $intent_wakeword_id,
+    "wakeword_id": "$intent_wakeword_id",
     "site_id": "$intent_site_id",
     "speech": {
         "text": "$weather_text"
