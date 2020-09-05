@@ -56,30 +56,35 @@ class WeatherReport:
     def __str__(self):
         return f"[count: {self.__change_count}, min_temp: {self.min_temperature}, max_temp: {self.max_temperature}]"
 
+    def report(self):
+        if self.request.forecast_type == ForecastType.TEMPERATURE:
+            pass
+        elif self.request.forecast_type == ForecastType.CONDITION:
+            pass
+        elif self.request.forecast_type == ForecastType.FULL:
+            pass
+        elif self.request.forecast_type == ForecastType.ITEM:
+            self.report_item()
+
+        self.speech = self.speech.format(weather=self.config.locale.combine_conditions([x.description for x in self.weather_condition_list]), when="{when}", where="{where}")
+        print(self.speech)
+
     def report_item(self):
         requested_item = item_list.items.get_item(self.request.requested)
         true_conditions = []
         false_conditions = []
         for condition in self.weather_condition_list:
             if condition.condition_type in requested_item.weather_types:
-                answer_type = "other"
-                if not true_conditions:
-                    answer_type = "main"
-
-                true_conditions.append(random.choice(self.config.locale.answers_true[condition.condition_type][answer_type]))
+                true_conditions.append(condition)
             else:
-                answer_type = "other"
-                if not false_conditions:
-                    answer_type = "main"
-
-                false_conditions.append(random.choice(self.config.locale.answers_true[condition.condition_type][answer_type]))
+                false_conditions.append(condition)
 
         if true_conditions:
-            print(true_conditions)
+            self.speech = random.choice(self.config.locale.general_answers["affirmative"]) + ", " + requested_item.format_for_output(random.choice(self.config.locale.general_answers["item_needed"])) + ". "
         else:
-            prefix = random.choice(self.config.locale.general_answers["negative"]) + ", " + random.choice(self.config.locale.general_answers["item_not_needed"]).format(item=self.config.locale.format_item_for_output(requested_item.name))
-            print(prefix)
-            print(self.config.locale.combine_conditions(false_conditions))
+            self.speech = random.choice(self.config.locale.general_answers["negative"]) + ", " + requested_item.format_for_output(random.choice(self.config.locale.general_answers["item_not_needed"])) + ". "
+
+        self.speech = self.speech + random.choice(self.config.locale.general_answers["weather"])
 
     def __apply_weather(self):
         for weather_at_time in self.__weather:

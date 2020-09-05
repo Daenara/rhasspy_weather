@@ -10,7 +10,7 @@ from rhasspy_weather.data_types.temperature import TemperatureType
 from rhasspy_weather.data_types.weather_type import WeatherType
 
 
-def generate_report(request, forecast):
+def generate_report(request, weather):
     config = get_config()
     timezone = config.timezone
     locale = config.locale
@@ -20,16 +20,11 @@ def generate_report(request, forecast):
     if not (request.grain == Grain.DAY or request.grain == Grain.HOUR):
         raise WeatherError(ErrorCode.NOT_IMPLEMENTED_ERROR)
 
-    if request.forecast_type == ForecastType.TEMPERATURE:
+    if config.detail and request.forecast_type is not ForecastType.ITEM:
         pass
-    elif request.forecast_type == ForecastType.CONDITION:
-        pass
-    elif request.forecast_type == ForecastType.FULL:
-        pass
-    elif request.forecast_type == ForecastType.ITEM:
-        item = item_list.items.get_item(request.requested)
-        report = WeatherReport(request, forecast)
-        report.report_item()
+    else:
+        report = WeatherReport(request, weather)
+        report.report()
 
     return report
 

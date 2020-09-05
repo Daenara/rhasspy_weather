@@ -249,10 +249,9 @@ condition_answers = {
 general_answers = {
     "affirmative": ["Ja"],
     "negative": ["Nein"],
-    "item_needed": ["{item} macht Sinn", "{item} wäre praktisch"],
-    "item_not_needed": ["{item} unnötig", "{item} sinnlos"],
-    "alternate_weather": ["Das Wetter ist: {weather}", "Stattdessen ist das Wetter {weather}",
-                          "Stattdessen ist es {weather}", "Das Wetter: {weather}"]
+    "item_needed": ["{article} {noun} macht Sinn", "{article} {noun} wäre praktisch", "{article} {noun} {verb} praktisch", "{article} {noun} {verb} gute Idee"],
+    "item_not_needed": ["{article} {noun} {verb} {when} {where} unnötig", "{article} {noun} {verb} {when} {where} sinnlos", "{article} {noun} macht {when} {where} keinen Sinn"],
+    "weather": ["Das Wetter ist: {weather}", "Das Wetter: {weather}"]
 }
 
 answers_true = {
