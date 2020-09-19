@@ -111,5 +111,5 @@ class MockResponse:
             self.__response = weather_data[response_type]
 
     def json(self):
-        return json.loads(self.__response, ensure_ascii=False)
+        return json.loads(self.__response)
 

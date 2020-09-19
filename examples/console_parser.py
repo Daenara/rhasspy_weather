@@ -36,7 +36,7 @@ def parse():
             # read and parse json from stdin and send it to rhasspy_weather
             weather_input = json.load(sys.stdin)
         else:
-            weather_input = json.loads(args.json, ensure_ascii=False)
+            weather_input = json.loads(args.json)
 
     get_weather_forecast(weather_input, config_path=config_path)
 
