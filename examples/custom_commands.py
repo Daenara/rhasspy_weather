@@ -38,10 +38,10 @@ log.info("\n\nCustom Script Started")
 if intent == "GetTime":
     now = datetime.datetime.now(pytz.timezone('Europe/Berlin'))
     speech("Es ist %s Uhr %d." % (now.hour, now.minute))
-    print(json.dumps(o))
+    print(json.dumps(o, ensure_ascii=False))
 elif intent.startswith("GetWeatherForecast"):
     log.info("Detected Weather Intent")
     forecast = weather.get_weather_forecast(o, config_path="../rhasspy_weather_config.ini")
 else:
     log.info("No intent found.")
-    print(json.dumps(o))
+    print(json.dumps(o, ensure_ascii=False))
