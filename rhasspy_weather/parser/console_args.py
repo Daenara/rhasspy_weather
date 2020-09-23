@@ -52,11 +52,7 @@ def parse_general_intent(args:json) -> WeatherRequest:
     arg_time = args.time
     if arg_time is not None:
         time, str_time = parse_time(arg_time, config.locale)
-        if isinstance(time, tuple):
-            new_request.date_type = DateType.INTERVAL
-            new_request.start_time, new_request.end_time = time
-        new_request.time_specified = str_time
-        new_request.grain = Grain.HOUR
+        new_request.set_time(time, str_time)
 
     arg_location = args.location
     if arg_location is not None:

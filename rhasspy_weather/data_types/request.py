@@ -4,6 +4,7 @@ from enum import Enum
 
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.error import ErrorCode, WeatherError
+from rhasspy_weather.data_types.fixed_times import FixedTimes
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +61,8 @@ class WeatherRequest:
         self.grain = grain
         self.request_date = request_date
         self.requested = ""
+        self.start_time = None
+        self.end_time = None
         self.time_specified = ""
         self.date_specified = ""
         self.location_specified = False
@@ -67,17 +70,29 @@ class WeatherRequest:
         self.detail = config.detail
         self.__timezone = config.timezone
         self.__locale = config.locale
+        self.times = []
 
         # weather apis don't have weather for the past, so no no need checking
-        if self.request_date < datetime.datetime.now(self.__timezone).date() \
-                or self.grain == Grain.HOUR and self.__request.request_date == datetime.datetime.now(self.__timezone).date() \
-                and self.__request.start_time < datetime.datetime.now(self.__timezone).time():
+        if self.request_date < datetime.datetime.now(self.__timezone).date():
             raise WeatherError(ErrorCode.PAST_WEATHER_ERROR)
 
     def __str__(self):
         return "(" + str(self.forecast_type) + ", " + str(self.date_type) + ", " + \
                str(self.grain) + ", " + self.string_date + ", " + str(self.start_time) + \
                ", " + str(self.end_time) + ", " + self.location.name + ", " + self.requested + ", " + str(self.detail) + ")"
+
+    def __update_times(self):
+        if self.detail and self.forecast_type is not ForecastType.ITEM:
+            if not self.times:
+                for fixed_time in [FixedTimes.MORNING, FixedTimes.AFTERNOON, FixedTimes.EVENING]:
+                    self.times.append(fixed_time.value)
+        else:
+            if self.grain == Grain.HOUR:
+                self.times = []
+                self.times.append((self.start_time, self.end_time))
+            elif self.grain == Grain.DAY:
+                self.times = []
+                self.times.append((datetime.time.min, datetime.time.max))
 
     def __get_valid_time(self, val):
         time = None
@@ -88,20 +103,33 @@ class WeatherRequest:
             try:
                 time = datetime.datetime.strptime(val, "%H:%M:%S").time()
             except ValueError:
-                hours, minutes, seconds = map(int, "00:00:00".split(':'))
-                if hours >= 24 and 0 <= minutes < 60 and 0 <= seconds < 60:
-                    time = datetime.time(0, minutes, seconds)
+                raise WeatherError(ErrorCode.TIME_ERROR)
         if time is not None:
-            # if the weather at midnight was requested change the day to the
-            # next day
+            # if the weather at midnight was requested change the day to the next day
             # I say the next day is after 11:59PM of the day requested)
             if self.grain == Grain.HOUR and time == datetime.time.min:
                 self.request_date = self.request_date + datetime.timedelta(days=1)
+            # if the request was for today and the time has already passed I assume it meant the time +12h (PM instead of AM)
             elif self.grain == Grain.HOUR and self.request_date == datetime.datetime.now(self.__timezone).date() and \
                     datetime.datetime.now(self.__timezone).time() > time and time < datetime.time(12, 0):
                 return time.replace(hour=time.hour + 12)
             return time
         raise WeatherError(ErrorCode.TIME_ERROR)
+
+    def set_time(self, time, str_time):
+        self.grain = Grain.HOUR
+        if isinstance(time, tuple):
+            self.date_type = DateType.INTERVAL
+            self.start_time = self.__get_valid_time(time[0])
+            self.end_time = self.__get_valid_time(time[1])
+        else:
+            self.start_time = self.__get_valid_time(time)
+        self.time_specified = str_time
+
+        if self.request_date == datetime.datetime.now(self.__timezone).date() and self.start_time < datetime.datetime.now(self.__timezone).time():
+            raise WeatherError(ErrorCode.PAST_WEATHER_ERROR)
+
+        self.__update_times()
 
     @property
     def location(self):
@@ -153,26 +181,6 @@ class WeatherRequest:
             raise WeatherError(ErrorCode.DATE_ERROR)
 
     @property
-    def start_time(self):
-        if '_WeatherRequest__start_time' in self.__dict__:
-            return self.__start_time
-        return None
-
-    @start_time.setter
-    def start_time(self, val):
-        self.__start_time = self.__get_valid_time(val)
-
-    @property
-    def end_time(self):
-        if '_WeatherRequest__end_time' in self.__dict__:
-            return self.__end_time
-        return None
-
-    @end_time.setter
-    def end_time(self, val):
-        self.__end_time = self.__get_valid_time(val)
-
-    @property
     def weekday(self):
         return self.__locale.weekday_names[self.request_date.weekday()]
 
@@ -186,19 +194,27 @@ class WeatherRequest:
 
     @property
     def string_start_time(self):
-        return self.start_time.strftime("%H:%M:%S")
+        if self.start_time:
+            return self.start_time.strftime("%H:%M:%S")
+        return ""
 
     @property
     def string_end_time(self):
-        return self.end_time.strftime("%H:%M:%S")
+        if self.end_time:
+            return self.end_time.strftime("%H:%M:%S")
+        return ""
 
     @property
     def readable_start_time(self):
-        return self.start_time.strftime("%H:%M")
+        if self.start_time:
+            return self.start_time.strftime("%H:%M")
+        return ""
 
     @property
     def readable_end_time(self):
-        return self.end_time.strftime("%H:%M")
+        if self.end_time:
+            return self.end_time.strftime("%H:%M")
+        return ""
 
     @property
     def time_difference(self):

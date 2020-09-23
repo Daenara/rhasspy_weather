@@ -62,11 +62,7 @@ def parse_general_intent(intent_message: dict) -> WeatherRequest:
 
     if slot_names["time"] in slots and slots[slot_names["time"]] != "":
         time, str_time = parse_time(slots[slot_names["time"]], config.locale)
-        if isinstance(time, tuple):
-            new_request.date_type = DateType.INTERVAL
-            new_request.start_time, new_request.end_time = time
-        new_request.time_specified = str_time
-        new_request.grain = Grain.HOUR
+        new_request.set_time(time, str_time)
 
     if slot_names["location"] in slots and slots[slot_names["location"]] != "":
         new_request.location = parse_location(slots[slot_names["location"]], config.locale)
