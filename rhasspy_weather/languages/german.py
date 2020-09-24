@@ -159,18 +159,16 @@ fixed_times = {
 # temperature report
 temperature_answers = {
     "general_temperature_full": ["Die Temperaturen {when} {where}: ", "Temperaturen für {when} {where}: "],
-    TemperatureType.GENERAL: {
-        "": ["Die Temperatur {when} {where} ist {temperature}.",
-             "Es hat {where} {temperature} {when}.",
-             "Es hat {where} {when} {temperature}.",
-             "Es hat {when} {temperature} {where}."]
-    },
+    TemperatureType.GENERAL: ["Die Temperatur {when} {where} ist {temperature}.",
+                              "Es hat {where} {temperature} {when}.",
+                              "Es hat {where} {when} {temperature}.",
+                              "Es hat {when} {temperature} {where}."],
     TemperatureType.COLD: {
-        "true": ["Ja, es wird {when} {where} kalt. Die Temperatur ist {temperature}."],
-        "false": ["Nein, es wird {when} {where} nicht kalt. Die Temperatur ist {temperature}."]},
+        "true": ["Ja, es wird {when} {where} kalt."],
+        "false": ["Nein, es wird {when} {where} nicht kalt."]},
     TemperatureType.WARM: {
-        "true": ["Ja, es wird {when} {where} warm. Die Temperatur ist {temperature}."],
-        "false": ["Nein, es wird {when} {where} nicht warm. Die Temperatur ist {temperature}."]
+        "true": ["Ja, es wird {when} {where} warm."],
+        "false": ["Nein, es wird {when} {where} nicht warm."]
     }
 }
 
@@ -189,11 +187,9 @@ condition_answers = {
                              "Wetterbericht für {when} {where}: ",
                              "Das Wetter {when} {where}: ",
                              "Das Wetter für {when} {where}: "],
-    ConditionType.GENERAL: {
-        "": ["Das Wetter {when} {where}: {weather}.",
-             "{when} {where} ist das Wetter: {weather}.",
-             "Wetter {when} {where}: {weather}."]
-    },
+    ConditionType.GENERAL: ["Das Wetter {when} {where}: {weather}.",
+                            "{when} {where} ist das Wetter: {weather}.",
+                            "Wetter {when} {where}: {weather}."],
     ConditionType.RAIN: {
         "true": ["{when} wird es {where} regnen.",
                  "{when} gibt es {where} Regen.",
@@ -241,16 +237,17 @@ condition_answers = {
         "true": ["{when} {where} kann es windig sein"],
         "false": ["{when} {where} weht kein Wind"]
     },
-    ConditionType.UNKNOWN: {
-        "": ["Ich weiß nicht, was genau du wissen willst."]
-    }
+    ConditionType.UNKNOWN: ["Ich weiß nicht, was genau du wissen willst."]
 }
 
 general_answers = {
     "affirmative": ["Ja"],
     "negative": ["Nein"],
-    "item_needed": ["{article} {noun} macht Sinn", "{article} {noun} wäre praktisch", "{article} {noun} {verb} praktisch", "{article} {noun} {verb} gute Idee"],
-    "item_not_needed": ["{article} {noun} {verb} {when} {where} unnötig", "{article} {noun} {verb} {when} {where} sinnlos", "{article} {noun} macht {when} {where} keinen Sinn"],
+    "item_needed": ["{article} {noun} macht Sinn", "{article} {noun} wäre praktisch",
+                    "{article} {noun} {verb} praktisch", "{article} {noun} {verb} gute Idee"],
+    "item_not_needed": ["{article} {noun} {verb} {when} {where} unnötig",
+                        "{article} {noun} {verb} {when} {where} sinnlos",
+                        "{article} {noun} macht {when} {where} keinen Sinn"],
     "weather": ["Das Wetter ist: {weather}", "Das Wetter: {weather}"]
 }
 
@@ -329,23 +326,29 @@ grammar = {
 items = WeatherItemList()
 items.add_item("Regenmantel", NounType.SINGULAR, article="ein", weather_list=[ConditionType.RAIN, ConditionType.WIND])
 items.add_item("Schirm", NounType.SINGULAR, article="ein", weather_list=[ConditionType.RAIN, ConditionType.SNOW])
-items.add_item("Gummistiefel", NounType.PLURAL,weather_list=[ConditionType.RAIN])
-items.add_item("Halbschuhe", NounType.PLURAL, weather_list=[ConditionType.RAIN, ConditionType.WIND, ConditionType.THUNDERSTORM])
+items.add_item("Gummistiefel", NounType.PLURAL, weather_list=[ConditionType.RAIN])
+items.add_item("Halbschuhe", NounType.PLURAL,
+               weather_list=[ConditionType.RAIN, ConditionType.WIND, ConditionType.THUNDERSTORM])
 items.add_item("Kaputze", NounType.SINGULAR, article="eine", weather_list=[ConditionType.RAIN])
-items.add_item("Hut", NounType.SINGULAR, article="ein", weather_list=[ConditionType.RAIN, ConditionType.SUN, ConditionType.SNOW])
+items.add_item("Hut", NounType.SINGULAR, article="ein",
+               weather_list=[ConditionType.RAIN, ConditionType.SUN, ConditionType.SNOW])
 items.add_item("Regenschirm", NounType.SINGULAR, article="ein", weather_list=[ConditionType.RAIN, ConditionType.SNOW])
 items.add_item("T-Shirt", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.WARM, ConditionType.SUN])
 items.add_item("Sandalen", NounType.PLURAL, weather_list=[TemperatureType.WARM, ConditionType.SUN])
 items.add_item("kurze Hosen", NounType.PLURAL, weather_list=[TemperatureType.WARM, ConditionType.SUN])
 items.add_item("leichte Kleidung", NounType.SINGULAR, weather_list=[TemperatureType.WARM, ConditionType.SUN])
 items.add_item("Winterstiefel", NounType.PLURAL, weather_list=[TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("Mantel", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.COLD, ConditionType.RAIN, ConditionType.SNOW, ConditionType.WIND, ConditionType.THUNDERSTORM])
+items.add_item("Mantel", NounType.SINGULAR, article="ein",
+               weather_list=[TemperatureType.COLD, ConditionType.RAIN, ConditionType.SNOW, ConditionType.WIND,
+                             ConditionType.THUNDERSTORM])
 items.add_item("Schal", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Handschuhe", NounType.PLURAL, weather_list=[TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Mütze", NounType.SINGULAR, article="eine", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("dicke Kleidung", NounType.SINGULAR, weather_list=[TemperatureType.COLD])
-items.add_item("Stiefel", NounType.PLURAL, weather_list=[ConditionType.RAIN, TemperatureType.COLD, ConditionType.SNOW, ConditionType.WIND])
-items.add_item("lange Hosen", NounType.PLURAL, weather_list=[ConditionType.WIND, TemperatureType.COLD, ConditionType.SNOW])
+items.add_item("Stiefel", NounType.PLURAL,
+               weather_list=[ConditionType.RAIN, TemperatureType.COLD, ConditionType.SNOW, ConditionType.WIND])
+items.add_item("lange Hosen", NounType.PLURAL,
+               weather_list=[ConditionType.WIND, TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("lange Unterhosen", NounType.PLURAL, weather_list=[TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Fleece", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.COLD, ConditionType.WIND])
 items.add_item("Sonnenhut", NounType.SINGULAR, article="ein", weather_list=[ConditionType.SUN])
@@ -354,10 +357,17 @@ items.add_item("Kappe", NounType.SINGULAR, article="eine", weather_list=[Conditi
 items.add_item("Sonnenbrille", NounType.SINGULAR, article="eine", weather_list=[ConditionType.SUN])
 items.add_item("Sonnencreme", NounType.SINGULAR, weather_list=[ConditionType.SUN])
 items.add_item("paar Gummistiefel", NounType.SINGULAR, article="ein", weather_list=[ConditionType.RAIN])
-items.add_item("paar lange Unterhosen", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("paar Handschuhe", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("paar Stiefel", NounType.SINGULAR, article="ein", weather_list=[ConditionType.RAIN, TemperatureType.COLD, ConditionType.SNOW, ConditionType.WIND, ConditionType.THUNDERSTORM])
-items.add_item("paar Sandalen", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.WARM, ConditionType.SUN])
-items.add_item("paar Winterstiefel", NounType.SINGULAR, article="ein", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
-items.add_item("Winterjacke", NounType.SINGULAR, article="eine", weather_list=[TemperatureType.COLD, ConditionType.SNOW])
+items.add_item("paar lange Unterhosen", NounType.SINGULAR, article="ein",
+               weather_list=[TemperatureType.COLD, ConditionType.SNOW])
+items.add_item("paar Handschuhe", NounType.SINGULAR, article="ein",
+               weather_list=[TemperatureType.COLD, ConditionType.SNOW])
+items.add_item("paar Stiefel", NounType.SINGULAR, article="ein",
+               weather_list=[ConditionType.RAIN, TemperatureType.COLD, ConditionType.SNOW, ConditionType.WIND,
+                             ConditionType.THUNDERSTORM])
+items.add_item("paar Sandalen", NounType.SINGULAR, article="ein",
+               weather_list=[TemperatureType.WARM, ConditionType.SUN])
+items.add_item("paar Winterstiefel", NounType.SINGULAR, article="ein",
+               weather_list=[TemperatureType.COLD, ConditionType.SNOW])
+items.add_item("Winterjacke", NounType.SINGULAR, article="eine",
+               weather_list=[TemperatureType.COLD, ConditionType.SNOW])
 items.add_item("Teleskop", NounType.SINGULAR, article="ein", weather_list=[ConditionType.STARS])

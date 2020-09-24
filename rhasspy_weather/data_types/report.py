@@ -10,6 +10,8 @@ from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.error import WeatherError, ErrorCode
 from rhasspy_weather.data_types.fixed_times import FixedTimes
 from rhasspy_weather.data_types.request import DateType, Grain, ForecastType
+from rhasspy_weather.data_types.temperature import TemperatureType
+from rhasspy_weather.utils import utils
 
 
 class WeatherReport:
@@ -19,7 +21,7 @@ class WeatherReport:
         self.request = request
 
         self.__weather = []
-        self.speech = ""
+        self.speech = {}
         self.min_temperature = math.inf
         self.max_temperature = -math.inf
         self.min_pressure = math.inf
@@ -58,16 +60,42 @@ class WeatherReport:
 
     def report(self):
         if self.request.forecast_type == ForecastType.TEMPERATURE:
-            pass
+            self.report_temperature()
         elif self.request.forecast_type == ForecastType.CONDITION:
-            pass
+            self.report_condition()
         elif self.request.forecast_type == ForecastType.FULL:
-            pass
+            self.report_full()
         elif self.request.forecast_type == ForecastType.ITEM:
             self.report_item()
+            self.speech["item"] = self.speech["item"].format(weather=self.config.locale.combine_conditions([x.description for x in self.weather_condition_list]), when="{when}", where="{where}")
 
-        self.speech = self.speech.format(weather=self.config.locale.combine_conditions([x.description for x in self.weather_condition_list]), when="{when}", where="{where}")
         print(self.speech)
+
+    def report_temperature(self):
+        general_answer = random.choice(self.config.locale.temperature_answers[TemperatureType.GENERAL])
+        if self.request.forecast_type == ForecastType.TEMPERATURE and type(self.request.requested) == TemperatureType:
+            temperature_type = self.request.requested
+            response_type = "false"
+            if temperature_type == TemperatureType.COLD:
+                if self.min_temperature <= self.config.temperature_cold_to:
+                    response_type = "true"
+            elif temperature_type == TemperatureType.WARM:
+                if self.min_temperature >= self.config.temperature_warm_from:
+                    response_type = "true"
+            self.speech["temperature"] = random.choice(self.config.locale.temperature_answers[temperature_type][response_type]) + " "
+            general_answer = self.format_when_and_where(general_answer)
+        else:
+            self.speech["temperature"] = ""
+
+        temperature_output = self.config.locale.format_temperature_output(self.min_temperature, self.max_temperature)
+        temperature_answer = general_answer.format(temperature=temperature_output, when="{when}", where="{where}")
+        self.speech["temperature"] = self.speech["temperature"] + temperature_answer
+
+    def report_condition(self):
+        pass
+
+    def report_full(self):
+        pass
 
     def report_item(self):
         requested_item = item_list.items.get_item(self.request.requested)
@@ -80,11 +108,17 @@ class WeatherReport:
                 false_conditions.append(condition)
 
         if true_conditions:
-            self.speech = random.choice(self.config.locale.general_answers["affirmative"]) + ", " + requested_item.format_for_output(random.choice(self.config.locale.general_answers["item_needed"])) + ". "
+            self.speech["item"] = random.choice(self.config.locale.general_answers["affirmative"]) + ", " + requested_item.format_for_output(random.choice(self.config.locale.general_answers["item_needed"])) + ". "
         else:
-            self.speech = random.choice(self.config.locale.general_answers["negative"]) + ", " + requested_item.format_for_output(random.choice(self.config.locale.general_answers["item_not_needed"])) + ". "
+            self.speech["item"] = random.choice(self.config.locale.general_answers["negative"]) + ", " + requested_item.format_for_output(random.choice(self.config.locale.general_answers["item_not_needed"])) + ". "
 
-        self.speech = self.speech + random.choice(self.config.locale.general_answers["weather"])
+        self.speech["item"] = self.speech["item"] + random.choice(self.config.locale.general_answers["weather"])
+
+    @staticmethod
+    def format_when_and_where(answer, when="", where=""):
+        answer = answer.format(when=when, where=where, temperature="{temperature}", weather="{weather}")
+        answer = utils.format_string(answer)
+        return answer
 
     def __apply_weather(self):
         for weather_at_time in self.__weather:

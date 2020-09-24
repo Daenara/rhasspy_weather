@@ -156,9 +156,7 @@ fixed_times = {
 # temperature report
 temperature_answers = {
     "general_temperature_full": ["The temperature {when} {where}: "],
-    TemperatureType.GENERAL: {
-        "": ["The temperature {when} {where} is {temperature}."]
-    },
+    TemperatureType.GENERAL: ["The temperature {when} {where} is {temperature}."],
     TemperatureType.COLD: {
         "true": ["Yes, it will be cold {where} {when}. The temperature will be {temperature}."],
         "false": ["No, {when} {where} will not be cold. The temperature will be {temperature}."]
@@ -180,9 +178,7 @@ def format_temperature_output(min_temperature, max_temperature):
 # condition report
 condition_answers = {
     "general_weather_full": ["The weather {when} {where}: ", "Weather for {when} {where}: "],
-    ConditionType.GENERAL: {
-        "": ["The weather {when} {where}: {weather}."]
-    },
+    ConditionType.GENERAL: ["The weather {when} {where}: {weather}."],
     ConditionType.RAIN: {
         "true": ["{when} could be rainy {where}."],
         "false": ["It will not rain {when} {where}."]
@@ -216,9 +212,7 @@ condition_answers = {
         "true": ["{when} {where} might be foggy."],
         "false": ["{when} {where} will have no fog."]
     },
-    ConditionType.UNKNOWN: {
-        "": ["I don't know what you want to know."]
-    }
+    ConditionType.UNKNOWN: ["I don't know what you want to know."]
 }
 
 general_answers = {
