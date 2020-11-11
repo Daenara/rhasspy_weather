@@ -1,14 +1,12 @@
 import datetime
 import math
 import random
-import sys
 from typing import Tuple
 
 from rhasspy_weather.data_types import item_list
-from rhasspy_weather.data_types.condition import ConditionType, WeatherCondition
+from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.error import WeatherError, ErrorCode
-from rhasspy_weather.data_types.fixed_times import FixedTimes
 from rhasspy_weather.data_types.request import DateType, Grain, ForecastType
 from rhasspy_weather.data_types.temperature import TemperatureType
 from rhasspy_weather.utils import utils
@@ -218,7 +216,7 @@ class WeatherReport:
         return date
 
     def get_output_location(self):
-        return self.config.locale.format_output_location(self.request.location.name)
+        return self.locale.format_output_location(self.request.location.name) if self.request.location_specified else ""
 
     # makes sure that only one element of a condition type is in the list (the most severe one)
     @staticmethod

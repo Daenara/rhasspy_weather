@@ -65,7 +65,7 @@ __report = None
 def weather_report_to_template_values(report):
     global __report
     if __report is None:
-        __report = report.generate_report()
+        __report = report.speech[report.request.forecast_type]
     template_values = {
         "weather_text": __report
     }
