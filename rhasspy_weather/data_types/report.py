@@ -216,7 +216,7 @@ class WeatherReport:
         return date
 
     def get_output_location(self):
-        return self.locale.format_output_location(self.request.location.name) if self.request.location_specified else ""
+        return self.config.locale.format_output_location(self.request.location.name) if self.request.location_specified else ""
 
     # makes sure that only one element of a condition type is in the list (the most severe one)
     @staticmethod
@@ -232,8 +232,6 @@ class WeatherReport:
                             condition_list.append(element)
             else:
                 condition_list.append(element)
-
-
 
     @property
     def weather(self):
