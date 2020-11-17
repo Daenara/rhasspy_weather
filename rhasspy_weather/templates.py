@@ -64,7 +64,7 @@ __report = None
 
 def weather_report_to_template_values(report):
     global __report
-    if __report is None:
+    if __report is None or __report != report.speech[report.request.forecast_type]:
         __report = report.speech[report.request.forecast_type]
     template_values = {
         "weather_text": __report
@@ -82,7 +82,7 @@ def weather_error_to_template_values(error):
 def weather_object_to_template_values(weather_object, name):
     template_values = {}
     for key, value in weather_object.__dict__.items():
-        new_key = name + "_" + key.replace("_"+ type(weather_object).__name__ + "__", "")
+        new_key = name + "_" + key.replace("_" + type(weather_object).__name__ + "__", "")
         if isinstance(value, str) and not value == "":
             template_values[new_key] = value
         elif isinstance(value, bool):
