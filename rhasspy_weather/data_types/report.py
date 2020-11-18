@@ -67,6 +67,7 @@ class WeatherReport:
             self.report_condition()
         elif self.request.forecast_type == ForecastType.FULL:
             self.report_temperature()
+            self.report_condition()
             self.report_full()
         elif self.request.forecast_type == ForecastType.ITEM:
             self.report_item()
@@ -110,10 +111,12 @@ class WeatherReport:
         else:
             self.speech[ForecastType.CONDITION] = random.choice(self.config.locale.condition_answers[ConditionType.GENERAL])
 
-        self.speech[ForecastType.CONDITION] = self.speech[ForecastType.CONDITION].format(weather=self.config.locale.combine_conditions([x.description for x in self.weather_condition_list]), when="{when}", where="{where}")
+        self.speech[ForecastType.CONDITION] = self.speech[ForecastType.CONDITION].format(weather=self.format_conditions(), when="{when}", where="{where}")
 
     def report_full(self):
-        pass
+        self.speech[ForecastType.FULL] = self.speech[ForecastType.CONDITION]
+        self.speech[ForecastType.FULL] = self.speech[ForecastType.FULL] + " " + self.speech[ForecastType.TEMPERATURE].format(when="", where="")
+        self.speech[ForecastType.FULL] = self.speech[ForecastType.FULL].format(weather=self.format_conditions(), when="{when}", where="{where}")
 
     def report_item(self):
         requested_item = item_list.items.get_item(self.request.requested)
@@ -137,6 +140,9 @@ class WeatherReport:
         answer = answer.format(when=when, where=where, temperature="{temperature}", weather="{weather}")
         answer = utils.format_string(answer)
         return answer
+
+    def format_conditions(self):
+        return self.config.locale.combine_conditions([x.description for x in self.weather_condition_list])
 
     def __apply_weather(self):
         for weather_at_time in self.__weather:
