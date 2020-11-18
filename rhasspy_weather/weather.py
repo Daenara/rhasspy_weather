@@ -2,11 +2,11 @@
 import logging
 from typing import Union
 
-from rhasspy_weather.data_types.forecast import WeatherForecast
 from rhasspy_weather.data_types.report import WeatherReport
 import rhasspy_weather.data_types.config as cf
 from rhasspy_weather.data_types.error import WeatherError, ConfigError
 from rhasspy_weather.data_types.request import WeatherRequest
+from rhasspy_weather.data_types.weather import Weather
 from rhasspy_weather.templates import fill_template
 
 log = logging.getLogger(__name__)
@@ -63,16 +63,16 @@ def get_request(weather_input, config_path: str = None) -> WeatherRequest:
     return request
 
 
-def get_weather(request: WeatherRequest, config_path: str = None) -> WeatherForecast:
+def get_weather(request: WeatherRequest, config_path: str = None) -> Weather:
     """
-    Function taking a WeatherRequest and returning the weather forecast for the time around the request
+    Function taking a WeatherRequest and returning the weather information for the time around the request
 
     Args:
         request: WeatherRequest object
         config_path: optional path to a config file
 
     Returns:
-        WeatherForecast object
+        Weather object
 
     Raises:
         WeatherError: the universal error for this library, more information about what went wrong can be found in the log or inside the error object
@@ -88,13 +88,13 @@ def get_weather(request: WeatherRequest, config_path: str = None) -> WeatherFore
     return forecast
 
 
-def get_report(request: WeatherRequest, forecast: WeatherForecast, config_path: str = None) -> WeatherReport:
+def get_report(request: WeatherRequest, weather_information: Weather, config_path: str = None) -> WeatherReport:
     """
-    Function that takes a WeatherRequest and a WeatherForecast and turns those into a finished WeatherReport
+    Function that takes a WeatherRequest and a Weather object and turns those into a finished WeatherReport
 
     Args:
         request: WeatherRequest object
-        forecast: WeatherForecast object
+        weather_information: WeatherForecast object
         config_path: optional path to a config file
 
     Returns:
@@ -108,7 +108,7 @@ def get_report(request: WeatherRequest, forecast: WeatherForecast, config_path: 
         cf.set_config_path(config_path)
 
     log.info("Formulating answer")
-    report = WeatherReport(request, forecast)
+    report = WeatherReport(request, weather_information)
     return report
 
 

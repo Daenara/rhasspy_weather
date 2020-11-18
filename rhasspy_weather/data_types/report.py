@@ -1,19 +1,23 @@
 import datetime
 import math
 import random
-from typing import Tuple
+from typing import Tuple, List
 
 from rhasspy_weather.data_types import item_list
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.error import WeatherError, ErrorCode
-from rhasspy_weather.data_types.request import DateType, Grain, ForecastType
+from rhasspy_weather.data_types.request import DateType, Grain, ForecastType, WeatherRequest
 from rhasspy_weather.data_types.temperature import TemperatureType
+from rhasspy_weather.data_types.weather import Weather
 from rhasspy_weather.utils import utils
 
 
 class WeatherReport:
-    def __init__(self, request, weather, interval: Tuple[datetime.time, datetime.time] = None):
+    """
+    Class containing information about the weather for a specific WeatherRequest, as well as the answers formulated for TTS.
+    """
+    def __init__(self, request: WeatherRequest, weather_information: Weather, interval: Tuple[datetime.time, datetime.time] = None):
         if not (request.grain == Grain.DAY or request.grain == Grain.HOUR):
             raise WeatherError(ErrorCode.NOT_IMPLEMENTED_ERROR)
 
@@ -49,7 +53,7 @@ class WeatherReport:
                 else:
                     raise WeatherError(ErrorCode.NOT_IMPLEMENTED_ERROR)
 
-        self.__weather = self.__weather + weather.get_weather_at_interval(request.request_date, self.interval)
+        self.__weather = self.__weather + weather_information.get_weather_at_interval(request.request_date, self.interval)
 
         if not self.__weather:
             raise WeatherError(ErrorCode.NO_WEATHER_FOR_DAY_ERROR)
@@ -61,6 +65,7 @@ class WeatherReport:
         return f"[count: {self.__change_count}, min_temp: {self.min_temperature}, max_temp: {self.max_temperature}]"
 
     def report(self):
+        """Method that turns the weather information into text according to the WeatherRequest"""
         if self.request.forecast_type == ForecastType.TEMPERATURE:
             self.report_temperature()
         elif self.request.forecast_type == ForecastType.CONDITION:
@@ -72,11 +77,10 @@ class WeatherReport:
         elif self.request.forecast_type == ForecastType.ITEM:
             self.report_item()
 
-        self.speech[self.request.forecast_type] = self.speech[self.request.forecast_type].format(weather=self.config.locale.combine_conditions([x.description for x in self.weather_condition_list]), when="{when}", where="{where}")
         self.speech[self.request.forecast_type] = self.format_when_and_where(self.speech[self.request.forecast_type], self.get_output_date_and_time(), self.get_output_location())
-        print(self.speech)
 
     def report_temperature(self):
+        """Method that turns temperature information into text"""
         general_answer = random.choice(self.config.locale.temperature_answers[TemperatureType.GENERAL])
         if self.request.forecast_type == ForecastType.TEMPERATURE and type(self.request.requested) == TemperatureType:
             temperature_type = self.request.requested
@@ -97,6 +101,7 @@ class WeatherReport:
         self.speech[ForecastType.TEMPERATURE] = self.speech[ForecastType.TEMPERATURE] + temperature_answer
 
     def report_condition(self):
+        """Method that turns condition information into text"""
         if self.request.forecast_type == ForecastType.CONDITION and type(self.request.requested) == ConditionType:
             condition_type = self.request.requested
             response_type = "false"
@@ -114,11 +119,11 @@ class WeatherReport:
         self.speech[ForecastType.CONDITION] = self.speech[ForecastType.CONDITION].format(weather=self.format_conditions(), when="{when}", where="{where}")
 
     def report_full(self):
-        self.speech[ForecastType.FULL] = self.speech[ForecastType.CONDITION]
-        self.speech[ForecastType.FULL] = self.speech[ForecastType.FULL] + " " + self.speech[ForecastType.TEMPERATURE].format(when="", where="")
+        self.speech[ForecastType.FULL] = self.speech[ForecastType.CONDITION] + " " + self.format_when_and_where(self.speech[ForecastType.TEMPERATURE])
         self.speech[ForecastType.FULL] = self.speech[ForecastType.FULL].format(weather=self.format_conditions(), when="{when}", where="{where}")
 
     def report_item(self):
+        """Method that turns item information into text"""
         requested_item = item_list.items.get_item(self.request.requested)
         true_conditions = []
         false_conditions = []
@@ -134,15 +139,35 @@ class WeatherReport:
             self.speech[ForecastType.ITEM] = random.choice(self.config.locale.general_answers["negative"]) + ", " + requested_item.format_for_output(random.choice(self.config.locale.general_answers["item_not_needed"])) + ". "
 
         self.speech[ForecastType.ITEM] = self.speech[ForecastType.ITEM] + random.choice(self.config.locale.general_answers["weather"])
+        self.speech[ForecastType.ITEM] = self.speech[ForecastType.ITEM].format(weather=self.format_conditions(), when="{when}", where="{where}")
 
     @staticmethod
-    def format_when_and_where(answer, when="", where=""):
+    def format_when_and_where(answer: str, when: str = "", where: str = "") -> str:
+        """
+        Method that replaces {when} and {where} in a string while leaving {temperature} and {weather} alone
+
+        Args:
+            answer: the string to replace in
+            when: value to replace {when} with, default is an empty string
+            where: value to replace {where} with, default is an empty string
+
+        Returns:
+            The formatted string
+
+        """
         answer = answer.format(when=when, where=where, temperature="{temperature}", weather="{weather}")
         answer = utils.format_string(answer)
         return answer
 
-    def format_conditions(self):
-        return self.config.locale.combine_conditions([x.description for x in self.weather_condition_list])
+    def format_conditions(self) -> str:
+        """
+        Formats conditions with combining words according to locale
+
+        Returns:
+            the formatted string
+
+        """
+        return self.config.locale.combine_conditions(self.get_output_condition_list())
 
     def __apply_weather(self):
         for weather_at_time in self.__weather:
@@ -172,27 +197,44 @@ class WeatherReport:
                         self.weather_condition_list.append(condition)
                 self.__increase_counter(condition.condition_type)
 
-    # counts how many occurrences of a certain weather type there are
-    def __increase_counter(self, condition_type):
+    def __increase_counter(self, condition_type: ConditionType):
+        """counts how many occurrences of a certain weather type there are"""
         if condition_type not in self.__condition_counts:
             self.__condition_counts[condition_type] = 0
         self.__condition_counts[condition_type] = self.__condition_counts[condition_type] + 1
 
-    def is_weather_chance(self, condition_type):
+    def is_weather_chance(self, condition_type: ConditionType) -> bool:
+        """
+        Checks if there is a chance of condition_type
+
+        Args:
+            condition_type: which condition to check for
+
+        Returns:
+            True if condition can occur, else False
+
+        """
         return self.__condition_counts.get(condition_type, 0) > 0
 
-    # creates a list of condition descriptions to be used in output
-    def get_output_condition_list(self, clouds_and_clear_exclusive=False):
+    def get_output_condition_list(self, clouds_and_clear_exclusive: bool = False) -> List[str]:
+        """
+        Method that creates a list of condition descriptions to be used for output
+
+        Args:
+            clouds_and_clear_exclusive: setting this to True means that either clouds or clear sky will be included.
+            clear sky and clouds in the same interval seems like it might be something that could be mutual exclusive,
+            at least if the interval is short so there is an option to only add one of those (the one that occurs more
+            often, if both occur at the same frequency, clouds are added)
+
+        Returns:
+            A list containing the descriptions of the weather conditions that apply
+
+        """
         if len(self.weather_condition_list) == 1:
             return [self.weather_condition_list[0].description]
 
         selected = []
         for x in self.weather_condition_list:
-            # clear sky and clouds in the same interval seems like it might be
-            # something that could be mutual exclusive, at least if the interval
-            # is short so there is an option to only add one of those (the one
-            # that occurs more often, if both occur at the same frequency, clouds
-            # are added)
             if clouds_and_clear_exclusive:
                 if x.condition_type == ConditionType.CLOUDS:
                     if self.__condition_counts[ConditionType.CLOUDS] >= self.__condition_counts[ConditionType.CLEAR]:
@@ -208,7 +250,14 @@ class WeatherReport:
             conditions.append(x.description)
         return conditions
 
-    def get_output_date_and_time(self):
+    def get_output_date_and_time(self) -> str:
+        """
+        Method that formats date and time for output. Respects formatting coded into locale
+
+        Returns:
+            string containing the formatted date and time
+
+        """
         if self.request.date_specified != "":
             date = self.request.date_specified
         else:
@@ -228,9 +277,9 @@ class WeatherReport:
     def get_output_location(self):
         return self.config.locale.format_output_location(self.request.location.name) if self.request.location_specified else ""
 
-    # makes sure that only one element of a condition type is in the list (the most severe one)
     @staticmethod
     def __add_element_to_condition_list(element, condition_list):
+        """makes sure that only one element of a condition type is in the list (the most severe one)"""
         if len(condition_list) == 0:
             condition_list.append(element)
         else:
