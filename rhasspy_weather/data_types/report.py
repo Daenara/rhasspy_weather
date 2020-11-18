@@ -14,6 +14,9 @@ from rhasspy_weather.utils import utils
 
 class WeatherReport:
     def __init__(self, request, weather, interval: Tuple[datetime.time, datetime.time] = None):
+        if not (request.grain == Grain.DAY or request.grain == Grain.HOUR):
+            raise WeatherError(ErrorCode.NOT_IMPLEMENTED_ERROR)
+
         self.config = get_config()
 
         self.request = request
@@ -52,6 +55,7 @@ class WeatherReport:
             raise WeatherError(ErrorCode.NO_WEATHER_FOR_DAY_ERROR)
 
         self.__apply_weather()
+        self.report()
 
     def __str__(self):
         return f"[count: {self.__change_count}, min_temp: {self.min_temperature}, max_temp: {self.max_temperature}]"
