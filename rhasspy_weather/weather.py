@@ -13,6 +13,9 @@ log = logging.getLogger(__name__)
 
 
 # TODO: find a better name for this file
+# TODO: write something that replaced detail since that doesn't work with the current system
+# maybe similar to get_weather_forecast but with a separate request for morning, afternoon and night
+# that or just remove that logic completely
 
 
 def get_weather_forecast(weather_input, config_path: str = None):
