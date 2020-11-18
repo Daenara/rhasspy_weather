@@ -5,7 +5,6 @@ import requests
 
 from rhasspy_weather.data_types.config import get_config
 from rhasspy_weather.data_types.condition import WeatherCondition, ConditionType
-from rhasspy_weather.data_types.forecast import WeatherForecast
 from rhasspy_weather.data_types.error import ErrorCode, WeatherError, ConfigError
 from rhasspy_weather.data_types.weather import Weather
 from rhasspy_weather.data_types.weather_at_time import WeatherAtTime
@@ -26,7 +25,6 @@ def get_weather(location):
     """
     log.debug("parsing weather from openweathermap")
     config = get_config()
-    weather_forecast = WeatherForecast()
 
     if hasattr(location, "lat") and hasattr(location, "lon"):
         url_location = f"lat={location.lat}&lon={location.lon}"
@@ -51,7 +49,7 @@ def get_weather(location):
         # Parse the output of Open Weather Map's forecast endpoint
         if not (hasattr(location, "lat") and hasattr(location, "lon")):
             location.set_lat_and_lon(response["city"]["coord"]["lat"], response["city"]["coord"]["lon"])
-        weather_forecast.sunrise, weather_forecast.sunset = location.sunrise, location.sunset
+
         forecasts = {}
         for x in response["list"]:
             if str(datetime.date.fromtimestamp(x["dt"])) not in forecasts:
