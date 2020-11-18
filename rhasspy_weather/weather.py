@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import logging
+from typing import Union
 
 from rhasspy_weather.data_types.forecast import WeatherForecast
 from rhasspy_weather.data_types.report import WeatherReport
@@ -48,6 +49,9 @@ def get_request(weather_input, config_path: str = None) -> WeatherRequest:
     Returns:
         WeatherRequest containing the information from weather_input
 
+    Raises:
+        WeatherError: the universal error for this library, more information about what went wrong can be found in the log or inside the error object
+
     """
     if config_path is not None and cf.config_path is not config_path:
         cf.set_config_path(config_path)
@@ -69,6 +73,9 @@ def get_weather(request: WeatherRequest, config_path: str = None) -> WeatherFore
 
     Returns:
         WeatherForecast object
+
+    Raises:
+        WeatherError: the universal error for this library, more information about what went wrong can be found in the log or inside the error object
 
     """
     if config_path is not None and cf.config_path is not config_path:
@@ -93,6 +100,9 @@ def get_report(request: WeatherRequest, forecast: WeatherForecast, config_path: 
     Returns:
         WeatherReport object containing the answer to the request as well as all the relevant weather information
 
+    Raises:
+        WeatherError: something along the way goes wrong, check error object or log to see what
+
     """
     if config_path is not None and cf.config_path is not config_path:
         cf.set_config_path(config_path)
@@ -102,7 +112,7 @@ def get_report(request: WeatherRequest, forecast: WeatherForecast, config_path: 
     return report
 
 
-def answer(weather_input, output, config_path: str = None):
+def answer(weather_input, output, config_path: str = None) -> Union[WeatherReport, WeatherError]:
     """
     Function that combines information into the form specified in config and outputs them to where is should go
 
