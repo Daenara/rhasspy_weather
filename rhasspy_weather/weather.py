@@ -23,6 +23,7 @@ def get_weather_forecast(weather_input, config_path: str = None):
         config_path: optional path to a config file
 
     Returns:
+        output, unless one of the selected outputs has a specified return value. If there is one, it will return that instead
 
     """
     try:
@@ -32,9 +33,9 @@ def get_weather_forecast(weather_input, config_path: str = None):
     except WeatherError as error:
         output = error
 
-    answer(weather_input, output, config_path)
+    answer_value = answer(weather_input, output, config_path)
 
-    return output
+    return answer_value
 
 
 def get_request(weather_input, config_path: str = None) -> WeatherRequest:
@@ -111,6 +112,7 @@ def answer(weather_input, output, config_path: str = None):
         config_path: optional path to a config file
 
     Returns:
+        output, unless one of the selected outputs has a specified return value. If there is one, it will return that instead
 
     """
     if config_path is not None and cf.config_path is not config_path:
@@ -118,9 +120,12 @@ def answer(weather_input, output, config_path: str = None):
 
     config = cf.get_config()
     log.info("Answering")
+    return_value = output
     for output_item in config.output:
         try:
             filled_template = fill_template(weather_input, output, output_item.get_template())
-            output_item.output_response(filled_template)
+            return_value = output_item.output_response(filled_template)
         except (WeatherError, ConfigError) as e:
             log.error(f"Can't output response on {output_item.__name__}: {e.description}")
+
+    return return_value
