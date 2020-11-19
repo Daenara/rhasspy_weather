@@ -251,57 +251,6 @@ general_answers = {
     "weather": ["Das Wetter ist: {weather}", "Das Wetter: {weather}"]
 }
 
-answers_true = {
-    ConditionType.RAIN: {
-        "main": ["{when} gibt es {where} Regen",
-                 "Es regnet {when} {where}",
-                 "{when} regnet es {where}"],
-        "other": ["es gibt Regen",
-                  "es regnet",
-                  "es kann regnen",
-                  "es gibt eine Chance auf Regen"]
-    },
-    ConditionType.SNOW: {
-        "main": ["{when} wird es {where} schneien",
-                 "{when} gibt es {where} Schnee",
-                 "Es schneit {when} {where}",
-                 "{when} schneit es {where}"],
-        "other": [
-            "es wird schneien",
-            "es gibt Schnee",
-            "es kann Schnee geben"
-        ]
-    },
-    ConditionType.THUNDERSTORM: {
-        "main": ["{when} gibt es {where} Gewitter"],
-        "other": ["es kann gewittern"]
-    },
-    ConditionType.CLOUDS: {
-        "main": ["{when} kann es {where} bewölkt sein"],
-        "other": ["der Himmel ist bewölkt"]
-    },
-    ConditionType.SUN: {
-        "main": ["{when} {where} scheint die Sonne"],
-        "other": ["die Sonne kommt raus"],
-    },
-    ConditionType.STARS: {
-        "main": ["Man kann {when} {where} die Sterne sehen"],
-        "other": ["es gibt klaren Blick auf die Sterne"]
-    },
-    ConditionType.CLEAR: {
-        "main": ["Der Himmel ist klar {when} {where}"],
-        "other": ["der Himmel ist klar"]
-    },
-    ConditionType.MIST: {
-        "main": ["{when} {where} ist es neblig"],
-        "other": ["es kann neblig sein"]
-    },
-    ConditionType.WIND: {
-        "main": ["{when} {where} kann es windig sein"],
-        "other": ["es kann windig sein"]
-    }
-}
-
 
 def combine_conditions(condition_list):
     if isinstance(condition_list, list):
