@@ -44,7 +44,7 @@ def fill_template(weather_input, result, template_override=None, remove_not_repl
         output = new_output
     if ".json" in config.output_template_name and template_override is None:
         output = output.replace("None", "null").replace("'", "\"")
-        output = json.dumps(json.loads(output))  # not the best way but otherwise the json is not correct
+        output = json.dumps(json.loads(output), ensure_ascii=False)  # not the best way but otherwise the json is not correct
     return output
 
 
