@@ -1,11 +1,7 @@
-import datetime
 import logging
-from typing import List
 
-from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
-from rhasspy_weather.data_types.config import get_config
-from rhasspy_weather.utils.parser import parse_date, parse_time, parse_condition, parse_temperature, parse_item, \
-    parse_location
+from rhasspy_weather.data_types.request import WeatherRequest
+from rhasspy_weather.parser import rhasspy_intent
 from rhasspyhermes.nlu import NluIntent
 
 log = logging.getLogger(__name__)
@@ -31,49 +27,7 @@ def parse_intent_message(intent_message: NluIntent) -> WeatherRequest:
     Returns: WeatherRequest object
 
     """
-    if "GetWeatherForecastCondition" == intent_message.intent.intent_name:
-        return parse_condition_intent(intent_message.slots)
-    elif "GetWeatherForecastItem" == intent_message.intent.intent_name:
-        return parse_item_intent(intent_message.slots)
-    elif "GetWeatherForecastTemperature" == intent_message.intent.intent_name:
-        return parse_temperature_intent(intent_message.slots)
-
-    return parse_general_intent(intent_message.slots)
-
-
-def parse_general_intent(slots: List) -> WeatherRequest:
-    """
-    Parses general rhasspy weather intents.
-
-    Args:
-        slots: the slot list contained in an NluIntent
-
-    Returns: WeatherRequest object
-
-    """
-    config = get_config()
-    today = datetime.datetime.now(config.timezone).date()
-
-    # define default request
-    new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, ForecastType.FULL)
-    used_slots = []
-    for slot in slots:
-        if slot.value["value"] is not "":
-            if slot.slot_name == slot_names["day"]:
-                new_request.request_date, new_request.date_specified = parse_date(slot.value["value"], config.locale)
-                used_slots.append(slot)
-
-            if slot.slot_name == slot_names["time"]:
-                time, str_time = parse_time(slot.value["value"], config.locale)
-                new_request.set_time(time, str_time)
-                used_slots.append(slot)
-
-            if slot.slot_name == slot_names["location"]:
-                new_request.location = parse_location(slot.value["value"], config.locale)
-                used_slots.append(slot)
-
-    for slot in used_slots:
-        slots.remove(slot)
+    return rhasspy_intent.parse_intent_message(intent_message.to_rhasspy_dict())
 
     return new_request
 
