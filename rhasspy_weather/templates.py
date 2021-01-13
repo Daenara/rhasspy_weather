@@ -13,7 +13,6 @@ from rhasspy_weather.data_types.report import WeatherReport
 log = logging.getLogger(__name__)
 
 # TODO: add more detailed templates to use (especially debug/expanded to use with testcases)
-# TODO: move intent_to_template to parser and call it from there
 
 
 def fill_template(weather_input, result, template_override=None, remove_not_replaced_lines=True):
@@ -46,16 +45,6 @@ def fill_template(weather_input, result, template_override=None, remove_not_repl
         output = json.dumps(json.loads(output), ensure_ascii=False)  # not the best way but otherwise the json is not correct
     return output
 
-
-def intent_to_template_values(intent_message):
-    template_values = {}
-    for key, value in intent_message.items():
-        if key == "intent":
-            for i_key, i_value in value.items():
-                template_values["intent_" + i_key] = i_value
-        else:
-            template_values["intent_" + key] = value
-    return template_values
 
 __template_values = {}
 __report_speech = None

@@ -119,3 +119,15 @@ def parse_temperature_intent(args: json) -> WeatherRequest:
     if arg_temperature is not None:
         new_request.requested = parse_temperature(arg_temperature, locale)
     return new_request
+
+
+__template_values = None
+
+
+def get_template_values(intent_message) -> dict:
+    global __template_values
+    if __template_values is None:
+        __template_values = {}
+        for key, value in vars(intent_message).items():
+            __template_values["intent_" + key] = value
+    return __template_values

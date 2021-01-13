@@ -128,3 +128,19 @@ def parse_temperature_intent(intent_message: dict) -> WeatherRequest:
     if slot_names["temperature"] in slots:
         new_request.requested = parse_temperature(slots[slot_names["temperature"]], locale)
     return new_request
+
+
+__template_values = None
+
+
+def get_template_values(intent_message) -> dict:
+    global __template_values
+    if __template_values is None:
+        __template_values = {}
+        for key, value in intent_message.items():
+            if key == "intent":
+                for i_key, i_value in value.items():
+                    __template_values["intent_" + i_key] = i_value
+            else:
+                __template_values["intent_" + key] = value
+    return __template_values
