@@ -54,7 +54,7 @@ class WeatherConfig:
         self.units = self.__get_option_with_default_value(section, "units", "metric")
         self.api = self.__get_option_with_default_value(section, "api", "openweathermap")
         self.parser = self.__get_option_with_default_value(section, "parser", "rhasspy_intent")
-        self.output = self.__get_option_with_default_value(section, "output", "console_json").replace(" ", "").split(",")
+        self.output = self.__get_option_with_default_value(section, "output", "console_json").split(" ")
         self.output_template = self.__get_option_with_default_value(section, "output_template", "rhasspy.json")
         self.timezone = pytz.timezone(self.__get_option_with_default_value(section, "timezone", "Europe/Berlin"))
 
