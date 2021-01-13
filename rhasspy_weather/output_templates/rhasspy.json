@@ -12,6 +12,6 @@
     "wakeword_id": "$intent_wakeword_id",
     "site_id": "$intent_site_id",
     "speech": {
-        "text": "$weather_text"
+        "text": "$speech"
     }
 }

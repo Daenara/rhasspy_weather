@@ -29,7 +29,7 @@ def parse_intent_message(args: json) -> WeatherRequest:
     return parse_general_intent(args)
 
 
-def parse_general_intent(args:json) -> WeatherRequest:
+def parse_general_intent(args: json) -> WeatherRequest:
     """
     Parses general rhasspy weather intents.
 

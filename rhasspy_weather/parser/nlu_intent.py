@@ -29,7 +29,6 @@ def parse_intent_message(intent_message: NluIntent) -> WeatherRequest:
     """
     return rhasspy_intent.parse_intent_message(intent_message.to_rhasspy_dict())
 
-    return new_request
 
 def get_template_values(intent_message: NluIntent) -> dict:
     return rhasspy_intent.get_template_values(intent_message.to_rhasspy_dict())

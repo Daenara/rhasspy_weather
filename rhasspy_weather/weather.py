@@ -60,7 +60,7 @@ def get_request(weather_input, config_path: str = None) -> WeatherRequest:
         cf.set_config_path(config_path)
 
     config = cf.get_config()
-    log.info("Parsing rhasspy intent")
+    log.info("Parsing input")
     request = config.parser.parse_intent_message(weather_input)
 
     return request
