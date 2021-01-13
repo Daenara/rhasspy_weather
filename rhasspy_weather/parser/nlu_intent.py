@@ -6,16 +6,6 @@ from rhasspyhermes.nlu import NluIntent
 
 log = logging.getLogger(__name__)
 
-# if you changed the slot names in rhasspy, change them here on the right side
-slot_names = {
-    "day": "when_day",
-    "time": "when_time",
-    "location": "location",
-    "item": "item",
-    "condition": "condition",
-    "temperature": "temperature"
-}
-
 
 def parse_intent_message(intent_message: NluIntent) -> WeatherRequest:
     """
