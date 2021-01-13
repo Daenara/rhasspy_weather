@@ -29,4 +29,4 @@ def parse_config(config):
 
 
 def get_template():
-    return "$weather_text"
+    return "$speech"
