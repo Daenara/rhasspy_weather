@@ -77,14 +77,6 @@ class MockConfig:
 
 
 @pytest.fixture
-def request_full_weather():
-    return json.loads('{ "entities": [], "intent": {"confidence": 1, "name": "GetWeatherForecast"}, "raw_text": "wie '
-                      'wird das wetter", "raw_tokens": ["wie", "wird", "das", "wetter"], "recognize_seconds": '
-                      '0.08515081899531651, "slots": {}, "speech_confidence": 1, "text": "wie wird das wetter", '
-                      '"tokens": ["wie", "wird", "das", "wetter"], "wakeword_id": null}')
-
-
-@pytest.fixture
 def mock_config_detail_true(monkeypatch):
     def mock_get_config():
         from tests.conftest import MockConfig
