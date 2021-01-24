@@ -10,7 +10,6 @@ Just open an issue and supply me with the sentence that produced the bug.
 * [Usage](#usage)
 * [Development](#development)
     * [Project Structure](#project-structure)
-    * [What not to do](#what-not-to-do)
 * [TODO](#todo)
 
 ## Setup
