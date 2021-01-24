@@ -7,6 +7,11 @@ Just open an issue and supply me with the sentence that produced the bug. If you
 or if you just have a question, you can also post in the [rhasspy forum thread](https://community.rhasspy.org/t/rhasspy-can-tell-you-the-weather/671)
 for this project.
 
+## Python Versions
+
+This project is tested on python 3.7.
+As of now python 3.9 is incompatible.
+
 ## Table of Contents
 * [Setup (out of date, will be fixed soon)](#setup)
 * [Usage](#usage)
