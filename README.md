@@ -1,5 +1,7 @@
 # rhasspy Weather
 
+## This is the original project, it has since been partly rewritten so I don't plan on updating this anymore.
+
 A python script that can make rhasspy voice assistant tell the weather.
 
 ## Found a bug?
