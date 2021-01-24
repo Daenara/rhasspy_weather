@@ -3,7 +3,9 @@
 A python script that can make rhasspy voice assistant tell the weather.
 
 ## Found a bug?
-Just open an issue and supply me with the sentence that produced the bug. 
+Just open an issue and supply me with the sentence that produced the bug. If you are not sure if it is a bug 
+or if you just have a question, you can also post in the [rhasspy forum thread](https://community.rhasspy.org/t/rhasspy-can-tell-you-the-weather/671)
+for this project.
 
 ## Table of Contents
 * [Setup (out of date, will be fixed soon)](#setup)
@@ -13,7 +15,14 @@ Just open an issue and supply me with the sentence that produced the bug.
 * [TODO](#todo)
 
 ## Setup
-For setup instructions see the project wiki.
+The setup instructions have been moved to the project wiki.
+
+Instructions for 
+* [rhasspy-hermes-app](https://github.com/Daenara/rhasspy_weather/wiki/Setup-for-rhasspy-hermes-app)
+* [command script](https://github.com/Daenara/rhasspy_weather/wiki/Setup-for-rhasspy-command-script)
+
+If you run into trouble using those instructions or you find they are unclear, please contact me so I can fix it.
+
 
 ## Usage
 If everything is set up you can query the weather:
