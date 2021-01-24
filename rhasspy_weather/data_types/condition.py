@@ -21,7 +21,7 @@ class WeatherCondition:
     def __init__(self, severity, description, condition_type: ConditionType):
         self.severity = severity
         self.description = description
-        if description is "":
+        if description == "":
             try:
                 self.description = get_config().locale.conditions[condition_type][severity]
             except KeyError:

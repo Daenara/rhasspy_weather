@@ -83,7 +83,7 @@ class WeatherConfig:
 
     @api.setter
     def api(self, val: str):
-        if val is None or val is "":
+        if val is None or val == "":
             raise ConfigError("API Error", "API is set to OpenWeatherMap yet no API-Key is found. Please refer to 'config.default' for an example config.")
         try:
             self.__api = __import__("rhasspy_weather.api." + val, fromlist=[''])

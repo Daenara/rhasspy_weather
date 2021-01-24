@@ -35,7 +35,7 @@ def fill_template(weather_input, result, template_override=None, remove_not_repl
             if "$" in item:
                 pass
             else:
-                if new_output is "":
+                if new_output == "":
                     new_output = item
                 else:
                     new_output = new_output + "\n" + item
