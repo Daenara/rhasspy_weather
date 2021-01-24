@@ -7,9 +7,6 @@ Just open an issue and supply me with the sentence that produced the bug.
 
 ## Table of Contents
 * [Setup (out of date, will be fixed soon)](#setup)
-    * [custom_command script](#custom_command-script)
-    * [sentences and slots](#setting-up-sentences-and-slots)
-    * [config file](#config-file)
 * [Usage](#usage)
 * [Development](#development)
     * [Project Structure](#project-structure)
