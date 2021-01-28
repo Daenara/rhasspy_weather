@@ -1,6 +1,6 @@
 import argparse
-import json
 
+from rhasspyhermes.intent import Intent, Slot
 from rhasspyhermes.nlu import NluIntent
 
 rhasspy_intent = {
@@ -30,11 +30,12 @@ rhasspy_intent = {
                                          '"text": "wie wird das wetter heute Mittag", "tokens": ["wie", "wird", "das", "wetter", "heute", "Mittag"], '
                                          '"wakeword_id": null}'
     }
-test = NluIntent.from_dict(rhasspy_intent["request_weather_full_day"])
+
+day_slot = Slot(entity="test", slot_name="when_day", value={"value": "heute"}, raw_value="heute")
 nlu_intent = {
-        "request_weather_full_day": NluIntent.from_json(rhasspy_intent["request_weather_full_day"]),
-        "request_weather_full_time": NluIntent.from_json(rhasspy_intent["request_weather_full_time"]),
-        "request_weather_full_interval": NluIntent.from_json(rhasspy_intent["request_weather_full_interval"])
+        "request_weather_full_day": NluIntent("Wie wird das Wetter heute?", Intent("GetWeatherForecastFull", 1), slots=[day_slot]),
+        "request_weather_full_time": NluIntent("Wie wird das Wetter heute um 10 Uhr?", Intent("GetWeatherForecastFull", 1), slots=[day_slot, Slot(entity="test", slot_name="when_time", value={"value": 10}, raw_value="zehn")]),
+        "request_weather_full_interval": NluIntent("Wie wird das Wetter heute mittag?", Intent("GetWeatherForecastFull", 1), slots=[day_slot, Slot(entity="test", slot_name="when_time", value={"value": "mittag"}, raw_value="mittag")])
     }
 console_args = {
         "request_weather_full_day": argparse.ArgumentParser("-d", "heute", "-t", "mittag"),

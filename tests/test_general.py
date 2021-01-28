@@ -7,8 +7,8 @@ import tests.data.parser_data as intent
 from rhasspy_weather.data_types.request import WeatherRequest
 from rhasspy_weather.data_types.request import ForecastType, Grain, DateType
 from rhasspy_weather.data_types.error import WeatherError, ErrorCode
-from tests.conftest import mock_config_detail_true, mock_config_detail_false, mock_request_401, mock_request_404, \
-    mock_request_200, request_full_weather_day, request_full_weather_time, request_full_weather_interval
+#from tests.conftest import mock_config_detail_true, mock_config_detail_false, mock_request_401, mock_request_404, \
+#    mock_request_200, request_full_weather_day, request_full_weather_time, request_full_weather_interval
 
 
 # @pytest.mark.parametrize("mock_config", [mock_config_detail_true, mock_config_detail_false])
