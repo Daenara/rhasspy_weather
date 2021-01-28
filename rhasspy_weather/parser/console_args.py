@@ -19,11 +19,11 @@ def parse_intent_message(args: json) -> WeatherRequest:
     Returns: WeatherRequest object
 
     """
-    if args.condition is not None:
+    if hasattr(args, "condition") and args.condition is not None:
         return parse_condition_intent(args)
-    elif args.item is not None:
+    elif hasattr(args, "item") and args.item is not None:
         return parse_item_intent(args)
-    elif args.temperature is not None:
+    elif hasattr(args, "temperature") and args.temperature is not None:
         return parse_temperature_intent(args)
 
     return parse_general_intent(args)
@@ -45,18 +45,15 @@ def parse_general_intent(args: json) -> WeatherRequest:
     # define default request
     new_request = WeatherRequest(DateType.FIXED, Grain.DAY, today, ForecastType.FULL)
 
-    arg_day = args.day
-    if arg_day is not None:
-        new_request.request_date, new_request.date_specified = parse_date(arg_day, config.locale)
+    if hasattr(args, "day") and args.day is not None:
+        new_request.request_date, new_request.date_specified = parse_date(args.day, config.locale)
 
-    arg_time = args.time
-    if arg_time is not None:
-        time, str_time = parse_time(arg_time, config.locale)
+    if hasattr(args, "time") and args.time is not None:
+        time, str_time = parse_time(args.time, config.locale)
         new_request.set_time(time, str_time)
 
-    arg_location = args.location
-    if arg_location is not None:
-        new_request.location = parse_location(arg_location, config.locale)
+    if hasattr(args, "location") and args.location is not None:
+        new_request.location = parse_location(args.location, config.locale)
 
     return new_request
 
