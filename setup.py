@@ -7,7 +7,7 @@ setuptools.setup(
     url='https://github.com/Daenara/rhasspy_weather',
     packages=setuptools.find_packages(),
     py_modules=["rhasspy_weather", "templates", "utils", "api", "data_types", "languages", "output"],
-    python_requires='>=3.7',
+    python_requires='>=3.7, <3.9',
     install_requires=["requests", "pytz", "paho-mqtt", "suntime", "python-dateutil"],
     package_data={
         '': ['config.default', 'output_templates', 'output_templates/*'],
