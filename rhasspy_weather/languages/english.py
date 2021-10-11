@@ -158,12 +158,12 @@ temperature_answers = {
     "general_temperature_full": ["The temperature {when} {where}: "],
     TemperatureType.GENERAL: ["The temperature {when} {where} is {temperature}."],
     TemperatureType.COLD: {
-        "true": ["Yes, it will be cold {where} {when}. The temperature will be {temperature}."],
-        "false": ["No, {when} {where} will not be cold. The temperature will be {temperature}."]
+        "true": ["Yes, it will be cold {where} {when}."],
+        "false": ["No, {when} {where} will not be cold.."]
     },
     TemperatureType.WARM: {
-        "true": ["Yes, it will be warm {where} {when}. The temperature will be {temperature}."],
-        "false": ["No, {when} {where} will not be warm. The temperature will be {temperature}."]
+        "true": ["Yes, it will be warm {where} {when}."],
+        "false": ["No, {when} {where} will not be warm."]
     }
 }
 
